@@ -8,8 +8,8 @@
 using namespace std;
 using namespace sf;
 // Intialized Variables
-int PlayerMovement = 0, PlayerDir = 0;
-int PlayerSpeed = 6, PlayerRight = 0, PlayerLeft = 0;
+double PlayerMovement = 0, PlayerDir = 0;
+double PlayerSpeed = 10, PlayerRight = 0, PlayerLeft = 0;
 // Creating Game Window
 RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders");
 // adding textures
@@ -42,10 +42,7 @@ void PlayerMove()
     // Creating Movement For Right Direction
     if ((Keyboard::isKeyPressed(Keyboard::D) || Keyboard::isKeyPressed(Keyboard::Right)) && Player.getPosition().x <= 1746)
     {
-        if (PlayerRight < 20)
-            PlayerMovement = 0;
         // changing ship to be facing to the right
-        PlayerLeft = 0;
         PlayerDir = 1;
         Player.move(PlayerSpeed, 0);
         Player.setTextureRect(IntRect(PlayerMovement * 160.625, PlayerDir * 82.5, 160.625, 82.5));
@@ -53,22 +50,34 @@ void PlayerMove()
         {
             PlayerMovement += 1;
         }
-        PlayerRight++;
 
     }
     //Creating Movement For Left Direction
     else if ((Keyboard::isKeyPressed(Keyboard::A) || Keyboard::isKeyPressed(Keyboard::Left)) && Player.getPosition().x >= -48)
     {
-        if (PlayerLeft < 20)
-            PlayerMovement = 0;
         PlayerDir = 0;
         // changing ship to be facing to the left
-        PlayerRight = 0;
         Player.move(-PlayerSpeed, 0);
         Player.setTextureRect(IntRect(PlayerMovement * 160.625, PlayerDir * 82.5, 160.625, 82.5));
-        if (PlayerMovement < 7)
+        if (PlayerMovement < 7) 
+        {
             PlayerMovement++;
-        PlayerLeft++;
+        }
+    }
+    else
+    {
+        
+        if (PlayerMovement > 0)
+        {
+            Player.setTextureRect(IntRect(PlayerMovement * 160.625, PlayerDir * 82.5, 160.625, 82.5));
+            PlayerMovement--;
+        }
+        else if (PlayerMovement == 0 && PlayerDir == 1)
+        {
+            Player.move(20, 0);
+            PlayerDir = 0;
+        }
+
     }
 }
 int main()
@@ -79,7 +88,7 @@ int main()
     while (window.isOpen())
     {
         // set framelimit
-        window.setFramerateLimit(60);
+        window.setFramerateLimit(40);
         //Event
         Event event;
         while (window.pollEvent(event))
