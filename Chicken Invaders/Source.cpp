@@ -21,7 +21,6 @@ Texture PlayerSkin;
 // Ingame Sprites
 Sprite _GameBackground;
 Sprite Player;
-
 // Loading Ingame Files
 void IngameImages()
 {
@@ -38,17 +37,18 @@ void IngameImages()
 // function for player movement
 void PlayerMove()
 {
-    // Kareem
+    bool right = false;
+    // Kareem Essam and Mohamed Wael
     // Creating Movement For Right Direction
     if ((Keyboard::isKeyPressed(Keyboard::D) || Keyboard::isKeyPressed(Keyboard::Right)) && Player.getPosition().x <= 1746)
     {
-        // changing ship to be facing to the right
         PlayerDir = 1;
-        Player.move(PlayerSpeed, 0);
+        // changing ship to be facing to the right
         Player.setTextureRect(IntRect(PlayerMovement * 160.625, PlayerDir * 82.5, 160.625, 82.5));
+        Player.move(PlayerSpeed, 0);
         if (PlayerMovement < 7)
         {
-            PlayerMovement += 1;
+            PlayerMovement ++;
         }
 
     }
@@ -56,9 +56,9 @@ void PlayerMove()
     else if ((Keyboard::isKeyPressed(Keyboard::A) || Keyboard::isKeyPressed(Keyboard::Left)) && Player.getPosition().x >= -48)
     {
         PlayerDir = 0;
+        Player.setTextureRect(IntRect(PlayerMovement * 160.625, PlayerDir * 82.5, 160.625, 82.5));
         // changing ship to be facing to the left
         Player.move(-PlayerSpeed, 0);
-        Player.setTextureRect(IntRect(PlayerMovement * 160.625, PlayerDir * 82.5, 160.625, 82.5));
         if (PlayerMovement < 7) 
         {
             PlayerMovement++;
@@ -67,15 +67,15 @@ void PlayerMove()
     else
     {
         
-        if (PlayerMovement > 0)
+        if (PlayerMovement > 0 )
         {
             Player.setTextureRect(IntRect(PlayerMovement * 160.625, PlayerDir * 82.5, 160.625, 82.5));
             PlayerMovement--;
         }
         else if (PlayerMovement == 0 && PlayerDir == 1)
         {
-            Player.move(20, 0);
             PlayerDir = 0;
+            Player.setTextureRect(IntRect(PlayerMovement * 160.625, PlayerDir * 82.5, 160.625, 82.5));
         }
 
     }
