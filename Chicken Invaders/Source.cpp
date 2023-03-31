@@ -7,20 +7,36 @@
 #include<ctime>
 using namespace std;
 using namespace sf;
+
+// Chicken Struct
+struct ChickenStruct
+{
+    double HP, speed;
+};
+
 // Intialized Variables
-double PlayerMovement = 0, PlayerDir = 0;
-double PlayerSpeed = 10, PlayerRight = 0, PlayerLeft = 0;
+double PlayerMovement = 9, PlayerSpeed = 12; 
+double ChickenDir = 0,ChickenPositionX=0,ChickenPositionY=0;
+int ChickenMovement=0;
+bool checkchickenanimation = true;
+ChickenStruct chicken;
+
+
+ 
 // Creating Game Window
 RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders");
 // adding textures
 Texture Background;
 Texture PlayerSkin;
+Texture ChickenSkin;
 
 
 
 // Ingame Sprites
 Sprite _GameBackground;
 Sprite Player;
+Sprite Chicken[9][4];
+
 // Loading Ingame Files
 void IngameImages()
 {
@@ -29,10 +45,24 @@ void IngameImages()
     _GameBackground.setTexture(Background);
     _GameBackground.setScale(1.875f, 1.05f);
     // player image
-    PlayerSkin.loadFromFile("Player.png");
+    PlayerSkin.loadFromFile("Playerr.png");
     Player.setTexture(PlayerSkin);
-    Player.setTextureRect(IntRect(PlayerMovement*160.625, PlayerDir*82.5, 160.625, 82.5));
-    Player.setPosition(900, 750);
+    Player.setTextureRect(IntRect(PlayerMovement * 60, 0, 60, 42));
+    Player.setPosition(960, 850);
+    // chicken image
+    ChickenSkin.loadFromFile("RedChicken.png");
+    for ( int j = 0; j < 4; j++)
+    {
+        for (int i = 0; i < 9; i++)
+        {
+            Chicken[i][j].setTexture(ChickenSkin);
+            Chicken[i][j].setScale(2.75, 2.75);
+            Chicken[i][j].setPosition(120 + (ChickenPositionX * 190), 100 +(ChickenPositionY * 125));
+            ChickenPositionX++;
+        }
+        ChickenPositionX = 0;
+        ChickenPositionY++;
+    }
 }
 // function for player movement
 void PlayerMove()
@@ -42,11 +72,10 @@ void PlayerMove()
     // Creating Movement For Right Direction
     if ((Keyboard::isKeyPressed(Keyboard::D) || Keyboard::isKeyPressed(Keyboard::Right)) && Player.getPosition().x <= 1746)
     {
-        PlayerDir = 1;
         // changing ship to be facing to the right
-        Player.setTextureRect(IntRect(PlayerMovement * 160.625, PlayerDir * 82.5, 160.625, 82.5));
+        Player.setTextureRect(IntRect(PlayerMovement * 60, 0, 60, 42));
         Player.move(PlayerSpeed, 0);
-        if (PlayerMovement < 7)
+        if (PlayerMovement < 18)
         {
             PlayerMovement ++;
         }
@@ -55,30 +84,51 @@ void PlayerMove()
     //Creating Movement For Left Direction
     else if ((Keyboard::isKeyPressed(Keyboard::A) || Keyboard::isKeyPressed(Keyboard::Left)) && Player.getPosition().x >= -48)
     {
-        PlayerDir = 0;
-        Player.setTextureRect(IntRect(PlayerMovement * 160.625, PlayerDir * 82.5, 160.625, 82.5));
+
+        Player.setTextureRect(IntRect(PlayerMovement * 60, 0, 60, 42));
         // changing ship to be facing to the left
         Player.move(-PlayerSpeed, 0);
-        if (PlayerMovement < 7) 
+        if (PlayerMovement >0) 
         {
-            PlayerMovement++;
+            PlayerMovement--;
         }
     }
     else
     {
         
-        if (PlayerMovement > 0 )
+        if (PlayerMovement > 9 )
         {
-            Player.setTextureRect(IntRect(PlayerMovement * 160.625, PlayerDir * 82.5, 160.625, 82.5));
             PlayerMovement--;
+            Player.setTextureRect(IntRect(PlayerMovement * 60, 0, 60, 42));
         }
-        else if (PlayerMovement == 0 && PlayerDir == 1)
+        else if (PlayerMovement < 9)
         {
-            PlayerDir = 0;
-            Player.setTextureRect(IntRect(PlayerMovement * 160.625, PlayerDir * 82.5, 160.625, 82.5));
+            PlayerMovement++;
+            Player.setTextureRect(IntRect(PlayerMovement * 60, 0, 60, 42));
+            
         }
 
     }
+}
+// function for chicken movement
+void ChickenMove()
+{   
+    for (int j = 0; j < 4; j++)
+    {
+        for (int i = 0; i < 9; i++)
+        {
+            Chicken[i][j].setTextureRect(IntRect(ChickenMovement * 47, 0, 45, 38));  
+        }
+    }
+    if (ChickenMovement == 9)
+        checkchickenanimation = false;
+    else if (ChickenMovement == 0)
+        checkchickenanimation = true;
+    if (checkchickenanimation == false)
+        ChickenMovement--;
+    else
+        ChickenMovement++;
+    
 }
 int main()
 {
@@ -88,7 +138,7 @@ int main()
     while (window.isOpen())
     {
         // set framelimit
-        window.setFramerateLimit(40);
+        window.setFramerateLimit(30);
         //Event
         Event event;
         while (window.pollEvent(event))
@@ -100,11 +150,19 @@ int main()
             }
         }
         PlayerMove();
+        ChickenMove();
         //clear window
         window.clear();
         //draw window
         window.draw(_GameBackground);
         window.draw(Player);
+        for (int j = 0; j < 4; j++)
+        {
+            for (int i = 0; i < 9; i++)
+            {
+                window.draw(Chicken[i][j]);
+            }
+        }
         // show window
         window.display();
     }
