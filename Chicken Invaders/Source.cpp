@@ -18,7 +18,7 @@ struct ChickenStruct
 double PlayerMovement = 9, PlayerSpeed = 12; 
 double ChickenDir = 0,ChickenPositionX=0,ChickenPositionY=0;
 int ChickenMovement=0;
-bool checkchickenanimation = true;
+bool checkchickenanimation = true; 
 ChickenStruct chicken;
 
 
@@ -49,6 +49,7 @@ void IngameImages()
     Player.setTexture(PlayerSkin);
     Player.setTextureRect(IntRect(PlayerMovement * 60, 0, 60, 42));
     Player.setPosition(960, 850);
+    Player.setScale(1.5, 1.5);
     // chicken image
     ChickenSkin.loadFromFile("RedChicken.png");
     for ( int j = 0; j < 4; j++)
@@ -70,7 +71,7 @@ void PlayerMove()
     bool right = false;
     // Kareem Essam and Mohamed Wael
     // Creating Movement For Right Direction
-    if ((Keyboard::isKeyPressed(Keyboard::D) || Keyboard::isKeyPressed(Keyboard::Right)) && Player.getPosition().x <= 1746)
+    if ((Keyboard::isKeyPressed(Keyboard::D) || Keyboard::isKeyPressed(Keyboard::Right)) && Player.getPosition().x <= 1800)
     {
         // changing ship to be facing to the right
         Player.setTextureRect(IntRect(PlayerMovement * 60, 0, 60, 42));
@@ -82,7 +83,7 @@ void PlayerMove()
 
     }
     //Creating Movement For Left Direction
-    else if ((Keyboard::isKeyPressed(Keyboard::A) || Keyboard::isKeyPressed(Keyboard::Left)) && Player.getPosition().x >= -48)
+    else if ((Keyboard::isKeyPressed(Keyboard::A) || Keyboard::isKeyPressed(Keyboard::Left)) && Player.getPosition().x >= 15)
     {
 
         Player.setTextureRect(IntRect(PlayerMovement * 60, 0, 60, 42));
