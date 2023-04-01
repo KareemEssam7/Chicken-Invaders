@@ -168,7 +168,7 @@ int main()
     while (window.isOpen())
     {
         // set framelimit
-        window.setFramerateLimit(300);
+        window.setFramerateLimit(30);
         //Event
         Event event;
         while (window.pollEvent(event))
