@@ -129,6 +129,7 @@ void PlayerMove()
 // function for chicken movement
 void ChickenMove()
 {   
+    // mohamed wael and kareem essam
     for (int j = 0; j < 6; j++)
     {
         for (int i = 0; i < 8; i++)
