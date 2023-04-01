@@ -11,31 +11,39 @@ using namespace sf;
 // Chicken Struct
 struct ChickenStruct
 {
-    double HP, speed;
+    double HP[8][5], speed = 4;
 };
 
 // Intialized Variables
 double PlayerMovement = 9, PlayerSpeed = 12; 
 double ChickenDir = 0,ChickenPositionX=0,ChickenPositionY=0;
-int ChickenMovement=0;
+int ChickenMovement=0,x=0;
+int borderadjust = 0;
 bool checkchickenanimation = true; 
 ChickenStruct chicken;
+Time deltatime;
 
 
  
 // Creating Game Window
 RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders");
+
 // adding textures
 Texture Background;
 Texture PlayerSkin;
 Texture ChickenSkin;
 
 
+// adding border
+RectangleShape rectangle1(Vector2f(60, 1080));
+RectangleShape rectangle2(Vector2f(60, 1080));
+
+
 
 // Ingame Sprites
 Sprite _GameBackground;
 Sprite Player;
-Sprite Chicken[9][4];
+Sprite Chicken[8][6];
 
 // Loading Ingame Files
 void IngameImages()
@@ -50,15 +58,22 @@ void IngameImages()
     Player.setTextureRect(IntRect(PlayerMovement * 60, 0, 60, 42));
     Player.setPosition(960, 850);
     Player.setScale(1.5, 1.5);
+
+    // Border Image
+    rectangle1.setPosition(0, 0);
+    rectangle1.setFillColor(Color::Transparent);
+    rectangle2.setPosition(1855, 0);
+    rectangle2.setFillColor(Color::Transparent);
+
     // chicken image
     ChickenSkin.loadFromFile("RedChicken.png");
-    for ( int j = 0; j < 4; j++)
+    for ( int j = 0; j < 6; j++)
     {
-        for (int i = 0; i < 9; i++)
+        for (int i = 0; i < 8; i++)
         {
             Chicken[i][j].setTexture(ChickenSkin);
             Chicken[i][j].setScale(2.75, 2.75);
-            Chicken[i][j].setPosition(120 + (ChickenPositionX * 190), 100 +(ChickenPositionY * 125));
+            Chicken[i][j].setPosition(120 + (ChickenPositionX * 170), 50 +(ChickenPositionY * 100));
             ChickenPositionX++;
         }
         ChickenPositionX = 0;
@@ -114,12 +129,26 @@ void PlayerMove()
 // function for chicken movement
 void ChickenMove()
 {   
-    for (int j = 0; j < 4; j++)
+    for (int j = 0; j < 6; j++)
     {
-        for (int i = 0; i < 9; i++)
+        for (int i = 0; i < 8; i++)
         {
-            Chicken[i][j].setTextureRect(IntRect(ChickenMovement * 47, 0, 45, 38));  
+            Chicken[i][j].setTextureRect(IntRect(ChickenMovement * 47, 0, 45, 38));
+            if (Chicken[7][5].getGlobalBounds().intersects(rectangle2.getGlobalBounds()))
+            {
+                ChickenDir = 0;
+            }
+            else if (Chicken[0][5].getGlobalBounds().intersects(rectangle1.getGlobalBounds()))
+            {
+                ChickenDir = 1;
+            }
+            if (ChickenDir == 0)
+                Chicken[i][j].move(-chicken.speed, 0);
+            else if (ChickenDir == 1)
+                Chicken[i][j].move(chicken.speed, 0);
         }
+  
+        
     }
     if (ChickenMovement == 9)
         checkchickenanimation = false;
@@ -157,9 +186,11 @@ int main()
         //draw window
         window.draw(_GameBackground);
         window.draw(Player);
-        for (int j = 0; j < 4; j++)
+        window.draw(rectangle1);
+        window.draw(rectangle2);
+        for (int j = 0; j < 5; j++)
         {
-            for (int i = 0; i < 9; i++)
+            for (int i = 0; i < 8; i++)
             {
                 window.draw(Chicken[i][j]);
             }
