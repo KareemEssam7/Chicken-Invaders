@@ -24,7 +24,7 @@ ChickenStruct chicken;
 Time deltatime;
 
 
-//test comment
+
 // Creating Game Window
 RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders");
 
