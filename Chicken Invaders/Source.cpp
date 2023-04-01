@@ -133,8 +133,8 @@ void ChickenMove()
     {
         for (int i = 0; i < 8; i++)
         {
-            Chicken[i][j].setTextureRect(IntRect(ChickenMovement * 47, 0, 45, 38));
-            if (Chicken[7][5].getGlobalBounds().intersects(rectangle2.getGlobalBounds()))
+            Chicken[i][j].setTextureRect(IntRect(ChickenMovement * 46.9, 0, 46.9, 38));
+            if (Chicken[i][j].getGlobalBounds().intersects(rectangle2.getGlobalBounds()))
             {
                 ChickenDir = 0;
             }
@@ -168,7 +168,7 @@ int main()
     while (window.isOpen())
     {
         // set framelimit
-        window.setFramerateLimit(30);
+        window.setFramerateLimit(300);
         //Event
         Event event;
         while (window.pollEvent(event))
