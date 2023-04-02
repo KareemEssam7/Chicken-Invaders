@@ -14,6 +14,17 @@ struct ChickenStruct
     double HP[8][5], speed = 4;
 };
 
+//Bullet Struct
+struct bulletstruct {
+    int heldWeapon = 1;
+    float bulletSpeed = 10;
+    int currentBullet = 0;
+    float bulletCoolDownvar = 10;
+    float bulletCoolDown = 0;
+};
+
+
+
 // Intialized Variables
 double PlayerMovement = 9, PlayerSpeed = 12; 
 double ChickenDir = 0,ChickenPositionX=0,ChickenPositionY=0;
@@ -21,6 +32,7 @@ int ChickenMovement=0,x=0;
 int borderadjust = 0;
 bool checkchickenanimation = true; 
 ChickenStruct chicken;
+bulletstruct bullet;
 Time deltatime;
 
 
@@ -32,7 +44,7 @@ RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders");
 Texture Background;
 Texture PlayerSkin;
 Texture ChickenSkin;
-
+Texture bulletImage;
 
 // adding border
 RectangleShape rectangle1(Vector2f(60, 1080));
@@ -44,6 +56,7 @@ RectangleShape rectangle2(Vector2f(60, 1080));
 Sprite _GameBackground;
 Sprite Player;
 Sprite Chicken[8][6];
+Sprite Bullets[40];
 
 // Loading Ingame Files
 void IngameImages()
@@ -52,6 +65,7 @@ void IngameImages()
     Background.loadFromFile("IngameBackground.jpg");
     _GameBackground.setTexture(Background);
     _GameBackground.setScale(1.875f, 1.05f);
+
     // player image
     PlayerSkin.loadFromFile("Playerr.png");
     Player.setTexture(PlayerSkin);
@@ -67,6 +81,11 @@ void IngameImages()
 
     // chicken image
     ChickenSkin.loadFromFile("RedChicken.png");
+
+    //bullet image
+    bulletImage.loadFromFile("Bullet1Image.png");
+
+    //setting chicken textures and positions
     for ( int j = 0; j < 6; j++)
     {
         for (int i = 0; i < 8; i++)
@@ -78,6 +97,13 @@ void IngameImages()
         }
         ChickenPositionX = 0;
         ChickenPositionY++;
+    }
+
+    //setting bullet textures
+    for (int i = 0; i < 40; i++) {
+        Bullets[i].setTexture(bulletImage);
+        Bullets[i].setScale(2,2);
+        Bullets[i].setPosition(-100, -100);
     }
 }
 // function for player movement
@@ -126,6 +152,35 @@ void PlayerMove()
 
     }
 }
+
+//shooting function
+void PlayerShooting(){
+
+    //Shooting
+    if ((Keyboard::isKeyPressed(Keyboard::Space)) && bullet.bulletCoolDown == 0)
+    {
+        bullet.bulletCoolDown = bullet.bulletCoolDownvar;
+        Bullets[bullet.currentBullet].setPosition(Player.getPosition().x + 29 , Player.getPosition().y - 45);
+        
+        if (bullet.currentBullet == 40) {
+            bullet.currentBullet = 0;
+        }
+        bullet.currentBullet++;
+    }
+
+    if (bullet.bulletCoolDown > 0) {
+        bullet.bulletCoolDown--;
+    }
+    
+    //bullet moving
+    for (int i = 0; i < 40; i++) {
+        Bullets[i].move(0, -bullet.bulletSpeed);
+    }
+}
+
+
+
+
 // function for chicken movement
 void ChickenMove()
 {   
@@ -196,6 +251,11 @@ int main()
                 window.draw(Chicken[i][j]);
             }
         }
+        PlayerShooting();
+        for (int i = 0; i < 40; i++) {
+            window.draw(Bullets[i]);
+        }
+        
         // show window
         window.display();
     }
