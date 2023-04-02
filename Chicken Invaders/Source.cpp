@@ -157,12 +157,12 @@ void PlayerMove()
 void PlayerShooting(){
 
     //Shooting
-    if ((Keyboard::isKeyPressed(Keyboard::Space)) && bullet.bulletCoolDown == 0)
+    if ((Keyboard::isKeyPressed(Keyboard::G)) && bullet.bulletCoolDown == 0)
     {
         bullet.bulletCoolDown = bullet.bulletCoolDownvar;
         Bullets[bullet.currentBullet].setPosition(Player.getPosition().x + 29 , Player.getPosition().y - 45);
         
-        if (bullet.currentBullet == 40) {
+        if (bullet.currentBullet == 39) {
             bullet.currentBullet = 0;
         }
         bullet.currentBullet++;
