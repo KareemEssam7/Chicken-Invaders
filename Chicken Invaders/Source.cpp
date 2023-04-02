@@ -136,8 +136,7 @@ void PlayerMove()
         }
     }
     else
-    {
-        
+    {  
         if (PlayerMovement > 9 )
         {
             PlayerMovement--;
@@ -147,9 +146,7 @@ void PlayerMove()
         {
             PlayerMovement++;
             Player.setTextureRect(IntRect(PlayerMovement * 60, 0, 60, 42));
-            
         }
-
     }
 }
 
@@ -157,7 +154,7 @@ void PlayerMove()
 void PlayerShooting(){
 
     //Shooting
-    if ((Keyboard::isKeyPressed(Keyboard::G)) && bullet.bulletCoolDown == 0)
+    if ((Keyboard::isKeyPressed(Keyboard::Space)) && bullet.bulletCoolDown == 0 || (Mouse::isButtonPressed(Mouse::Left)) && bullet.bulletCoolDown == 0)
     {
         bullet.bulletCoolDown = bullet.bulletCoolDownvar;
         Bullets[bullet.currentBullet].setPosition(Player.getPosition().x + 29 , Player.getPosition().y - 45);
