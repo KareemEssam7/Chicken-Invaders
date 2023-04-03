@@ -33,8 +33,8 @@ struct bulletstruct
 int cnt = 0;  //counter for score
 int health = 100;
 double PlayerMovement = 9, PlayerSpeed = 12;
-double ChickenDir = 0, ChickenPositionX = 0, ChickenPositionY = 0, rectdir;
-int ChickenMovement = 0;
+double ChickenDir = 0, ChickenPositionX = 0, ChickenPositionY = 0,rectdir;
+int ChickenMovement = 0 ;
 int borderadjust = 0;
 bool checkchickenanimation = true, check = true;
 ChickenStruct chicken;
@@ -45,7 +45,7 @@ Time deltatime;
 
 
 // Creating Game Window
-RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders", Style::Fullscreen);
+RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders",Style::Fullscreen);
 
 // adding textures
 Texture Background;
@@ -77,8 +77,8 @@ Sprite health_bar;
 //increasing score
 void scorecalc() {
     for (int i = 0; i < 40; i++) {
-        for (int j = 0; j < 6; j++) {
-            for (int z = 0; z < 8; z++) {
+        for (int j = 0; j < 8; j++) {
+            for (int z = 0; z < 5; z++) {
 
                 if (Bullets[i].getGlobalBounds().intersects(Chicken[j][z].getGlobalBounds())) {
                     cnt += 1;
@@ -130,7 +130,7 @@ void IngameImages()
     // chicken image
     ChickenSkin.loadFromFile("RedChicken.png");
 
-
+  
 
     //bullet image
     bulletImage.loadFromFile("Bullet1Image.png");
@@ -155,7 +155,7 @@ void IngameImages()
     score.setString("score = " + to_string(cnt));
 
     //setting chicken textures and positions
-    for (int j = 0; j < 6; j++)
+    for (int j = 0; j < 5; j++)
     {
         for (int i = 0; i < 8; i++)
         {
@@ -251,7 +251,7 @@ void PlayerShooting() {
 void ChickenMove()
 {
     // mohamed wael and kareem essam
-    for (int j = 0; j < 6; j++)
+    for (int j = 0; j < 5; j++)
     {
         for (int i = 0; i < 8; i++)
         {
@@ -326,7 +326,7 @@ int main()
                 window.draw(Chicken[i][j]);
             }
         }
-
+      
         for (int i = 0; i < 40; i++) {
             window.draw(Bullets[i]);
         }
