@@ -8,16 +8,14 @@
 using namespace std;
 using namespace sf;
 
-
 // Chicken Struct
 struct ChickenStruct
 {
     double HP[8][5], speed = 4;
 };
-
+;
 //Bullet Struct
-struct bulletstruct
-{
+struct bulletstruct {
     int heldWeapon = 1;
     float bulletSpeed = 10;
     int currentBullet = 0;
@@ -25,45 +23,45 @@ struct bulletstruct
     float bulletCoolDown = 0;
 };
 
-struct eggstruct
-{
-    int eggcooldown[8][5];
-    int eggCoolDownvar = 751;
-    int eggyolkcounter=200;
-    int yolkanimation = 0;
-    Sprite eggbreak;
-    double eggspeed=6;
-};
-
 
 
 // Intialized Variables
+int cnt = 0;      //counter for score
+int health = 100;
 double PlayerMovement = 9, PlayerSpeed = 12; 
-double ChickenDir = 0,ChickenPositionX=0,ChickenPositionY=0;
-int ChickenMovement=0,counterloopeggs=0;
+double ChickenDir = 0,ChickenPositionX=0,ChickenPositionY=0,rectdir=0;
+int ChickenMovement=0,x=0;
 int borderadjust = 0;
-bool checkchickenanimation = true,check=true; 
+bool checkchickenanimation = true; 
 ChickenStruct chicken;
 bulletstruct bullet;
-eggstruct egg;
 Time deltatime;
 
 
 
 // Creating Game Window
-RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders");
+RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders",Style::Fullscreen);
 
 // adding textures
 Texture Background;
 Texture PlayerSkin;
 Texture ChickenSkin;
-Texture bulletImage;
-Texture EggSkin;
-Texture eggyolk;
+Texture bulletImage; 
+Texture healhbar;
 
 // adding border
 RectangleShape rectangle1(Vector2f(60, 1080));
 RectangleShape rectangle2(Vector2f(60, 1080));
+RectangleShape rectangle3(Vector2f(1300, 200));
+//adding texts
+Text hp;
+Text score;
+
+//fonts
+Font font1;
+
+
+
 
 
 
@@ -72,14 +70,60 @@ Sprite _GameBackground;
 Sprite Player;
 Sprite Chicken[8][6];
 Sprite Bullets[40];
-Sprite Eggs[8][5];
+Sprite healh_bar;
+
+
+//increasing score
+void scorecalc() {
+    for (int i = 0; i < 40; i++) {
+        for (int j = 0; j < 6; j++) {
+            for (int z = 0; z < 8; z++) {
+
+                if (Bullets[i].getGlobalBounds().intersects(Chicken[j][z].getGlobalBounds())) {
+                    cnt += 1;
+                    score.setString("score : " + to_string(cnt));
+                    Bullets[i].setScale(0, 0);
+                    Chicken[j][z].setScale(0,0);
+                }
+
+            }
+
+
+        }
+
+
+    }
+}
+
+//void playerdamage() {
+//    for (int i = 0; i < 6; i++) {
+//        for (int j = 0; j < 8; j++) {
+//        
+//            if (Player.getGlobalBounds().intersects(Chicken[i][j].getGlobalBounds())) {
+//                health -= 5;
+//                hp.setString("health = " + to_string(health));
+//            }
+//        
+//        }
+//       }
+//}
+
+
+
+
+
+
+
 
 // Loading Ingame Files
 void IngameImages()
-{
+{   //Fonts
+    font1.loadFromFile("LATINWD.ttf");
+
+
     // background
     Background.loadFromFile("IngameBackground.jpg");
-    _GameBackground.setTexture(Background);
+    _GameBackground.setTexture(Background);                                                     
     _GameBackground.setScale(1.875f, 1.05f);
 
     // player image
@@ -94,19 +138,38 @@ void IngameImages()
     rectangle1.setFillColor(Color::Transparent);
     rectangle2.setPosition(1855, 0);
     rectangle2.setFillColor(Color::Transparent);
+    rectangle3.setOrigin(1300/2, 200);
+    rectangle3.setPosition(770,400);
+    rectangle3.setFillColor(Color::Transparent);
 
     // chicken image
     ChickenSkin.loadFromFile("RedChicken.png");
-
-    // egg image
-    EggSkin.loadFromFile("egg2.png");
-    eggyolk.loadFromFile("eggyolk.png");
-
+   
+     
     //bullet image
     bulletImage.loadFromFile("Bullet1Image.png");
 
+    //setting health and score bar
+    healhbar.loadFromFile("Button1.png");
+    healh_bar.setTexture(healhbar);
+    healh_bar.setPosition(0, window.getSize().y - 150);
+    healh_bar.setScale(1.3, 1.3);
+
+    //health
+    hp.setFont(font1);
+    hp.setCharacterSize(20);
+    hp.setOrigin(0, 0);
+    hp.setPosition(30, window.getSize().y - 120);
+    hp.setString("health : " + to_string(health));
+    //score
+    score.setFont(font1);
+    score.setCharacterSize(20);
+    score.setOrigin(0, 0);
+    score.setPosition(30, window.getSize().y - 90);
+    score.setString("score = " + to_string(cnt));
+
     //setting chicken textures and positions
-    for ( int j = 0; j < 6; j++)
+    for ( int j = 0; j <6 ; j++)
     {
         for (int i = 0; i < 8; i++)
         {
@@ -120,22 +183,10 @@ void IngameImages()
     }
 
     //setting bullet textures
-    for (int i = 0; i < 40; i++) 
-    {
+    for (int i = 0; i < 40; i++) {
         Bullets[i].setTexture(bulletImage);
         Bullets[i].setScale(2,2);
         Bullets[i].setPosition(-100, -100);
-    }
-
-    for (int j = 0; j < 5; j++)
-    {
-        for (int i = 0; i < 8; i++)
-        {
-            Eggs[i][j].setTexture(EggSkin);
-            Eggs[i][j].setScale(0.75,0.75);
-            Eggs[i][j].setPosition(12000, 50000 );
-            
-        }
     }
 }
 // function for player movement
@@ -183,11 +234,12 @@ void PlayerMove()
 }
 
 //shooting function
+
 void PlayerShooting(){
 
-    //Shooting
     if ((Keyboard::isKeyPressed(Keyboard::Space)) && bullet.bulletCoolDown == 0 || (Mouse::isButtonPressed(Mouse::Left)) && bullet.bulletCoolDown == 0)
     {
+        
         bullet.bulletCoolDown = bullet.bulletCoolDownvar;
         Bullets[bullet.currentBullet].setPosition(Player.getPosition().x + 29 , Player.getPosition().y - 45);
         
@@ -204,8 +256,11 @@ void PlayerShooting(){
     //bullet moving
     for (int i = 0; i < 40; i++) {
         Bullets[i].move(0, -bullet.bulletSpeed);
+        
     }
 }
+
+
 
 
 // function for chicken movement
@@ -217,22 +272,29 @@ void ChickenMove()
         for (int i = 0; i < 8; i++)
         {
             Chicken[i][j].setTextureRect(IntRect(ChickenMovement * 46.9, 0, 46.9, 38));
-            if (Chicken[i][j].getGlobalBounds().intersects(rectangle2.getGlobalBounds()))
+            if (rectangle3.getGlobalBounds().intersects(rectangle2.getGlobalBounds()))
             {
+                rectdir = 0;
                 ChickenDir = 0;
             }
-            else if (Chicken[0][5].getGlobalBounds().intersects(rectangle1.getGlobalBounds()))
+            else if (rectangle3.getGlobalBounds().intersects(rectangle1.getGlobalBounds()))
             {
+                rectdir = 1;
                 ChickenDir = 1;
             }
             if (ChickenDir == 0)
                 Chicken[i][j].move(-chicken.speed, 0);
             else if (ChickenDir == 1)
                 Chicken[i][j].move(chicken.speed, 0);
-        }
+       }
   
         
     }
+    if (rectdir == 0)
+        rectangle3.move(-chicken.speed, 0);
+    else if (rectdir == 1)
+        rectangle3.move(chicken.speed, 0);
+
     if (ChickenMovement == 9)
         checkchickenanimation = false;
     else if (ChickenMovement == 0)
@@ -244,71 +306,9 @@ void ChickenMove()
     
 }
 
-void eggmovement()
-{
-    if (counterloopeggs==0)
-    {
-        for (int j = 0; j < 5; j++)
-        {
-            for (int i = 0; i < 8; i++)
-            {
-                egg.eggcooldown[i][j] = rand() % egg.eggCoolDownvar;
-                counterloopeggs++;
-            }
-        }
-    }
-
-    for (int j = 0; j < 5; j++)
-    {
-        for (int i = 0; i < 8; i++)
-        {
-            if (egg.eggcooldown[i][j] > 0)
-                egg.eggcooldown[i][j]--;
-            if (egg.eggcooldown[i][j] == 0) 
-            {
-                
-                Eggs[i][j].setPosition(Chicken[i][j].getPosition().x + 53.8, Chicken[i][j].getPosition().y + 75);
-               
-                egg.eggcooldown[i][j]--; 
-            }
-            if (egg.eggcooldown[i][j] == -1 || egg.eggcooldown[i][j] == -2)
-            {
-                
-                if (egg.eggcooldown[i][j] == -1)
-                Eggs[i][j].move(0, egg.eggspeed);    
-
-                if (Eggs[i][j].getPosition().y > 900) 
-                {
-                    egg.eggcooldown[i][j]--;
-                    Eggs[i][j].move(0, 0);
-                    if (egg.eggyolkcounter > 0)
-                    {
-                        egg.eggyolkcounter--;
-                        Eggs[i][j].setTexture(eggyolk);
-                        Eggs[i][j].setTextureRect(IntRect(3 * 23, 0, 23, 19));
-                        Eggs[i][j].setScale(2, 2);
-                        egg.eggcooldown[i][j] = 50 + rand() % egg.eggCoolDownvar;
-                    }
-                   /* 
-                    else if (egg.eggyolkcounter == 0) 
-                    {
-                        Eggs[i][j].setScale(0, 0);
-                        Eggs[i][j].setTexture(EggSkin);
-                        Eggs[i][j].setScale(0.75, 0.75);
-                        egg.eggcooldown[i][j] = rand() % egg.eggCoolDownvar;
-                        check = true;
-                    }*/
-                        }
-
-                    }
-                    
-                }
-            }
-        
-    
-}
 int main()
 {
+    
     // add functions
     IngameImages();
     // main game loop
@@ -326,10 +326,9 @@ int main()
                 window.close();
             }
         }
+   
         PlayerMove();
         ChickenMove();
-        PlayerShooting();
-        eggmovement();
         //clear window
         window.clear();
         //draw window
@@ -344,18 +343,15 @@ int main()
                 window.draw(Chicken[i][j]);
             }
         }
-        for (int j = 0; j < 5; j++)
-        {
-            for (int i = 0; i < 8; i++)
-            {
-                window.draw(Eggs[i][j]);
-            }
-        }
-
+        PlayerShooting();
         for (int i = 0; i < 40; i++) {
             window.draw(Bullets[i]);
         }
-        
+        window.draw(healh_bar);
+        window.draw(hp);
+        scorecalc();
+        window.draw(score);
+        window.draw(rectangle3);
         // show window
         window.display();
     }
