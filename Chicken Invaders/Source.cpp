@@ -29,23 +29,31 @@ struct bulletstruct
 
 
 
+
+
 // Intialized Variables
 int cnt = 0;  //counter for score
 int health = 100;
 double PlayerMovement = 9, PlayerSpeed = 12;
 double ChickenDir = 0, ChickenPositionX = 0, ChickenPositionY = 0,rectdir;
 int ChickenMovement = 0 ;
+int timer[8][5];
+int eggtimer = 0;
+int x = 0, y = 0;
+int yolkcnt = 300;
+int yolkanime = 0;
 int borderadjust = 0;
 bool checkchickenanimation = true, check = true;
 ChickenStruct chicken;
 bulletstruct bullet;
+
 
 Time deltatime;
 
 
 
 // Creating Game Window
-RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders",Style::Fullscreen);
+RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders",Style::Default);
 
 // adding textures
 Texture Background;
@@ -53,6 +61,8 @@ Texture PlayerSkin;
 Texture ChickenSkin;
 Texture bulletImage;
 Texture healthbar;
+Texture eggTex;
+Texture eggbreak;
 
 // adding border
 RectangleShape rectangle1(Vector2f(60, 1080));
@@ -73,6 +83,8 @@ Sprite Player;
 Sprite Chicken[8][6];
 Sprite Bullets[40];
 Sprite health_bar;
+Sprite Eggs[8][5];
+Sprite eggyolk;
 
 //increasing score
 void scorecalc() {
@@ -130,7 +142,9 @@ void IngameImages()
     // chicken image
     ChickenSkin.loadFromFile("RedChicken.png");
 
-  
+    //Egg image
+    eggTex.loadFromFile("egg.png");
+    eggbreak.loadFromFile("eggBreak.png");
 
     //bullet image
     bulletImage.loadFromFile("Bullet1Image.png");
@@ -175,6 +189,22 @@ void IngameImages()
         Bullets[i].setScale(2, 2);
         Bullets[i].setPosition(-100, -100);
     }
+
+    //Eggs textures
+    for (int j = 0; j < 5; j++)
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            Eggs[i][j].setTexture(eggTex);
+            Eggs[i][j].setPosition(10000, -10000);
+            Eggs[i][j].setScale(0.13, 0.13);
+
+            timer[i][j] = rand() % 701;
+
+        }
+
+    }
+    
 
 }
 // function for player movement
@@ -247,6 +277,7 @@ void PlayerShooting() {
 }
 
 
+
 // function for chicken movement
 void ChickenMove()
 {
@@ -290,6 +321,71 @@ void ChickenMove()
 
 }
 
+
+
+// egg movement function
+void eggmovement()
+{  
+    for (int j = 0; j < 5; j++)
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            if (timer[i][j] > 0)
+            {
+                timer[i][j]--;
+            }
+             
+            if(timer[i][j]==0)
+            { 
+                Eggs[i][j].setScale(0.13, 0.13);
+                Eggs[i][j].setPosition(Chicken[i][j].getPosition().x + 53.45, Chicken[i][j].getPosition().y + 75);
+                timer[i][j]--;
+            }
+            if (timer[i][j]==-1)
+            {
+                Eggs[i][j].move(0, 9.8f);
+            }
+            if (Eggs[i][j].getPosition().y > Player.getPosition().y + 42)
+            {
+                Eggs[i][j].move(0, 0);
+                timer[i][j]--;
+                if (yolkcnt > 0)
+                {
+                    yolkcnt--;
+                    Eggs[i][j].setTexture(eggbreak);
+                    yolkanime++;
+                    yolkanime %= 8;
+                    Eggs[i][j].setTextureRect(IntRect(yolkanime * 28, 0, 28, 24));
+                    timer[i][j] = 20 + rand() % 701;
+
+                }
+                else if (yolkcnt == 0)
+                {
+                    Eggs[i][j].setScale(0, 0);
+                    Eggs[i][j].setTexture(eggTex);
+                    timer[i][j] = 20 + rand() % 701;
+
+                }
+
+
+                      
+            }
+
+            //collision egg
+
+            /*if (Eggs[i][j].getGlobalBounds().intersects(Player.getGlobalBounds()))
+            {
+                Player.setPosition(10000, 10000);
+            }*/
+
+
+        }
+    }
+    
+
+}
+
+
 int main()
 {
     // add functions
@@ -312,6 +408,7 @@ int main()
         PlayerMove();
         ChickenMove();
         PlayerShooting();
+        eggmovement();
         //clear window
         window.clear();
         //draw window
@@ -330,6 +427,15 @@ int main()
         for (int i = 0; i < 40; i++) {
             window.draw(Bullets[i]);
         }
+
+        for (int j = 0; j < 5; j++)
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                window.draw(Eggs[i][j]);
+            }
+        }
+        
         window.draw(health_bar);
         window.draw(hp);
         scorecalc();
