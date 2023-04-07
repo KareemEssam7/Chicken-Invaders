@@ -40,13 +40,12 @@ int ChickenMovement = 0 ;
 int timer[8][5];
 int eggtimer = 0;
 int x = 0, y = 0;
-int yolkcnt = 300;
-int yolkanime = 0;
+int yolkcnt = 0;
+int yolkvar = 10;
 int borderadjust = 0;
 bool checkchickenanimation = true, check = true;
 ChickenStruct chicken;
 bulletstruct bullet;
-
 int chickenpx[8][6] = {}, chickenpy[8][6] = {};
 int foodcnt = 0;
 
@@ -225,7 +224,7 @@ void IngameImages()
             Eggs[i][j].setPosition(10000, -10000);
             Eggs[i][j].setScale(0.13, 0.13);
 
-            timer[i][j] = rand() % 701;
+            timer[i][j] = rand() % 501;
 
         }
 
@@ -360,10 +359,26 @@ void ChickenMove()
 // egg movement function
 void eggmovement()
 {  
+    if (x == 0)
+    {
+        for (int j = 0; j < 5; j++)
+        {
+            for (int i = 0; i < 8; i++)
+            {
+
+                timer[i][j] = rand() % 501;
+
+            }
+
+        }
+        x++;
+    }
+
     for (int j = 0; j < 5; j++)
     {
         for (int i = 0; i < 8; i++)
-        {
+        {          
+
             if (timer[i][j] > 0)
             {
                 timer[i][j]--;
@@ -381,28 +396,9 @@ void eggmovement()
             }
             if (Eggs[i][j].getPosition().y > Player.getPosition().y + 42)
             {
-                Eggs[i][j].move(0, 0);
+                timer[i][j] = rand() % 501;
                 timer[i][j]--;
-                if (yolkcnt > 0)
-                {
-                    yolkcnt--;
-                    Eggs[i][j].setTexture(eggbreak);
-                    yolkanime++;
-                    yolkanime %= 8;
-                    Eggs[i][j].setTextureRect(IntRect(yolkanime * 28, 0, 28, 24));
-                    timer[i][j] = 20 + rand() % 701;
-
-                }
-                else if (yolkcnt == 0)
-                {
-                    Eggs[i][j].setScale(0, 0);
-                    Eggs[i][j].setTexture(eggTex);
-                    timer[i][j] = 20 + rand() % 701;
-
-                }
-
-
-                      
+                Eggs[i][j].setScale(0, 0);              
             }
 
             //collision egg
