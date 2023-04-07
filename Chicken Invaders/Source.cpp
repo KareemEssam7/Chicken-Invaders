@@ -47,6 +47,9 @@ bool checkchickenanimation = true, check = true;
 ChickenStruct chicken;
 bulletstruct bullet;
 
+int chickenpx[8][6] = {}, chickenpy[8][6] = {};
+int foodcnt = 0;
+
 
 Time deltatime;
 
@@ -63,6 +66,7 @@ Texture bulletImage;
 Texture healthbar;
 Texture eggTex;
 Texture eggbreak;
+Texture Chickenlegs;
 
 // adding border
 RectangleShape rectangle1(Vector2f(60, 1080));
@@ -72,6 +76,7 @@ RectangleShape rectangle3(Vector2f(1300, 200));
 //adding texts
 Text hp;
 Text score;
+Text foodscore;
 
 //adding font
 Font font1;
@@ -85,6 +90,7 @@ Sprite Bullets[40];
 Sprite health_bar;
 Sprite Eggs[8][5];
 Sprite eggyolk;
+Sprite chicken_legs[8][6];
 
 //increasing score
 void scorecalc() {
@@ -96,7 +102,14 @@ void scorecalc() {
                     cnt += 1;
                     score.setString("score : " + to_string(cnt));
                     Bullets[i].setPosition(3000, 3000);
+                    chicken_legs[j][z].setPosition(Chicken[j][z].getPosition().x, Chicken[j][z].getPosition().y);
                     Chicken[j][z].setPosition(4000, 4000);
+                }
+
+                if (chicken_legs[j][z].getGlobalBounds().intersects(Player.getGlobalBounds())) {
+                    chicken_legs[j][z].setPosition(4000, -100);
+                    foodcnt += 10;
+                    foodscore.setString("food : " + to_string(foodcnt));
                 }
 
             }
@@ -146,6 +159,10 @@ void IngameImages()
     eggTex.loadFromFile("egg.png");
     eggbreak.loadFromFile("eggBreak.png");
 
+
+    // chicken leg
+    Chickenlegs.loadFromFile("chicken leg.png");
+
     //bullet image
     bulletImage.loadFromFile("Bullet1Image.png");
 
@@ -159,14 +176,23 @@ void IngameImages()
     hp.setFont(font1);
     hp.setCharacterSize(20);
     hp.setOrigin(0, 0);
-    hp.setPosition(30, window.getSize().y - 120);
+    hp.setPosition(30, window.getSize().y - 130);
     hp.setString("health : " + to_string(health));
     //score
     score.setFont(font1);
     score.setCharacterSize(20);
     score.setOrigin(0, 0);
-    score.setPosition(30, window.getSize().y - 90);
+    score.setPosition(30, window.getSize().y - 107);
     score.setString("score = " + to_string(cnt));
+
+    //foodscore
+    foodscore.setFont(font1);
+    foodscore.setCharacterSize(21);
+    foodscore.setOrigin(0, 0);
+    foodscore.setPosition(30, window.getSize().y - 82);
+    foodscore.setString("food = " + to_string(foodcnt));
+
+
 
     //setting chicken textures and positions
     for (int j = 0; j < 5; j++)
@@ -203,6 +229,14 @@ void IngameImages()
 
         }
 
+    }
+    //setting chicken legs
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 6; j++) {
+            chicken_legs[i][j].setTexture(Chickenlegs);
+            chicken_legs[i][j].setScale(0.05, 0.05);
+            chicken_legs[i][j].setPosition(-100, -100);
+        }
     }
     
 
@@ -385,6 +419,19 @@ void eggmovement()
 
 }
 
+//Food Movment Function
+void FoodMovment() {
+
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 6; j++) {
+            if (Chicken[i][j].getPosition().x > 3000 && Chicken[i][j].getPosition().y > 3000)
+                chicken_legs[i][j].move(0, 10);
+
+        }
+    }
+}
+
+
 
 int main()
 {
@@ -409,6 +456,7 @@ int main()
         ChickenMove();
         PlayerShooting();
         eggmovement();
+        FoodMovment();
         //clear window
         window.clear();
         //draw window
@@ -420,6 +468,7 @@ int main()
         {
             for (int i = 0; i < 8; i++)
             {
+                window.draw(chicken_legs[i][j]);
                 window.draw(Chicken[i][j]);
             }
         }
@@ -440,6 +489,7 @@ int main()
         window.draw(hp);
         scorecalc();
         window.draw(score);
+        window.draw(foodscore);
         window.draw(rectangle3);
         // show window
         window.display();
