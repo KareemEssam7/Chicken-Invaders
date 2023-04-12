@@ -39,7 +39,7 @@ struct meteorstruct {
 
 
 // Intialized Variables
-int cnt = 0;  //counter for score
+long long cnt = 0;  //counter for score
 int health = 100;
 double PlayerMovement = 9, PlayerSpeed = 12;
 double ChickenDir = 0, ChickenPositionX = 0, ChickenPositionY = 0,rectdir;
@@ -56,7 +56,7 @@ bulletstruct bullet;
 meteorstruct meteors;
 int chickenpx[8][6] = {}, chickenpy[8][6] = {};
 int foodcnt = 0;
-int tmp, meteortimer[40], meteorx = 0;
+int tmp, meteortimer[40], meteorhp[40], meteorx = 0;
 int xmeteor=0, ymeteor=0;
 
 Time deltatime;
@@ -419,13 +419,25 @@ void meteormove()
     if (meteorx == 0) 
     {
         tmp = 100;
-        for (int i = 0; i <= meteors.meteorcount - 20; i++) 
+        for (int i = 0; i <= 20; i++) 
         {
             meteor[i].setPosition(-100 + tmp, -200);
             meteor[i].setTextureRect(IntRect(62.625 * xmeteor, 62.25 * ymeteor, 62.625f, 62.25f));
             int randscale = rand() % 2 + 1;
+            meteorhp[i] = 1 * randscale;
             meteor[i].setScale(randscale, randscale);
             tmp += 100;
+            meteortimer[i] = rand() % 400 + 100;
+        }
+        tmp = 100;
+        for (int i = 21; i <= 39; i++)
+        {
+            meteor[i].setPosition(-200, 0 + tmp);
+            meteor[i].setTextureRect(IntRect(62.625 * xmeteor, 62.25 * ymeteor, 62.625f, 62.25f));
+            int randscale = rand() % 2 + 1;
+            meteorhp[i] = 1 * randscale;
+            meteor[i].setScale(randscale, randscale);
+            tmp += 50;
             meteortimer[i] = rand() % 400 + 100;
         }
         meteorx++;
@@ -433,7 +445,7 @@ void meteormove()
     xmeteor++;
     meteorx++;
     // meteor animation loop
-    for (int i = 0; i <= meteors.meteorcount - 20; i++)
+    for (int i = 0; i <= 39; i++)
     {
         meteor[i].setTextureRect(IntRect(62.625 * xmeteor, 62.25 * ymeteor, 62.625f, 62.25f));
         if (xmeteor == 7 && ymeteor < 8)
@@ -445,7 +457,7 @@ void meteormove()
         }
     }
     // meteor movement loop
-    for (int i = 0; i <= meteors.meteorcount - 20; i++) {
+    for (int i = 0; i <= 39; i++) {
         if (meteortimer[i] > 0) {
             meteortimer[i]--;
         }
@@ -454,14 +466,29 @@ void meteormove()
         }
         for (int i = 0; i < 40; i++)
         {
-            for (int a = 0; a <= 20; a++)
+            for (int a = 0; a <= 39; a++)
             {
                 if (Bullets[i].getGlobalBounds().intersects(meteor[a].getGlobalBounds()))
                 {
-                    meteor[a].setScale(0, 0);
+                    if (meteorhp[a] > 0) 
+                    {
+                        meteorhp[a] -= 1;
+                    }
+                    else if (meteorhp[a] == 0)
+                    {
+                        meteor[a].setPosition(10000, 10000);
+                        cnt += 700;
+                        score.setString("score : " + to_string(cnt));
+                    }
+                    Bullets[i].setPosition(-2000, -2000);
                 }
             }
         }
+    }
+    for (int i = 0; i < 40; i++) {
+          if (Player.getGlobalBounds().intersects(meteor[i].getGlobalBounds())) {
+              Player.setPosition(10000, 10000);
+          }
     }
 
 }
@@ -473,7 +500,7 @@ void scorecalc() {
             for (int z = 0; z < 5; z++) {
 
                 if (Bullets[i].getGlobalBounds().intersects(Chicken[j][z].getGlobalBounds())) {
-                    cnt += 1;
+                    cnt += 1000;
                     score.setString("score : " + to_string(cnt));
                     Bullets[i].setPosition(3000, 3000);
                     chicken_legs[j][z].setPosition(Chicken[j][z].getPosition().x, Chicken[j][z].getPosition().y);
@@ -482,7 +509,7 @@ void scorecalc() {
 
                 if (chicken_legs[j][z].getGlobalBounds().intersects(Player.getGlobalBounds())) {
                     chicken_legs[j][z].setPosition(4000, -100);
-                    foodcnt += 10;
+                    foodcnt += 200;
                     foodscore.setString("food : " + to_string(foodcnt));
                 }
             }
@@ -530,7 +557,7 @@ int main()
             for (int i = 0; i < 8; i++)
             {
                 window.draw(chicken_legs[i][j]);
-                window.draw(Chicken[i][j]);
+              window.draw(Chicken[i][j]);
             }
         }
       
@@ -548,7 +575,7 @@ int main()
 
         meteormove();
         scorecalc();
-        for (int i = 0; i <= meteors.meteorcount - 20; i++) 
+        for (int i = 0; i <= 39; i++) 
         {
             window.draw(meteor[i]);
         }
