@@ -57,7 +57,7 @@ meteorstruct meteors;
 int chickenpx[8][6] = {}, chickenpy[8][6] = {};
 int foodcnt = 0;
 int tmp, meteortimer[40], meteorx = 0;
-
+int xmeteor=0, ymeteor=0;
 
 Time deltatime;
 
@@ -415,26 +415,52 @@ void FoodMovment() {
 //meteor behavior
 void meteormove() 
 {
+    // one time loop for initialization
     if (meteorx == 0) 
     {
         tmp = 100;
         for (int i = 0; i <= meteors.meteorcount - 20; i++) 
         {
-            meteor[i].setPosition(-100 + tmp, -100);
-            meteor[i].setTextureRect()
+            meteor[i].setPosition(-100 + tmp, -200);
+            meteor[i].setTextureRect(IntRect(62.625 * xmeteor, 62.25 * ymeteor, 62.625f, 62.25f));
+            int randscale = rand() % 2 + 1;
+            meteor[i].setScale(randscale, randscale);
             tmp += 100;
             meteortimer[i] = rand() % 400 + 100;
         }
         meteorx++;
     }
-
-    
+    xmeteor++;
+    meteorx++;
+    // meteor animation loop
+    for (int i = 0; i <= meteors.meteorcount - 20; i++)
+    {
+        meteor[i].setTextureRect(IntRect(62.625 * xmeteor, 62.25 * ymeteor, 62.625f, 62.25f));
+        if (xmeteor == 7 && ymeteor < 8)
+        {
+            xmeteor = 0;
+            ymeteor++;
+            if (ymeteor == 7)
+                ymeteor= 0;
+        }
+    }
+    // meteor movement loop
     for (int i = 0; i <= meteors.meteorcount - 20; i++) {
         if (meteortimer[i] > 0) {
             meteortimer[i]--;
         }
         if (meteortimer[i] == 0) {
             meteor[i].move(meteors.meteorspeed, meteors.meteorspeed);
+        }
+        for (int i = 0; i < 40; i++)
+        {
+            for (int a = 0; a <= 20; a++)
+            {
+                if (Bullets[i].getGlobalBounds().intersects(meteor[a].getGlobalBounds()))
+                {
+                    meteor[a].setScale(0, 0);
+                }
+            }
         }
     }
 
