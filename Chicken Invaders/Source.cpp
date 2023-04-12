@@ -25,6 +25,13 @@ struct bulletstruct
     float bulletCoolDown = 0;
 };
 
+//Meteor Struct
+struct meteorstruct {
+    double meteorspeed = 5;
+    int meteorhp = 10;
+    int meteorcount = 40;
+};
+
 
 
 
@@ -46,8 +53,10 @@ int borderadjust = 0;
 bool checkchickenanimation = true, check = true;
 ChickenStruct chicken;
 bulletstruct bullet;
+meteorstruct meteors;
 int chickenpx[8][6] = {}, chickenpy[8][6] = {};
 int foodcnt = 0;
+int tmp, meteortimer[40], meteorx = 0;
 
 
 Time deltatime;
@@ -55,7 +64,7 @@ Time deltatime;
 
 
 // Creating Game Window
-RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders",Style::Default);
+RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders",Style::Fullscreen);
 
 // adding textures
 Texture Background;
@@ -66,6 +75,7 @@ Texture healthbar;
 Texture eggTex;
 Texture eggbreak;
 Texture Chickenlegs;
+Texture meteortex;
 
 // adding border
 RectangleShape rectangle1(Vector2f(60, 1080));
@@ -90,37 +100,7 @@ Sprite health_bar;
 Sprite Eggs[8][5];
 Sprite eggyolk;
 Sprite chicken_legs[8][6];
-
-//increasing score
-void scorecalc() {
-    for (int i = 0; i < 40; i++) {
-        for (int j = 0; j < 8; j++) {
-            for (int z = 0; z < 5; z++) {
-
-                if (Bullets[i].getGlobalBounds().intersects(Chicken[j][z].getGlobalBounds())) {
-                    cnt += 1;
-                    score.setString("score : " + to_string(cnt));
-                    Bullets[i].setPosition(3000, 3000);
-                    chicken_legs[j][z].setPosition(Chicken[j][z].getPosition().x, Chicken[j][z].getPosition().y);
-                    Chicken[j][z].setPosition(4000, 4000);
-                }
-
-                if (chicken_legs[j][z].getGlobalBounds().intersects(Player.getGlobalBounds())) {
-                    chicken_legs[j][z].setPosition(4000, -100);
-                    foodcnt += 10;
-                    foodscore.setString("food : " + to_string(foodcnt));
-                }
-
-            }
-
-
-        }
-
-
-    }
-}
-
-
+Sprite meteor[40];
 
 
 
@@ -191,7 +171,12 @@ void IngameImages()
     foodscore.setPosition(30, window.getSize().y - 82);
     foodscore.setString("food = " + to_string(foodcnt));
 
-
+    //meteor
+    meteortex.loadFromFile("Stones.png");
+    for (int i = 0; i < meteors.meteorcount; i++)
+    {
+        meteor[i].setTexture(meteortex);
+    }
 
     //setting chicken textures and positions
     for (int j = 0; j < 5; j++)
@@ -427,6 +412,60 @@ void FoodMovment() {
     }
 }
 
+//meteor behavior
+void meteormove() 
+{
+    if (meteorx == 0) 
+    {
+        tmp = 100;
+        for (int i = 0; i <= meteors.meteorcount - 20; i++) 
+        {
+            meteor[i].setPosition(-100 + tmp, -100);
+            meteor[i].setTextureRect()
+            tmp += 100;
+            meteortimer[i] = rand() % 400 + 100;
+        }
+        meteorx++;
+    }
+
+    
+    for (int i = 0; i <= meteors.meteorcount - 20; i++) {
+        if (meteortimer[i] > 0) {
+            meteortimer[i]--;
+        }
+        if (meteortimer[i] == 0) {
+            meteor[i].move(meteors.meteorspeed, meteors.meteorspeed);
+        }
+    }
+
+}
+
+//increasing score
+void scorecalc() {
+    for (int i = 0; i < 40; i++) {
+        for (int j = 0; j < 8; j++) {
+            for (int z = 0; z < 5; z++) {
+
+                if (Bullets[i].getGlobalBounds().intersects(Chicken[j][z].getGlobalBounds())) {
+                    cnt += 1;
+                    score.setString("score : " + to_string(cnt));
+                    Bullets[i].setPosition(3000, 3000);
+                    chicken_legs[j][z].setPosition(Chicken[j][z].getPosition().x, Chicken[j][z].getPosition().y);
+                    Chicken[j][z].setPosition(4000, 4000);
+                }
+
+                if (chicken_legs[j][z].getGlobalBounds().intersects(Player.getGlobalBounds())) {
+                    chicken_legs[j][z].setPosition(4000, -100);
+                    foodcnt += 10;
+                    foodscore.setString("food : " + to_string(foodcnt));
+                }
+            }
+        }
+    }
+}
+
+
+
 
 
 int main()
@@ -480,13 +519,21 @@ int main()
                 window.draw(Eggs[i][j]);
             }
         }
-        
+
+        meteormove();
+        scorecalc();
+        for (int i = 0; i <= meteors.meteorcount - 20; i++) 
+        {
+            window.draw(meteor[i]);
+        }
+
         window.draw(health_bar);
         window.draw(hp);
-        scorecalc();
+       
         window.draw(score);
         window.draw(foodscore);
         window.draw(rectangle3);
+        //window.draw(meteor[1]);
         // show window
         window.display();
     }
