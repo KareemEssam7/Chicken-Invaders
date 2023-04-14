@@ -32,6 +32,12 @@ struct meteorstruct {
     int meteorcount = 40;
 };
 
+//Boss struct
+struct bossstruct {
+
+    double bossspeed = 8;
+    int bosshp = 10;
+};
 
 
 
@@ -51,10 +57,12 @@ int x = 0, y = 0;
 int yolkcnt = 0;
 int yolkvar = 10;
 int borderadjust = 0;
-bool checkchickenanimation = true, check = true;
+int animation = 0;
+bool checkchickenanimation = true, check = true, bossanimation=true;
 ChickenStruct chicken;
 bulletstruct bullet;
 meteorstruct meteors;
+bossstruct boss;
 int chickenpx[8][6] = {}, chickenpy[8][6] = {};
 int foodcnt = 0;
 int tmp, meteortimer[40], meteorhp[40], meteorx = 0;
@@ -144,7 +152,7 @@ void IngameImages()
     Chickenlegs.loadFromFile("chicken leg.png");
 
     //boss image
-    bossimage.loadFromFile("Chicken Sprite.png");
+    bossimage.loadFromFile("bossRed.png");
   
     //bullet image
     bulletImage.loadFromFile("Bullet1Image.png");
@@ -197,8 +205,9 @@ void IngameImages()
     }
 
     //boss texture and position
-    bosssprite.setPosition(window.getSize().x / 2, window.getSize().y / 2);
     bosssprite.setTexture(bossimage);
+    bosssprite.setPosition(Vector2f(800, 240));
+    bosssprite.setScale(4.5 , 4.5);
    
     //setting bullet textures
     for (int i = 0; i < 40; i++)
@@ -301,24 +310,6 @@ void PlayerShooting() {
     for (int i = 0; i < 40; i++) {
         Bullets[i].move(0, -bullet.bulletSpeed);
     }
-}
-void bossmove() {
-    int animation = 0;
-        animation = animation % 3;
-    bosssprite.setTextureRect(IntRect(568*animation, 0, 568, 479));
-        animation++;
-        if (bosssprite.getGlobalBounds().intersects(rectangle2.getGlobalBounds())) {
-            bossdir = 0;
-        }
-        else if (bosssprite.getGlobalBounds().intersects(rectangle1.getGlobalBounds())) {
-            bossdir = 1;
-        }
-        if (bossdir == 0) {
-            bosssprite.move(-chicken.speed, 0);
-        }
-        else if (bossdir == 1) {
-            bosssprite.move(chicken.speed, 0);
-        }
 }
 // function for chicken movement
 void ChickenMove()
@@ -605,6 +596,60 @@ void scorecalc() {
     }
 }
 
+//Boss 
+void bossmove() {
+
+    bosssprite.setTextureRect(IntRect(75 * animation, 0, 75, 68));
+    if (bosssprite.getGlobalBounds().intersects(rectangle2.getGlobalBounds())) {
+        bossdir = 0;
+    }
+    else if (bosssprite.getGlobalBounds().intersects(rectangle1.getGlobalBounds())) {
+        bossdir = 1;
+    }
+    if (bossdir == 0) {
+        bosssprite.move(-boss.bossspeed, 0);
+    }
+    else if (bossdir == 1) {
+        bosssprite.move(boss.bossspeed, 0);
+    }
+
+    if (animation == 9)
+    {
+        bossanimation = false;
+    }
+    else if (animation == 0)
+    {
+        bossanimation = true;
+    }
+
+    if (bossanimation == false)
+    {
+        animation--;
+    }
+    else
+        animation++;
+
+
+    for (int i = 0; i < 40; i++)
+    {
+        if (Bullets[i].getGlobalBounds().intersects(bosssprite.getGlobalBounds()))
+        {
+            if (boss.bosshp > 0)
+            {
+                boss.bosshp -= 2;
+            }
+            else if (boss.bosshp == 0)
+            {
+                bosssprite.setPosition(10000, 10000);
+                cnt += 5000;
+                score.setString("score : " + to_string(cnt));
+            }
+            Bullets[i].setPosition(-2000, -2000);
+        }
+    }
+}
+
+
 int main()
 {
     // add functions
@@ -630,14 +675,18 @@ int main()
         eggmovement();
         FoodMovment();
         bossmove();
+
+
         //clear window
         window.clear();
+
+
         //draw window
         window.draw(_GameBackground);
         window.draw(Player);
         window.draw(rectangle1);
         window.draw(rectangle2);
-       /* for (int j = 0; j < 5; j++)
+        for (int j = 0; j < 5; j++)
         {
             for (int i = 0; i < 8; i++)
             {
@@ -645,19 +694,19 @@ int main()
               window.draw(Chicken[i][j]);
             }
         }
-      */
+      
         for (int i = 0; i < 40; i++) {
             window.draw(Bullets[i]);
         }
 
-      /*  for (int j = 0; j < 5; j++)
+        for (int j = 0; j < 5; j++)
         {
             for (int i = 0; i < 8; i++)
             {
                 window.draw(Eggs[i][j]);
             }
         }
-   */
+   
         scorecalc();
 
         window.draw(health_bar);
@@ -666,7 +715,7 @@ int main()
         window.draw(score);
         window.draw(foodscore);
         window.draw(rectangle3);
-        window.draw(bosssprite);
+        //window.draw(bosssprite);
         //window.draw(meteor[1]);
         // show window
         window.display();
