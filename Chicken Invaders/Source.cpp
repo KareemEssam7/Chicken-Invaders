@@ -36,7 +36,10 @@ struct meteorstruct {
 struct bossstruct {
 
     double bossspeed = 8;
-    int bosshp = 10;
+    int bosshp = 50;
+    int eggcooldown[5];
+    int eggcooldownvar = 101;
+
 };
 
 
@@ -46,14 +49,13 @@ struct bossstruct {
 
 // Intialized Variables
 long long cnt = 0;  //counter for score
-int bosshealth = 10;
 int health = 100;
 double PlayerMovement = 9, PlayerSpeed = 12;
 double ChickenDir = 0, ChickenPositionX = 0, ChickenPositionY = 0,rectdir,bossdir=0;
 int ChickenMovement = 0 ;
 int timer[8][5];
 int eggtimer = 0;
-int x = 0, y = 0;
+int x = 0, y = 0, z = 0 ,n=15;
 int yolkcnt = 0;
 int yolkvar = 10;
 int borderadjust = 0;
@@ -108,7 +110,8 @@ Sprite Chicken[8][6];
 Sprite Bullets[40];
 Sprite health_bar;
 Sprite Eggs[8][5];
-Sprite eggyolk;
+Sprite eggyolk[5];
+Sprite bossegg[5];
 Sprite chicken_legs[8][6];
 Sprite meteor[40];
 Sprite bosssprite;
@@ -206,7 +209,7 @@ void IngameImages()
 
     //boss texture and position
     bosssprite.setTexture(bossimage);
-    bosssprite.setPosition(Vector2f(800, 240));
+    bosssprite.setPosition(Vector2f(800, 140));
     bosssprite.setScale(4.5 , 4.5);
    
     //setting bullet textures
@@ -226,8 +229,14 @@ void IngameImages()
             Eggs[i][j].setPosition(10000, -10000);
             Eggs[i][j].setScale(0.13, 0.13);
 
-            timer[i][j] = rand() % 501;
+            
+            bossegg[j].setTexture(eggTex);
+            bossegg[j].setScale(0.25, 0.25);
+            bossegg[j].setPosition(10000, 10000);
 
+            eggyolk[j].setTexture(eggbreak);
+            eggyolk[j].setScale(2, 2);
+            eggyolk[j].setPosition(10000, 10000);
         }
 
     }
@@ -400,10 +409,10 @@ void eggmovement()
             }
 
             //collision egg
-            if (Eggs[i][j].getGlobalBounds().intersects(Player.getGlobalBounds()))
+            /*if (Eggs[i][j].getGlobalBounds().intersects(Player.getGlobalBounds()))
             {
                 Player.setPosition(10000, 10000);
-            }
+            }*/
 
 
         }
@@ -596,9 +605,10 @@ void scorecalc() {
     }
 }
 
-//Boss 
+//Boss   By mohamed akram , ziad khaled
 void bossmove() {
 
+    //Boss movement + animation
     bosssprite.setTextureRect(IntRect(75 * animation, 0, 75, 68));
     if (bosssprite.getGlobalBounds().intersects(rectangle2.getGlobalBounds())) {
         bossdir = 0;
@@ -629,7 +639,7 @@ void bossmove() {
     else
         animation++;
 
-
+    //Boss getting killed after collision with bullets
     for (int i = 0; i < 40; i++)
     {
         if (Bullets[i].getGlobalBounds().intersects(bosssprite.getGlobalBounds()))
@@ -647,6 +657,65 @@ void bossmove() {
             Bullets[i].setPosition(-2000, -2000);
         }
     }
+    if (z == 0)
+    {
+        for (int i = 0; i < 5; i++)
+        {
+
+            boss.eggcooldown[i] = rand() % boss.eggcooldownvar;
+
+        }
+        z++;
+    }
+
+    for (int i = 0; i < 5; i++)
+    {
+
+        if (boss.eggcooldown[i] > 0)
+        {
+            boss.eggcooldown[i]--;
+        }
+
+        if (boss.eggcooldown[i] == 0)
+        {
+            boss.eggcooldown[i]--;
+            bossegg[i].setScale(0.3, 0.3);
+            bossegg[i].setPosition(bosssprite.getPosition().x + n , bosssprite.getPosition().y + 68 );
+            if (n != 75)
+                n += 30;
+            else
+                n = 15;
+        }
+        if (boss.eggcooldown[i] == -1)
+        {
+            bossegg[i].move(0, 9.8f);
+        }
+        if (bossegg[i].getPosition().y > Player.getPosition().y + 50)
+        {
+            boss.eggcooldown[i] = rand() % boss.eggcooldownvar;
+            eggyolk[i].setTextureRect(IntRect(28 * 3, 0, 28, 24));
+            eggyolk[i].setPosition(bossegg[i].getPosition().x, bossegg[i].getPosition().y);
+            bossegg[i].setScale(0, 0);
+        }
+        
+
+
+        //collision egg
+        /*if (bossegg[i].getGlobalBounds().intersects(Player.getGlobalBounds()))
+        {
+            Player.setPosition(10000, 10000);
+        }*/
+
+
+    }
+    
+
+
+
+
+
+
+
 }
 
 
@@ -670,10 +739,10 @@ int main()
             }
         }
         PlayerMove();
-        ChickenMove();
+        //ChickenMove();
         PlayerShooting();
-        eggmovement();
-        FoodMovment();
+        //eggmovement();
+        //FoodMovment();
         bossmove();
 
 
@@ -686,27 +755,32 @@ int main()
         window.draw(Player);
         window.draw(rectangle1);
         window.draw(rectangle2);
-        for (int j = 0; j < 5; j++)
+        /*for (int j = 0; j < 5; j++)
         {
             for (int i = 0; i < 8; i++)
             {
                 window.draw(chicken_legs[i][j]);
               window.draw(Chicken[i][j]);
             }
-        }
+        }*/
       
         for (int i = 0; i < 40; i++) {
             window.draw(Bullets[i]);
         }
 
-        for (int j = 0; j < 5; j++)
+        /*for (int j = 0; j < 5; j++)
         {
             for (int i = 0; i < 8; i++)
             {
                 window.draw(Eggs[i][j]);
             }
+        }*/
+
+        for (int i = 0; i < 5; i++)
+        {
+            window.draw(bossegg[i]);
         }
-   
+
         scorecalc();
 
         window.draw(health_bar);
@@ -715,7 +789,7 @@ int main()
         window.draw(score);
         window.draw(foodscore);
         window.draw(rectangle3);
-        //window.draw(bosssprite);
+        window.draw(bosssprite);
         //window.draw(meteor[1]);
         // show window
         window.display();
