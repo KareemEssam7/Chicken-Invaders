@@ -38,7 +38,7 @@ struct bossstruct {
     double bossspeed = 5;
     int bosshp = 50;
     int eggcooldown[5];
-    int eggcooldownvar = 101;
+    int eggcooldownvar = 301;
 
 };
 
@@ -115,6 +115,8 @@ Sprite health_bar;
 Sprite Eggs[8][5];
 Sprite eggyolk[5];
 Sprite bossegg[5];
+Sprite bossegg1[5];
+Sprite bossegg2[5];
 Sprite chicken_legs[8][6];
 Sprite meteor[40];
 Sprite bosssprite;
@@ -237,17 +239,22 @@ void IngameImages()
             Eggs[i][j].setPosition(10000, -10000);
             Eggs[i][j].setScale(0.13, 0.13);
 
-            
+
             bossegg[j].setTexture(eggTex);
             bossegg[j].setScale(0.25, 0.25);
             bossegg[j].setPosition(10000, 10000);
 
-            eggyolk[j].setTexture(eggbreak);
-            eggyolk[j].setScale(2, 2);
-            eggyolk[j].setPosition(10000, 10000);
+            bossegg1[j].setTexture(eggTex);
+            bossegg1[j].setScale(0.25, 0.25);
+            bossegg1[j].setPosition(10000, 10000);
+
+            bossegg2[j].setTexture(eggTex);
+            bossegg2[j].setScale(0.25, 0.25);
+            bossegg2[j].setPosition(10000, 10000);
         }
 
     }
+
     //setting chicken legs
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 6; j++) {
@@ -695,23 +702,28 @@ void bossmove() {
         if (boss.eggcooldown[i] == 0)
         {
             boss.eggcooldown[i]--;
-            bossegg[i].setScale(0.3, 0.3);
-            bossegg[i].setPosition(bosssprite.getPosition().x + n , bosssprite.getPosition().y + 68 );
-            if (n != 75)
-                n += 30;
-            else
-                n = 15;
+            bossegg[i].setScale(0.2, 0.2);
+            bossegg[i].setPosition(bosssprite.getPosition().x, bosssprite.getPosition().y + 68);
+
+            bossegg1[i].setScale(0.2, 0.2);
+            bossegg1[i].setPosition(bosssprite.getPosition().x + 30, bosssprite.getPosition().y + 68);
+
+            bossegg2[i].setScale(0.2, 0.2);
+            bossegg2[i].setPosition(bosssprite.getPosition().x + 70, bosssprite.getPosition().y + 68);
+
         }
         if (boss.eggcooldown[i] == -1)
         {
-            bossegg[i].move(0, 9.8f);
+            bossegg[i].move(-3, 9.8f);
+            bossegg1[i].move(0, 9.8f);
+            bossegg2[i].move(3, 9.8f);
         }
         if (bossegg[i].getPosition().y > Player.getPosition().y + 50)
         {
             boss.eggcooldown[i] = rand() % boss.eggcooldownvar;
-            eggyolk[i].setTextureRect(IntRect(28 * 3, 0, 28, 24));
-            eggyolk[i].setPosition(bossegg[i].getPosition().x, bossegg[i].getPosition().y);
             bossegg[i].setScale(0, 0);
+            bossegg1[i].setScale(0, 0);
+            bossegg2[i].setScale(0, 0);
         }
         
 
@@ -795,6 +807,8 @@ int main()
         for (int i = 0; i < 5; i++)
         {
             window.draw(bossegg[i]);
+            window.draw(bossegg1[i]);
+            window.draw(bossegg2[i]);
         }
 
         scorecalc();
