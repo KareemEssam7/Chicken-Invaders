@@ -35,7 +35,7 @@ struct meteorstruct {
 //Boss struct
 struct bossstruct {
 
-    double bossspeed = 8;
+    double bossspeed = 5;
     int bosshp = 50;
     int eggcooldown[5];
     int eggcooldownvar = 101;
@@ -93,6 +93,9 @@ Texture bossimage;
 RectangleShape rectangle1(Vector2f(60, 1080));
 RectangleShape rectangle2(Vector2f(60, 1080));
 RectangleShape rectangle3(Vector2f(1300, 200));
+//borders for boss!!
+RectangleShape rectangle4(Vector2f(window.getSize().x, 75));
+RectangleShape rectangle5(Vector2f(window.getSize().x, 75));
 
 //adding texts
 Text hp;
@@ -142,7 +145,12 @@ void IngameImages()
     rectangle3.setOrigin(1300 / 2, 200);
     rectangle3.setPosition(770, 400);
     rectangle3.setFillColor(Color::Transparent);
-
+    //boss borders
+    rectangle4.setPosition((window.getSize().x / 2), (window.getSize().y / 2)+200);
+    rectangle4.setOrigin(window.getSize().x / 2, 75 / 2);
+    rectangle5.setPosition(0, -50);
+    rectangle4.setFillColor(Color::Transparent);
+    rectangle5.setFillColor(Color::Transparent);
     // chicken image
     ChickenSkin.loadFromFile("RedChicken.png");
 
@@ -209,7 +217,7 @@ void IngameImages()
 
     //boss texture and position
     bosssprite.setTexture(bossimage);
-    bosssprite.setPosition(Vector2f(800, 140));
+    bosssprite.setPosition(Vector2f(200, 200));
     bosssprite.setScale(4.5 , 4.5);
    
     //setting bullet textures
@@ -610,16 +618,24 @@ void bossmove() {
 
     //Boss movement + animation
     bosssprite.setTextureRect(IntRect(75 * animation, 0, 75, 68));
-    if (bosssprite.getGlobalBounds().intersects(rectangle2.getGlobalBounds())) {
+    if (bosssprite.getGlobalBounds().intersects(rectangle5.getGlobalBounds()))
         bossdir = 0;
+    else if (bosssprite.getGlobalBounds().intersects(rectangle4.getGlobalBounds()))
+        bossdir = 1;
+    if (bossdir == 0)
+        bosssprite.move(boss.bossspeed, boss.bossspeed);
+    else if (bossdir == 1)
+        bosssprite.move(boss.bossspeed, -boss.bossspeed);
+   if (bosssprite.getGlobalBounds().intersects(rectangle2.getGlobalBounds())) {
+        bossdir = 3;
     }
     else if (bosssprite.getGlobalBounds().intersects(rectangle1.getGlobalBounds())) {
         bossdir = 1;
     }
-    if (bossdir == 0) {
+    if (bossdir == 3) {
         bosssprite.move(-boss.bossspeed, 0);
     }
-    else if (bossdir == 1) {
+    else if (bossdir == 0) {
         bosssprite.move(boss.bossspeed, 0);
     }
 
@@ -790,6 +806,8 @@ int main()
         window.draw(foodscore);
         window.draw(rectangle3);
         window.draw(bosssprite);
+        window.draw(rectangle4);
+        window.draw(rectangle5);
         //window.draw(meteor[1]);
         // show window
         window.display();
