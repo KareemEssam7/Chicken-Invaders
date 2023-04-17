@@ -88,6 +88,8 @@ Texture eggbreak;
 Texture Chickenlegs;
 Texture meteortex;
 Texture bossimage;
+Texture gamelogo;
+Texture gamemenubg;
 
 // adding border
 RectangleShape rectangle1(Vector2f(60, 1080));
@@ -97,13 +99,28 @@ RectangleShape rectangle3(Vector2f(1300, 200));
 RectangleShape rectangle4(Vector2f(window.getSize().x, 75));
 RectangleShape rectangle5(Vector2f(window.getSize().x, 75));
 
+
+//Buttons
+RectangleShape rectangleplay(Vector2f(350, 70));
+RectangleShape rectangleoptions(Vector2f(350, 70));
+RectangleShape rectangleleaderboard(Vector2f(350, 70));
+RectangleShape rectanglecredits(Vector2f(350, 70));
+RectangleShape rectanglequit(Vector2f(350, 70));
+
+
 //adding texts
 Text hp;
 Text score;
 Text foodscore;
+Text play;
+Text Options;
+Text Leaderboard;
+Text Credits;
+Text Quit;
 
 //adding font
 Font font1;
+Font font2;
 
 
 // Ingame Sprites
@@ -120,17 +137,81 @@ Sprite bossegg2[5];
 Sprite chicken_legs[8][6];
 Sprite meteor[40];
 Sprite bosssprite;
+Sprite Logo;
+Sprite menubg;
 
 // Loading Ingame Files
 void IngameImages()
 {
     //fonts
     font1.loadFromFile("LATINWD.ttf");
+    font2.loadFromFile("font1.ttf");
 
     // background
     Background.loadFromFile("IngameBackground.jpg");
     _GameBackground.setTexture(Background);
     _GameBackground.setScale(1.875f, 1.05f);
+    gamemenubg.loadFromFile("gamemenubg.jpg");
+    menubg.setTexture(gamemenubg);
+    gamelogo.loadFromFile("logo.png");
+    Logo.setTexture(gamelogo);
+    Logo.setPosition(400, -25);
+    Logo.setScale(1, 0.7f);
+
+    //Play Button 
+    rectangleplay.setPosition(750, 480);
+    rectangleplay.setFillColor(Color(0,0,255,40));
+    rectangleplay.setOutlineColor(Color(51, 153, 255,255));
+    rectangleplay.setOutlineThickness(2.8f);
+    play.setFont(font1);
+    play.setCharacterSize(23);
+    play.setPosition(772, 500);
+    play.setString("Save The World");
+    play.setFillColor(Color(204, 229, 255,225));
+
+    //Options Button
+    rectangleoptions.setPosition(750, 580);
+    rectangleoptions.setFillColor(Color(0, 0, 255, 40));
+    rectangleoptions.setOutlineColor(Color(51, 153, 255, 255));
+    rectangleoptions.setOutlineThickness(2.8f);
+    Options.setFont(font1);
+    Options.setCharacterSize(23);
+    Options.setPosition(845, 600); 
+    Options.setString("Options");
+    Options.setFillColor(Color(204, 229, 255, 225));
+  
+    //Leaderboard Button
+    rectangleleaderboard.setPosition(750, 680);
+    rectangleleaderboard.setFillColor(Color(0, 0, 255, 40));
+    rectangleleaderboard.setOutlineColor(Color(51, 153, 255, 255));
+    rectangleleaderboard.setOutlineThickness(2.8f);
+    Leaderboard.setFont(font1);
+    Leaderboard.setCharacterSize(23);
+    Leaderboard.setPosition(795, 700);
+    Leaderboard.setString("Hall Of Fame");
+    Leaderboard.setFillColor(Color(204, 229, 255, 225));
+
+    //Credits Button
+    rectanglecredits.setPosition(750, 780);
+    rectanglecredits.setFillColor(Color(0, 0, 255, 40));
+    rectanglecredits.setOutlineColor(Color(51, 153, 255, 255));
+    rectanglecredits.setOutlineThickness(2.8f);
+    Credits.setFont(font1);
+    Credits.setCharacterSize(23);
+    Credits.setPosition(850, 800);
+    Credits.setString("Credits");
+    Credits.setFillColor(Color(204, 229, 255, 225));
+
+    //Quit Button
+    rectanglequit.setPosition(750, 880);
+    rectanglequit.setFillColor(Color(0, 0, 255, 40));
+    rectanglequit.setOutlineColor(Color(51, 153, 255, 255));
+    rectanglequit.setOutlineThickness(2.8f);
+    Quit.setFont(font1);
+    Quit.setCharacterSize(23);
+    Quit.setPosition(880, 900);
+    Quit.setString("Quit");
+    Quit.setFillColor(Color(204, 229, 255, 225));
 
     // player image
     PlayerSkin.loadFromFile("Playerr.png");
@@ -147,6 +228,7 @@ void IngameImages()
     rectangle3.setOrigin(1300 / 2, 200);
     rectangle3.setPosition(770, 400);
     rectangle3.setFillColor(Color::Transparent);
+  
     //boss borders
     rectangle4.setPosition((window.getSize().x / 2), (window.getSize().y / 2)+200);
     rectangle4.setOrigin(window.getSize().x / 2, 75 / 2);
@@ -822,6 +904,19 @@ int main()
         window.draw(bosssprite);
         window.draw(rectangle4);
         window.draw(rectangle5);
+        window.draw(menubg);
+        window.draw(Logo);
+        window.draw(rectangleplay);
+        window.draw(rectangleoptions);
+        window.draw(rectangleleaderboard);
+        window.draw(rectanglecredits);
+        window.draw(rectanglequit);
+        window.draw(play);
+        window.draw(Options);
+        window.draw(Leaderboard);
+        window.draw(Credits);
+        window.draw(Quit);
+        
         //window.draw(meteor[1]);
         // show window
         window.display();
