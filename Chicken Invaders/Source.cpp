@@ -58,6 +58,9 @@ int eggtimer = 0;
 int x = 0, y = 0, z = 0 ,n=15;
 int yolkcnt = 0;
 int yolkvar = 10;
+int countgm = 1;
+int countb = 1;
+int checkclick = 0;
 int borderadjust = 0;
 int animation = 0;
 bool checkchickenanimation = true, check = true, bossanimation=true;
@@ -69,10 +72,6 @@ int chickenpx[8][6] = {}, chickenpy[8][6] = {};
 int foodcnt = 0;
 int tmp, meteortimer[40], meteorhp[40], meteorx = 0;
 int xmeteor=0, ymeteor=0;
-
-Time deltatime;
-
-
 
 // Creating Game Window
 RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders",Style::Fullscreen);
@@ -155,61 +154,61 @@ void IngameImages()
     menubg.setTexture(gamemenubg);
     gamelogo.loadFromFile("logo.png");
     Logo.setTexture(gamelogo);
-    Logo.setPosition(400, -25);
+    Logo.setPosition(423.5, -25);
     Logo.setScale(1, 0.7f);
 
     //Play Button 
-    rectangleplay.setPosition(750, 480);
+    rectangleplay.setPosition(785, 480);
     rectangleplay.setFillColor(Color(0,0,255,40));
-    rectangleplay.setOutlineColor(Color(51, 153, 255,255));
+    rectangleplay.setOutlineColor(Color(51, 153, 255,60));
     rectangleplay.setOutlineThickness(2.8f);
     play.setFont(font1);
     play.setCharacterSize(23);
-    play.setPosition(772, 500);
+    play.setPosition(807, 500);
     play.setString("Save The World");
     play.setFillColor(Color(204, 229, 255,225));
 
     //Options Button
-    rectangleoptions.setPosition(750, 580);
+    rectangleoptions.setPosition(785, 580);
     rectangleoptions.setFillColor(Color(0, 0, 255, 40));
-    rectangleoptions.setOutlineColor(Color(51, 153, 255, 255));
+    rectangleoptions.setOutlineColor(Color(51, 153, 255, 60));
     rectangleoptions.setOutlineThickness(2.8f);
     Options.setFont(font1);
     Options.setCharacterSize(23);
-    Options.setPosition(845, 600); 
+    Options.setPosition(880, 600); 
     Options.setString("Options");
     Options.setFillColor(Color(204, 229, 255, 225));
   
     //Leaderboard Button
-    rectangleleaderboard.setPosition(750, 680);
+    rectangleleaderboard.setPosition(785, 680);
     rectangleleaderboard.setFillColor(Color(0, 0, 255, 40));
-    rectangleleaderboard.setOutlineColor(Color(51, 153, 255, 255));
+    rectangleleaderboard.setOutlineColor(Color(51, 153, 255, 60));
     rectangleleaderboard.setOutlineThickness(2.8f);
     Leaderboard.setFont(font1);
     Leaderboard.setCharacterSize(23);
-    Leaderboard.setPosition(795, 700);
+    Leaderboard.setPosition(830, 700);
     Leaderboard.setString("Hall Of Fame");
     Leaderboard.setFillColor(Color(204, 229, 255, 225));
 
     //Credits Button
-    rectanglecredits.setPosition(750, 780);
+    rectanglecredits.setPosition(785, 780);
     rectanglecredits.setFillColor(Color(0, 0, 255, 40));
-    rectanglecredits.setOutlineColor(Color(51, 153, 255, 255));
+    rectanglecredits.setOutlineColor(Color(51, 153, 255, 60));
     rectanglecredits.setOutlineThickness(2.8f);
     Credits.setFont(font1);
     Credits.setCharacterSize(23);
-    Credits.setPosition(850, 800);
+    Credits.setPosition(885, 800);
     Credits.setString("Credits");
     Credits.setFillColor(Color(204, 229, 255, 225));
 
     //Quit Button
-    rectanglequit.setPosition(750, 880);
+    rectanglequit.setPosition(785, 880);
     rectanglequit.setFillColor(Color(0, 0, 255, 40));
-    rectanglequit.setOutlineColor(Color(51, 153, 255, 255));
+    rectanglequit.setOutlineColor(Color(51, 153, 255, 60));
     rectanglequit.setOutlineThickness(2.8f);
     Quit.setFont(font1);
     Quit.setCharacterSize(23);
-    Quit.setPosition(880, 900);
+    Quit.setPosition(915, 900);
     Quit.setString("Quit");
     Quit.setFillColor(Color(204, 229, 255, 225));
 
@@ -702,6 +701,91 @@ void scorecalc() {
     }
 }
 
+//Buttons 
+void Buttons()
+{
+    Vector2i mousepos = Mouse::getPosition(window);
+    if (Mouse::isButtonPressed(Mouse::Left) && checkclick==0)
+    {
+        if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550)
+        {
+            countb = 0;
+            checkclick++;
+        }
+        if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 580 && mousepos.y <= 650)
+        {
+            countgm = 0;
+            checkclick++;
+        }
+        if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 680 && mousepos.y <= 750)
+        {
+            countgm = 0;
+            checkclick++;
+        }
+        if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 780 && mousepos.y <= 850)
+        {
+            countgm = 0;
+            checkclick++;
+        }
+        if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 880 && mousepos.y <= 950)
+        {
+            window.close();
+        }
+
+
+    }
+    if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550)
+    {
+        rectangleplay.setFillColor(Color(0,128,255,40));
+        rectangleplay.setOutlineColor(Color(102, 178, 255, 255));
+    }
+    else 
+    {
+        rectangleplay.setFillColor(Color(0, 0, 255, 40));
+        rectangleplay.setOutlineColor(Color(51, 153, 255, 60)); 
+    }
+    if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 580 && mousepos.y <= 650)
+    {
+        rectangleoptions.setFillColor(Color(0, 128, 255, 40));
+        rectangleoptions.setOutlineColor(Color(102, 178, 255, 255));
+    }
+    else
+    {
+        rectangleoptions.setFillColor(Color(0, 0, 255, 40));
+        rectangleoptions.setOutlineColor(Color(51, 153, 255, 60));
+    }
+    if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 680 && mousepos.y <= 750)
+    {
+        rectangleleaderboard.setFillColor(Color(0, 128, 255, 40));
+        rectangleleaderboard.setOutlineColor(Color(102, 178, 255, 255));
+    }
+    else
+    {
+        rectangleleaderboard.setFillColor(Color(0, 0, 255, 40));
+        rectangleleaderboard.setOutlineColor(Color(51, 153, 255, 60));
+    }
+    if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 780 && mousepos.y <= 850)
+    {
+        rectanglecredits.setFillColor(Color(0, 128, 255, 40));
+        rectanglecredits.setOutlineColor(Color(102, 178, 255, 255));
+    }
+    else
+    {
+        rectanglecredits.setFillColor(Color(0, 0, 255, 40));
+        rectanglecredits.setOutlineColor(Color(51, 153, 255, 60));
+    }
+    if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 880 && mousepos.y <= 950)
+    {
+        rectanglequit.setFillColor(Color(0, 128, 255, 40));
+        rectanglequit.setOutlineColor(Color(102, 178, 255, 255));
+    }
+    else
+    {
+        rectanglequit.setFillColor(Color(0, 0, 255, 40));
+        rectanglequit.setOutlineColor(Color(51, 153, 255, 60));
+    }
+}
+
 //Boss   By mohamed akram , ziad khaled
 void bossmove() {
 
@@ -848,12 +932,13 @@ int main()
                 window.close();
             }
         }
-        PlayerMove();
-        //ChickenMove();
-        PlayerShooting();
-        //eggmovement();
-        //FoodMovment();
-        bossmove();
+            PlayerMove();
+            //ChickenMove();
+            PlayerShooting();
+            //eggmovement();
+            //FoodMovment();
+            bossmove();
+        Buttons();  
 
 
         //clear window
@@ -904,18 +989,37 @@ int main()
         window.draw(bosssprite);
         window.draw(rectangle4);
         window.draw(rectangle5);
-        window.draw(menubg);
-        window.draw(Logo);
-        window.draw(rectangleplay);
-        window.draw(rectangleoptions);
-        window.draw(rectangleleaderboard);
-        window.draw(rectanglecredits);
-        window.draw(rectanglequit);
-        window.draw(play);
-        window.draw(Options);
-        window.draw(Leaderboard);
-        window.draw(Credits);
-        window.draw(Quit);
+        if (countb == 1) 
+        {
+            window.draw(menubg);
+            window.draw(Logo);
+            window.draw(rectangleplay);
+            window.draw(rectangleoptions);
+            window.draw(rectangleleaderboard);
+            window.draw(rectanglecredits);
+            window.draw(rectanglequit);
+            window.draw(play);
+            window.draw(Options);
+            window.draw(Leaderboard);
+            window.draw(Credits);
+            window.draw(Quit);
+        }
+        if (countgm == 1 && countb==1)
+        {
+            window.draw(Logo);
+            window.draw(rectangleplay);
+            window.draw(rectangleoptions);
+            window.draw(rectangleleaderboard);
+            window.draw(rectanglecredits);
+            window.draw(rectanglequit);
+            window.draw(play);
+            window.draw(Options);
+            window.draw(Leaderboard);
+            window.draw(Credits);
+            window.draw(Quit);
+        }
+        if (countgm == 0)
+            window.draw(menubg);
         
         //window.draw(meteor[1]);
         // show window
