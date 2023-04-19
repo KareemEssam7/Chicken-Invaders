@@ -7,7 +7,6 @@
 #include<ctime>
 using namespace std;
 using namespace sf;
-
 // Chicken Struct
 struct ChickenStruct
 {
@@ -40,11 +39,6 @@ struct bossstruct {
     int eggcooldownvar = 301;
 
 };
-
-
-
-
-
 // Intialized Variables
 long long cnt = 0;  //counter for score
 int health = 100;
@@ -73,7 +67,7 @@ int foodcnt = 0;
 int tmp, meteortimer[40], meteorhp[40], meteorx = 0;
 int xmeteor=0, ymeteor=0;
 bool frommenu = true;
-
+bool soundon = true;
 // Creating Game Window
 RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders",Style::Fullscreen);
 
@@ -137,8 +131,6 @@ Text ret;
 //adding font
 Font font1;
 Font font2;
-
-
 // Ingame Sprites
 Sprite _GameBackground;
 Sprite Player;
@@ -155,7 +147,6 @@ Sprite meteor[40];
 Sprite bosssprite;
 Sprite Logo;
 Sprite menubg;
-
 // Loading Ingame Files
 void IngameImages()
 {
@@ -315,7 +306,28 @@ void IngameImages()
     rectangle3.setOrigin(1300 / 2, 200);
     rectangle3.setPosition(770, 400);
     rectangle3.setFillColor(Color::Transparent);
-  
+    //Credit Names
+    credits1.setFont(font1);
+    credits1.setPosition(650, 50);
+    credits1.setString("Omar Ahmed");
+    credits2.setFont(font1);
+    credits2.setPosition(650, 200);
+    credits2.setString("Kareem Essam");
+    credits3.setFont(font1);
+    credits3.setPosition(650, 350);
+    credits3.setString("Mohamed Wael");
+    credits4.setFont(font1);
+    credits4.setPosition(650, 500);
+    credits4.setString("Ahmed Alaa");
+    credits5.setFont(font1);
+    credits5.setPosition(650, 650);
+    credits5.setString("Malek Ahmed");
+    credits6.setFont(font1);
+    credits6.setPosition(650, 800);
+    credits6.setString("Mohamed Akram");
+    credits7.setFont(font1);
+    credits7.setPosition(650, 950);
+    credits7.setString("Ziad Khaled");
     //boss borders
     rectangle4.setPosition((window.getSize().x / 2), (window.getSize().y / 2)+200);
     rectangle4.setOrigin(window.getSize().x / 2, 75 / 2);
@@ -1121,39 +1133,9 @@ int main()
 {
     // add functions
 beginning: {};
-    //chicken struct
-    struct ChickenStruct
-    {
-        double HP[8][5], speed = 4;
-    };
-
-    //Bullet Struct
-    struct bulletstruct
-    {
-        int heldWeapon = 1;
-        float bulletSpeed = 10;
-        int currentBullet = 0;
-        float bulletCoolDownvar = 8;
-        float bulletCoolDown = 0;
-    };
-
-    //Meteor Struct
-    struct meteorstruct {
-        double meteorspeed = 5;
-        int meteorhp = 10;
-        int meteorcount = 40;
-    };
-
-    //Boss struct
-    struct bossstruct {
-
-        double bossspeed = 5;
-        int bosshp = 50;
-        int eggcooldown[5];
-        int eggcooldownvar = 301;
-
-    };
-
+    cnt = 0;
+    boss.bosshp = 50;
+    boss.eggcooldownvar = 301;
     IngameImages();
     // main game loop
     while (window.isOpen())
@@ -1288,8 +1270,15 @@ beginning: {};
             window.draw(menubg);
             window.draw(rectangleback);
             window.draw(back);
+            window.draw(credits1);
+            window.draw(credits2);
+            window.draw(credits3);
+            window.draw(credits4);
+            window.draw(credits5);
+            window.draw(credits6);
+            window.draw(credits7);
         }
-
+        //pause
         if (testing == 5)
         {
             mainmenu();
