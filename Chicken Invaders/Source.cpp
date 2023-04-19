@@ -59,7 +59,13 @@ int x = 0, y = 0, z = 0 ,n=15;
 int yolkcnt = 0;
 int yolkvar = 10;
 int countgm = 1;
+int pause = 0;
+int pausecount = 0;
+int pausecooldown=0;
+int pausecooldownvar = 40;
 int countb = 1;
+int option = 0;
+int countback = 0;
 int checkclick = 0;
 int borderadjust = 0;
 int animation = 0;
@@ -75,6 +81,9 @@ int xmeteor=0, ymeteor=0;
 
 // Creating Game Window
 RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders",Style::Fullscreen);
+
+//delay when starting
+
 
 // adding textures
 Texture Background;
@@ -100,13 +109,10 @@ RectangleShape rectangle5(Vector2f(window.getSize().x, 75));
 
 
 //Buttons
-RectangleShape rectangleplay(Vector2f(350, 70));
-RectangleShape rectangleoptions(Vector2f(350, 70));
-RectangleShape rectangleleaderboard(Vector2f(350, 70));
-RectangleShape rectanglecredits(Vector2f(350, 70));
-RectangleShape rectanglequit(Vector2f(350, 70));
-
-
+RectangleShape rectanglemainmenu[5];
+RectangleShape rectangleoption[2]; 
+RectangleShape rectangleback(Vector2f(200, 70));
+RectangleShape rectanglecont(Vector2f(350, 70));
 //adding texts
 Text hp;
 Text score;
@@ -116,7 +122,18 @@ Text Options;
 Text Leaderboard;
 Text Credits;
 Text Quit;
-
+Text credits1;
+Text credits2;
+Text credits3;
+Text credits4;
+Text credits5;
+Text credits6;
+Text credits7;
+Text controls;
+Text sound;
+Text back;
+Text Option;
+Text cont;
 //adding font
 Font font1;
 Font font2;
@@ -157,60 +174,100 @@ void IngameImages()
     Logo.setPosition(423.5, -25);
     Logo.setScale(1, 0.7f);
 
-    //Play Button 
-    rectangleplay.setPosition(785, 480);
-    rectangleplay.setFillColor(Color(0,0,255,40));
-    rectangleplay.setOutlineColor(Color(51, 153, 255,60));
-    rectangleplay.setOutlineThickness(2.8f);
+    //Buttons
+    for (int i = 0; i < 5; i++)
+    {
+        rectanglemainmenu[i].setSize(Vector2f(350, 70));
+        rectanglemainmenu[i].setPosition(785, 480 +i*100);
+        rectanglemainmenu[i].setFillColor(Color(0, 0, 255, 40));
+        rectanglemainmenu[i].setOutlineColor(Color(51, 153, 255, 60));
+        rectanglemainmenu[i].setOutlineThickness(2.8f);
+    }
+    for (int i = 0; i < 2; i++)
+    {
+        rectangleoption[i].setSize(Vector2f(350, 70));
+        rectangleoption[i].setPosition(785, 380 + i * 100);
+        rectangleoption[i].setFillColor(Color(0, 0, 255, 40));
+        rectangleoption[i].setOutlineColor(Color(51, 153, 255, 60));
+        rectangleoption[i].setOutlineThickness(2.8f);
+    }
+    rectangleback.setPosition(50, 900);
+    rectangleback.setFillColor(Color(0, 0, 255, 40));
+    rectangleback.setOutlineColor(Color(51, 153, 255, 60));
+    rectangleback.setOutlineThickness(2.8f);
+    rectanglecont.setPosition(785, 480);
+    rectanglecont.setFillColor(Color(0, 0, 255, 40));
+    rectanglecont.setOutlineColor(Color(51, 153, 255, 60));
+    rectanglecont.setOutlineThickness(2.8f);
+    //Play text
     play.setFont(font1);
     play.setCharacterSize(23);
     play.setPosition(807, 500);
     play.setString("Save The World");
     play.setFillColor(Color(204, 229, 255,225));
 
-    //Options Button
-    rectangleoptions.setPosition(785, 580);
-    rectangleoptions.setFillColor(Color(0, 0, 255, 40));
-    rectangleoptions.setOutlineColor(Color(51, 153, 255, 60));
-    rectangleoptions.setOutlineThickness(2.8f);
+    //Options text
     Options.setFont(font1);
     Options.setCharacterSize(23);
     Options.setPosition(880, 600); 
     Options.setString("Options");
     Options.setFillColor(Color(204, 229, 255, 225));
   
-    //Leaderboard Button
-    rectangleleaderboard.setPosition(785, 680);
-    rectangleleaderboard.setFillColor(Color(0, 0, 255, 40));
-    rectangleleaderboard.setOutlineColor(Color(51, 153, 255, 60));
-    rectangleleaderboard.setOutlineThickness(2.8f);
+    //Leaderboard text
     Leaderboard.setFont(font1);
     Leaderboard.setCharacterSize(23);
     Leaderboard.setPosition(830, 700);
     Leaderboard.setString("Hall Of Fame");
     Leaderboard.setFillColor(Color(204, 229, 255, 225));
 
-    //Credits Button
-    rectanglecredits.setPosition(785, 780);
-    rectanglecredits.setFillColor(Color(0, 0, 255, 40));
-    rectanglecredits.setOutlineColor(Color(51, 153, 255, 60));
-    rectanglecredits.setOutlineThickness(2.8f);
+    //Credits text
     Credits.setFont(font1);
     Credits.setCharacterSize(23);
     Credits.setPosition(885, 800);
     Credits.setString("Credits");
     Credits.setFillColor(Color(204, 229, 255, 225));
 
-    //Quit Button
-    rectanglequit.setPosition(785, 880);
-    rectanglequit.setFillColor(Color(0, 0, 255, 40));
-    rectanglequit.setOutlineColor(Color(51, 153, 255, 60));
-    rectanglequit.setOutlineThickness(2.8f);
+    //Quit text
     Quit.setFont(font1);
     Quit.setCharacterSize(23);
     Quit.setPosition(915, 900);
     Quit.setString("Quit");
     Quit.setFillColor(Color(204, 229, 255, 225));
+
+    //controls text
+    controls.setFont(font1);
+    controls.setCharacterSize(23);
+    controls.setPosition(875, 400);
+    controls.setString("Controls");
+    controls.setFillColor(Color(204, 229, 255, 225));
+
+    //sound text
+    sound.setFont(font1);
+    sound.setCharacterSize(23);
+    sound.setPosition(900, 500);
+    sound.setString("Sound");
+    sound.setFillColor(Color(204, 229, 255, 225));
+
+    //back text
+    back.setFont(font1); 
+    back.setCharacterSize(23);
+    back.setPosition(80, 920);
+    back.setString("< Back");
+    back.setFillColor(Color(204, 229, 255, 225));
+
+    //Option text
+    Option.setFont(font1);
+    Option.setCharacterSize(40);
+    Option.setPosition(830, 100);
+    Option.setString("Options");
+    Option.setFillColor(Color(255, 255, 255, 255));
+
+    //continue text
+    cont.setFont(font1);
+    cont.setCharacterSize(23);
+    cont.setPosition(870, 500);
+    cont.setString("Continue");
+    cont.setFillColor(Color(204, 229, 255, 225));
 
     // player image
     PlayerSkin.loadFromFile("Playerr.png");
@@ -234,6 +291,7 @@ void IngameImages()
     rectangle5.setPosition(0, -50);
     rectangle4.setFillColor(Color::Transparent);
     rectangle5.setFillColor(Color::Transparent);
+
     // chicken image
     ChickenSkin.loadFromFile("RedChicken.png");
 
@@ -282,6 +340,7 @@ void IngameImages()
     for (int i = 0; i < meteors.meteorcount; i++)
     {
         meteor[i].setTexture(meteortex);
+        meteor[i].setTextureRect(IntRect(62.625 * xmeteor, 62.25 * ymeteor, 62.625f, 62.25f));
     }
 
     //setting chicken textures and positions
@@ -292,6 +351,7 @@ void IngameImages()
             Chicken[i][j].setTexture(ChickenSkin);
             Chicken[i][j].setScale(2.75, 2.75);
             Chicken[i][j].setPosition(120 + (ChickenPositionX * 170), 50 + (ChickenPositionY * 100));
+            Chicken[i][j].setTextureRect(IntRect(ChickenMovement * 46.9, 0, 46.9, 38));
             ChickenPositionX++;
         }
         ChickenPositionX = 0;
@@ -302,6 +362,7 @@ void IngameImages()
     bosssprite.setTexture(bossimage);
     bosssprite.setPosition(Vector2f(200, 200));
     bosssprite.setScale(4.5 , 4.5);
+    bosssprite.setTextureRect(IntRect(75*animation, 0, 75, 68));
    
     //setting bullet textures
     for (int i = 0; i < 40; i++)
@@ -396,7 +457,13 @@ void PlayerMove()
 void PlayerShooting() {
 
     //Shooting
-    if ((Keyboard::isKeyPressed(Keyboard::Space)) && bullet.bulletCoolDown == 0 || (Mouse::isButtonPressed(Mouse::Left)) && bullet.bulletCoolDown == 0)
+    
+    if ((Keyboard::isKeyPressed(Keyboard::Space)) && bullet.bulletCoolDown == 0 && pausecooldown == 0 || (Mouse::isButtonPressed(Mouse::Left)) && bullet.bulletCoolDown == 0 && pausecooldown == 0)
+    {
+        bullet.bulletCoolDown = bullet.bulletCoolDownvar;
+        pausecooldown = 1;
+    }
+    if ((Keyboard::isKeyPressed(Keyboard::Space)) && bullet.bulletCoolDown == 0 && pausecooldown==1 || (Mouse::isButtonPressed(Mouse::Left)) && bullet.bulletCoolDown == 0 && pausecooldown == 1)
     {
         bullet.bulletCoolDown = bullet.bulletCoolDownvar;
         Bullets[bullet.currentBullet].setPosition(Player.getPosition().x + 29, Player.getPosition().y - 45);
@@ -701,8 +768,8 @@ void scorecalc() {
     }
 }
 
-//Buttons 
-void Buttons()
+//Main menu 
+void mainmenu()
 {
     Vector2i mousepos = Mouse::getPosition(window);
     if (Mouse::isButtonPressed(Mouse::Left) && checkclick==0)
@@ -711,10 +778,12 @@ void Buttons()
         {
             countb = 0;
             checkclick++;
+            pause = 0;
         }
         if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 580 && mousepos.y <= 650)
         {
             countgm = 0;
+            option = 1;
             checkclick++;
         }
         if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 680 && mousepos.y <= 750)
@@ -731,59 +800,107 @@ void Buttons()
         {
             window.close();
         }
+        if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970)
+        {
+            countback = 1;
+        }
 
 
     }
+    if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 380 && mousepos.y <= 450)
+    {
+        rectangleoption[0].setFillColor(Color(0, 128, 255, 40));
+        rectangleoption[0].setOutlineColor(Color(102, 178, 255, 255));
+    }
+    else
+    {
+        rectangleoption[0].setFillColor(Color(0, 0, 255, 40));
+        rectangleoption[0].setOutlineColor(Color(51, 153, 255, 60));
+    }
+
     if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550)
     {
-        rectangleplay.setFillColor(Color(0,128,255,40));
-        rectangleplay.setOutlineColor(Color(102, 178, 255, 255));
+        rectanglemainmenu[0].setFillColor(Color(0,128,255,40));
+        rectanglemainmenu[0].setOutlineColor(Color(102, 178, 255, 255));
+        rectangleoption[1].setFillColor(Color(0, 128, 255, 40));
+        rectangleoption[1].setOutlineColor(Color(102, 178, 255, 255));
+        rectanglecont.setFillColor(Color(0, 128, 255, 40));
+        rectanglecont.setOutlineColor(Color(102, 178, 255, 255));
     }
     else 
     {
-        rectangleplay.setFillColor(Color(0, 0, 255, 40));
-        rectangleplay.setOutlineColor(Color(51, 153, 255, 60)); 
+        rectanglemainmenu[0].setFillColor(Color(0, 0, 255, 40));
+        rectanglemainmenu[0].setOutlineColor(Color(51, 153, 255, 60));
+        rectangleoption[1].setFillColor(Color(0, 0, 255, 40));
+        rectangleoption[1].setOutlineColor(Color(51, 153, 255, 60)); 
+        rectanglecont.setFillColor(Color(0, 0, 255, 40));  
+        rectanglecont.setOutlineColor(Color(51, 153, 255, 60)); 
     }
     if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 580 && mousepos.y <= 650)
     {
-        rectangleoptions.setFillColor(Color(0, 128, 255, 40));
-        rectangleoptions.setOutlineColor(Color(102, 178, 255, 255));
+        rectanglemainmenu[1].setFillColor(Color(0, 128, 255, 40));
+        rectanglemainmenu[1].setOutlineColor(Color(102, 178, 255, 255));
     }
     else
     {
-        rectangleoptions.setFillColor(Color(0, 0, 255, 40));
-        rectangleoptions.setOutlineColor(Color(51, 153, 255, 60));
+        rectanglemainmenu[1].setFillColor(Color(0, 0, 255, 40));
+        rectanglemainmenu[1].setOutlineColor(Color(51, 153, 255, 60));
     }
     if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 680 && mousepos.y <= 750)
     {
-        rectangleleaderboard.setFillColor(Color(0, 128, 255, 40));
-        rectangleleaderboard.setOutlineColor(Color(102, 178, 255, 255));
+        rectanglemainmenu[2].setFillColor(Color(0, 128, 255, 40));
+        rectanglemainmenu[2].setOutlineColor(Color(102, 178, 255, 255));
     }
     else
     {
-        rectangleleaderboard.setFillColor(Color(0, 0, 255, 40));
-        rectangleleaderboard.setOutlineColor(Color(51, 153, 255, 60));
+        rectanglemainmenu[2].setFillColor(Color(0, 0, 255, 40));
+        rectanglemainmenu[2].setOutlineColor(Color(51, 153, 255, 60));
     }
     if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 780 && mousepos.y <= 850)
     {
-        rectanglecredits.setFillColor(Color(0, 128, 255, 40));
-        rectanglecredits.setOutlineColor(Color(102, 178, 255, 255));
+        rectanglemainmenu[3].setFillColor(Color(0, 128, 255, 40));
+        rectanglemainmenu[3].setOutlineColor(Color(102, 178, 255, 255));
     }
     else
     {
-        rectanglecredits.setFillColor(Color(0, 0, 255, 40));
-        rectanglecredits.setOutlineColor(Color(51, 153, 255, 60));
+        rectanglemainmenu[3].setFillColor(Color(0, 0, 255, 40));
+        rectanglemainmenu[3].setOutlineColor(Color(51, 153, 255, 60));
     }
     if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 880 && mousepos.y <= 950)
     {
-        rectanglequit.setFillColor(Color(0, 128, 255, 40));
-        rectanglequit.setOutlineColor(Color(102, 178, 255, 255));
+        rectanglemainmenu[4].setFillColor(Color(0, 128, 255, 40));
+        rectanglemainmenu[4].setOutlineColor(Color(102, 178, 255, 255));
     }
     else
     {
-        rectanglequit.setFillColor(Color(0, 0, 255, 40));
-        rectanglequit.setOutlineColor(Color(51, 153, 255, 60));
+        rectanglemainmenu[4].setFillColor(Color(0, 0, 255, 40));
+        rectanglemainmenu[4].setOutlineColor(Color(51, 153, 255, 60));
     }
+    if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970)
+    {
+        rectangleback.setFillColor(Color(0, 128, 255, 40));
+        rectangleback.setOutlineColor(Color(102, 178, 255, 255));
+    }
+    else
+    {
+        rectangleback.setFillColor(Color(0, 0, 255, 40));
+        rectangleback.setOutlineColor(Color(51, 153, 255, 60));
+    }
+
+    if (Keyboard::isKeyPressed(Keyboard::P))
+    {
+        pause = 1;
+        pausecooldown = 0;
+        checkclick = 0;
+        
+    }
+    if (Keyboard::isKeyPressed(Keyboard::Escape))
+    {
+        pause = 0;
+        pausecooldown = 1;
+        checkclick = 1;
+    }
+
 }
 
 //Boss   By mohamed akram , ziad khaled
@@ -791,6 +908,7 @@ void bossmove() {
 
     //Boss movement + animation
     bosssprite.setTextureRect(IntRect(75 * animation, 0, 75, 68));
+    if(countb==0){
     if (bosssprite.getGlobalBounds().intersects(rectangle5.getGlobalBounds()))
         bossdir = 0;
     else if (bosssprite.getGlobalBounds().intersects(rectangle4.getGlobalBounds()))
@@ -891,8 +1009,8 @@ void bossmove() {
             bossegg1[i].setScale(0, 0);
             bossegg2[i].setScale(0, 0);
         }
-        
 
+    }
 
         //collision egg
         /*if (bossegg[i].getGlobalBounds().intersects(Player.getGlobalBounds()))
@@ -932,13 +1050,18 @@ int main()
                 window.close();
             }
         }
-            PlayerMove();
-            //ChickenMove();
-            PlayerShooting();
-            //eggmovement();
-            //FoodMovment();
-            bossmove();
-        Buttons();  
+            
+            if (countb == 0 && pause ==0) 
+            {
+                
+                bossmove();
+                PlayerMove();
+                //ChickenMove();
+                PlayerShooting();
+                //eggmovement();
+                //FoodMovment();
+            }
+        mainmenu();  
 
 
         //clear window
@@ -977,7 +1100,7 @@ int main()
             window.draw(bossegg1[i]);
             window.draw(bossegg2[i]);
         }
-
+        
         scorecalc();
 
         window.draw(health_bar);
@@ -993,12 +1116,26 @@ int main()
         {
             window.draw(menubg);
             window.draw(Logo);
-            window.draw(rectangleplay);
-            window.draw(rectangleoptions);
-            window.draw(rectangleleaderboard);
-            window.draw(rectanglecredits);
-            window.draw(rectanglequit);
+            for (int i = 0; i < 5; i++)
+            {
+                window.draw(rectanglemainmenu[i]);
+            }
             window.draw(play);
+            window.draw(Options);
+            window.draw(Leaderboard);
+            window.draw(Credits);
+            window.draw(Quit);
+        }
+        if (pause == 1)
+        {
+            window.draw(menubg);
+            window.draw(Logo);
+            window.draw(rectanglecont);
+            for (int i = 1; i < 5; i++)
+            {
+                window.draw(rectanglemainmenu[i]);
+            }
+            window.draw(cont);
             window.draw(Options);
             window.draw(Leaderboard);
             window.draw(Credits);
@@ -1007,11 +1144,10 @@ int main()
         if (countgm == 1 && countb==1)
         {
             window.draw(Logo);
-            window.draw(rectangleplay);
-            window.draw(rectangleoptions);
-            window.draw(rectangleleaderboard);
-            window.draw(rectanglecredits);
-            window.draw(rectanglequit);
+            for (int i = 0; i < 5; i++)
+            {
+                window.draw(rectanglemainmenu[i]);
+            }
             window.draw(play);
             window.draw(Options);
             window.draw(Leaderboard);
@@ -1020,6 +1156,19 @@ int main()
         }
         if (countgm == 0)
             window.draw(menubg);
+        if (option == 1)
+        {
+            for (int i = 0; i < 2; i++)
+            {
+                window.draw(rectangleoption[i]);
+            }
+            window.draw(sound);
+            window.draw(controls);
+            window.draw(Option); 
+            window.draw(rectangleback);
+            window.draw(back);
+        }
+        
         
         //window.draw(meteor[1]);
         // show window
