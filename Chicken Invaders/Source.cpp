@@ -1131,6 +1131,13 @@ void bossmove() {
 
 int main()
 {
+    window.setMouseCursorVisible(false); // Hide cursor  
+    View fixed = window.getView(); // Create a fixed view  
+    // Load image and create sprite
+    Texture fork;
+    fork.loadFromFile("Fork.png");  
+    Sprite sprite(fork);   
+    sprite.setScale(1.4, 1); 
     // add functions
 beginning: {};
     cnt = 0;
@@ -1353,7 +1360,10 @@ beginning: {};
             }
             
         }
+        sprite.setPosition(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window))); // Set position 
         // window display
+        window.setView(fixed); 
+        window.draw(sprite); 
         window.display();
     }
     return 0;
