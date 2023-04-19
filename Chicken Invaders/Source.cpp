@@ -8,7 +8,6 @@
 using namespace std;
 using namespace sf;
 
-
 // Chicken Struct
 struct ChickenStruct
 {
@@ -46,7 +45,6 @@ struct bossstruct {
 
 
 
-
 // Intialized Variables
 long long cnt = 0;  //counter for score
 int health = 100;
@@ -58,12 +56,7 @@ int eggtimer = 0;
 int x = 0, y = 0, z = 0 ,n=15;
 int yolkcnt = 0;
 int yolkvar = 10;
-int countgm = 1;
-int pause = 0;
-int pausecount = 0;
-int pausecooldown=0;
-int pausecooldownvar = 40;
-int countb = 1;
+int pausecooldown = 0;
 int option = 0;
 int countback = 0;
 int checkclick = 0;
@@ -79,6 +72,7 @@ int chickenpx[8][6] = {}, chickenpy[8][6] = {};
 int foodcnt = 0;
 int tmp, meteortimer[40], meteorhp[40], meteorx = 0;
 int xmeteor=0, ymeteor=0;
+bool frommenu = true;
 
 // Creating Game Window
 RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders",Style::Fullscreen);
@@ -114,6 +108,9 @@ RectangleShape rectanglemainmenu[5];
 RectangleShape rectangleoption[2]; 
 RectangleShape rectangleback(Vector2f(200, 70));
 RectangleShape rectanglecont(Vector2f(350, 70));
+RectangleShape rectanglereturn(Vector2f(350, 70));
+RectangleShape rectanglelevels[5];
+
 //adding texts
 Text hp;
 Text score;
@@ -135,6 +132,8 @@ Text sound;
 Text back;
 Text Option;
 Text cont;
+Text levels[5];
+Text ret;
 //adding font
 Font font1;
 Font font2;
@@ -184,6 +183,14 @@ void IngameImages()
         rectanglemainmenu[i].setOutlineColor(Color(51, 153, 255, 60));
         rectanglemainmenu[i].setOutlineThickness(2.8f);
     }
+    for (int i = 0; i < 5; i++)
+    {
+        rectanglelevels[i].setSize(Vector2f(350, 70));
+        rectanglelevels[i].setPosition(785, 180 + i * 120);
+        rectanglelevels[i].setFillColor(Color(0, 0, 255, 40));
+        rectanglelevels[i].setOutlineColor(Color(51, 153, 255, 60));
+        rectanglelevels[i].setOutlineThickness(2.8f);
+    }
     for (int i = 0; i < 2; i++)
     {
         rectangleoption[i].setSize(Vector2f(350, 70));
@@ -196,10 +203,16 @@ void IngameImages()
     rectangleback.setFillColor(Color(0, 0, 255, 40));
     rectangleback.setOutlineColor(Color(51, 153, 255, 60));
     rectangleback.setOutlineThickness(2.8f);
+
     rectanglecont.setPosition(785, 480);
     rectanglecont.setFillColor(Color(0, 0, 255, 40));
     rectanglecont.setOutlineColor(Color(51, 153, 255, 60));
     rectanglecont.setOutlineThickness(2.8f);
+
+    rectanglereturn.setPosition(785, 880);
+    rectanglereturn.setFillColor(Color(0, 0, 255, 40));
+    rectanglereturn.setOutlineColor(Color(51, 153, 255, 60));
+    rectanglereturn.setOutlineThickness(2.8f);
     //Play text
     play.setFont(font1);
     play.setCharacterSize(23);
@@ -269,6 +282,23 @@ void IngameImages()
     cont.setPosition(870, 500);
     cont.setString("Continue");
     cont.setFillColor(Color(204, 229, 255, 225));
+
+    //return text
+    ret.setFont(font1);
+    ret.setCharacterSize(23);
+    ret.setPosition(880, 900);
+    ret.setString("Return");
+    ret.setFillColor(Color(204, 229, 255, 225));
+
+    //levels text
+    for (int i = 0; i < 5; i++)
+    {
+        levels[i].setFont(font1);
+        levels[i].setCharacterSize(23);
+        levels[i].setPosition(880, 200+i*120);
+        levels[i].setString("Level " + to_string(i+1));
+        levels[i].setFillColor(Color(204, 229, 255, 225));
+    }
 
     // player image
     PlayerSkin.loadFromFile("Playerr.png");
@@ -345,19 +375,7 @@ void IngameImages()
     }
 
     //setting chicken textures and positions
-    for (int j = 0; j < 5; j++)
-    {
-        for (int i = 0; i < 8; i++)
-        {
-            Chicken[i][j].setTexture(ChickenSkin);
-            Chicken[i][j].setScale(2.75, 2.75);
-            Chicken[i][j].setPosition(120 + (ChickenPositionX * 170), 50 + (ChickenPositionY * 100));
-            Chicken[i][j].setTextureRect(IntRect(ChickenMovement * 46.9, 0, 46.9, 38));
-            ChickenPositionX++;
-        }
-        ChickenPositionX = 0;
-        ChickenPositionY++;
-    }
+   
 
     //boss texture and position
     bosssprite.setTexture(bossimage);
@@ -488,6 +506,21 @@ void PlayerShooting() {
 void ChickenMove()
 {
     // mohamed wael and kareem essam
+
+    for (int j = 0; j < 5; j++)
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            Chicken[i][j].setTexture(ChickenSkin);
+            Chicken[i][j].setScale(2.75, 2.75);
+            Chicken[i][j].setPosition(120 + (ChickenPositionX * 170), 50 + (ChickenPositionY * 100));
+            Chicken[i][j].setTextureRect(IntRect(ChickenMovement * 46.9, 0, 46.9, 38));
+            ChickenPositionX++;
+        }
+        ChickenPositionX = 0;
+        ChickenPositionY++;
+    }
+
     for (int j = 0; j < 5; j++)
     {
         for (int i = 0; i < 8; i++)
@@ -773,77 +806,113 @@ void scorecalc() {
 void mainmenu()
 {
     Vector2i mousepos = Mouse::getPosition(window);
-    if (Mouse::isButtonPressed(Mouse::Left))
+    if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 180 && mousepos.y <= 250)
     {
-        if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550)
-        {
-            // Play
-            countb = 0;
-            checkclick++;
-            pause = 0;
-        }
-        if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 580 && mousepos.y <= 650)
-        {
-            // option
-            countgm = 0;
-            option = 1;
-            checkclick++;
-        }
-        if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 680 && mousepos.y <= 750)
-        {
-            // hall of fame
-            countgm = 0;
-            checkclick++;
-        }
-        if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 780 && mousepos.y <= 850)
-        {
-            //credits
-            countgm = 0;
-            checkclick++;
-        }
-        if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 880 && mousepos.y <= 950)
-        {
-            // quit
-            window.close();
-        }
-        if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970)
-        {
-            // back
-            countback = 1;
-        }
-
-
+        // level1 on
+        rectanglelevels[0].setFillColor(Color(0, 128, 255, 40));
+        rectanglelevels[0].setOutlineColor(Color(102, 178, 255, 255));
     }
+    else
+    {
+        // level1 off
+        rectanglelevels[0].setFillColor(Color(0, 0, 255, 40));
+        rectanglelevels[0].setOutlineColor(Color(51, 153, 255, 60));
+    }
+    if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 300 && mousepos.y <= 370)
+    {
+        // level2 on
+        rectanglelevels[1].setFillColor(Color(0, 128, 255, 40));
+        rectanglelevels[1].setOutlineColor(Color(102, 178, 255, 255));
+    }
+    else
+    {
+        // level2 off
+        rectanglelevels[1].setFillColor(Color(0, 0, 255, 40));
+        rectanglelevels[1].setOutlineColor(Color(51, 153, 255, 60));
+    }
+    if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 420 && mousepos.y <= 490)
+    {
+        // level3 on
+        rectanglelevels[2].setFillColor(Color(0, 128, 255, 40));
+        rectanglelevels[2].setOutlineColor(Color(102, 178, 255, 255));
+    }
+    else
+    {
+        // level3 off
+        rectanglelevels[2].setFillColor(Color(0, 0, 255, 40));
+        rectanglelevels[2].setOutlineColor(Color(51, 153, 255, 60));
+    }
+    if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 540 && mousepos.y <= 610)
+    {
+        // level4 on
+        rectanglelevels[3].setFillColor(Color(0, 128, 255, 40));
+        rectanglelevels[3].setOutlineColor(Color(102, 178, 255, 255));
+    }
+    else
+    {
+        // level4 off
+        rectanglelevels[3].setFillColor(Color(0, 0, 255, 40));
+        rectanglelevels[3].setOutlineColor(Color(51, 153, 255, 60));
+    }
+    if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 660 && mousepos.y <= 730)
+    {
+        // level5 on
+        rectanglelevels[4].setFillColor(Color(0, 128, 255, 40));
+        rectanglelevels[4].setOutlineColor(Color(102, 178, 255, 255));
+    }
+    else
+    {
+        // level5 off
+        rectanglelevels[4].setFillColor(Color(0, 0, 255, 40));
+        rectanglelevels[4].setOutlineColor(Color(51, 153, 255, 60));
+    }
+
     if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 380 && mousepos.y <= 450)
     {
-        //controls on
+        // sound on 
         rectangleoption[0].setFillColor(Color(0, 128, 255, 40));
         rectangleoption[0].setOutlineColor(Color(102, 178, 255, 255));
     }
     else
     {
-        // controls off
+        // sound off
         rectangleoption[0].setFillColor(Color(0, 0, 255, 40));
         rectangleoption[0].setOutlineColor(Color(51, 153, 255, 60));
     }
 
     if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550)
     {
-        // play continue sound on 
-        rectanglemainmenu[0].setFillColor(Color(0,128,255,40));
-        rectanglemainmenu[0].setOutlineColor(Color(102, 178, 255, 255));
+        // sound on 
         rectangleoption[1].setFillColor(Color(0, 128, 255, 40));
         rectangleoption[1].setOutlineColor(Color(102, 178, 255, 255));
+    }
+    else
+    {
+        // sound off
+        rectangleoption[1].setFillColor(Color(0, 0, 255, 40));
+        rectangleoption[1].setOutlineColor(Color(51, 153, 255, 60));
+    }
+    if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550)
+    {
+        // play on 
+        rectanglemainmenu[0].setFillColor(Color(0, 128, 255, 40));
+        rectanglemainmenu[0].setOutlineColor(Color(102, 178, 255, 255));
+    }
+    else
+    {
+        // play off
+        rectanglemainmenu[0].setFillColor(Color(0, 0, 255, 40));
+        rectanglemainmenu[0].setOutlineColor(Color(51, 153, 255, 60));
+    }
+    if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550)
+    {
+        // continue on 
         rectanglecont.setFillColor(Color(0, 128, 255, 40));
         rectanglecont.setOutlineColor(Color(102, 178, 255, 255));
     }
     else 
     {
-        // play continue sound off
-        rectanglemainmenu[0].setFillColor(Color(0, 0, 255, 40));
-        rectanglemainmenu[0].setOutlineColor(Color(51, 153, 255, 60));
-        rectangleoption[1].setFillColor(Color(0, 0, 255, 40));
-        rectangleoption[1].setOutlineColor(Color(51, 153, 255, 60)); 
+        // continue off
         rectanglecont.setFillColor(Color(0, 0, 255, 40));  
         rectanglecont.setOutlineColor(Color(51, 153, 255, 60)); 
     }
@@ -895,6 +964,18 @@ void mainmenu()
         rectanglemainmenu[4].setFillColor(Color(0, 0, 255, 40));
         rectanglemainmenu[4].setOutlineColor(Color(51, 153, 255, 60));
     }
+    if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 880 && mousepos.y <= 950)
+    {
+        // return on
+        rectanglereturn.setFillColor(Color(0, 128, 255, 40));
+        rectanglereturn.setOutlineColor(Color(102, 178, 255, 255));
+    }
+    else
+    {
+        //return off
+        rectanglereturn.setFillColor(Color(0, 0, 255, 40));
+        rectanglereturn.setOutlineColor(Color(51, 153, 255, 60));
+    }
     if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970)
     {
         // back on
@@ -907,21 +988,6 @@ void mainmenu()
         rectangleback.setFillColor(Color(0, 0, 255, 40));
         rectangleback.setOutlineColor(Color(51, 153, 255, 60));
     }
-
-    if (Keyboard::isKeyPressed(Keyboard::P))
-    {
-        pause = 1;
-        pausecooldown = 0;
-        checkclick = 0;
-        
-    }
-    if (Keyboard::isKeyPressed(Keyboard::Escape))
-    {
-        pause = 0;
-        pausecooldown = 1;
-        checkclick = 1;
-    }
-
 }
 
 //Boss   By mohamed akram , ziad khaled
@@ -929,7 +995,6 @@ void bossmove() {
 
     //Boss movement + animation
     bosssprite.setTextureRect(IntRect(75 * animation, 0, 75, 68));
-    if(countb==0){
     if (bosssprite.getGlobalBounds().intersects(rectangle5.getGlobalBounds()))
         bossdir = 0;
     else if (bosssprite.getGlobalBounds().intersects(rectangle4.getGlobalBounds()))
@@ -1040,7 +1105,7 @@ void bossmove() {
         }*/
 
 
-    }
+  
     
 
 
@@ -1055,6 +1120,40 @@ void bossmove() {
 int main()
 {
     // add functions
+beginning: {};
+    //chicken struct
+    struct ChickenStruct
+    {
+        double HP[8][5], speed = 4;
+    };
+
+    //Bullet Struct
+    struct bulletstruct
+    {
+        int heldWeapon = 1;
+        float bulletSpeed = 10;
+        int currentBullet = 0;
+        float bulletCoolDownvar = 8;
+        float bulletCoolDown = 0;
+    };
+
+    //Meteor Struct
+    struct meteorstruct {
+        double meteorspeed = 5;
+        int meteorhp = 10;
+        int meteorcount = 40;
+    };
+
+    //Boss struct
+    struct bossstruct {
+
+        double bossspeed = 5;
+        int bosshp = 50;
+        int eggcooldown[5];
+        int eggcooldownvar = 301;
+
+    };
+
     IngameImages();
     // main game loop
     while (window.isOpen())
@@ -1092,12 +1191,12 @@ int main()
             {
                 window.draw(rectanglemainmenu[i]);
             }
-            if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550)
+            if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550 )
             {
                 testing = 1;
                 goto vest;
             }
-            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 580 && mousepos.y <= 650)
+            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 580 && mousepos.y <= 650 )
             {
                 testing = 2;
                 goto vest;
@@ -1107,12 +1206,12 @@ int main()
                 testing = 3;
                 goto vest;
             }
-            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 780 && mousepos.y <= 850)
+            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 780 && mousepos.y <= 850 )
             {
                 testing = 4;
                 goto vest;
             }
-            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 880 && mousepos.y <= 950)
+            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 880 && mousepos.y <= 950 )
             {
                 window.close();
             }
@@ -1124,11 +1223,20 @@ int main()
             mainmenu();
             if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left))
             {
-                testing = 0;
+                    testing = 0;
             }
             window.draw(menubg);
             window.draw(rectangleback);
             window.draw(back);
+            for (int i = 0; i < 5; i++)
+            {
+                window.draw(rectanglelevels[i]);
+                window.draw(levels[i]);
+            }
+            if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 180 && mousepos.y <= 250 && Mouse::isButtonPressed(Mouse::Left))
+            {
+                testing = 6;
+            }
 
         }
         // options testing ==2
@@ -1136,7 +1244,10 @@ int main()
         {
             if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left))
             {
-                testing = 0;
+                if (frommenu)
+                    testing = 0;
+                else
+                    testing = 5;
             }
             mainmenu();
             window.draw(menubg);
@@ -1153,7 +1264,10 @@ int main()
         {
             if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left))
             {
-                testing = 0;
+                if (frommenu)
+                    testing = 0;
+                else
+                    testing = 5;
             }
             mainmenu();
             window.draw(menubg);
@@ -1165,12 +1279,90 @@ int main()
         {
             if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left))
             {
-                testing = 0;
+               if (frommenu)
+                    testing = 0;
+                else
+                    testing = 5;
             }
             mainmenu();
             window.draw(menubg);
             window.draw(rectangleback);
             window.draw(back);
+        }
+
+        if (testing == 5)
+        {
+            mainmenu();
+          if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550)
+          {
+              testing = 6;
+              goto vest;
+          }
+          else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 580 && mousepos.y <= 650)
+          {
+             testing = 2;
+             goto vest;
+          }
+          else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 680 && mousepos.y <= 750)
+          {
+             testing = 3;
+             goto vest;
+          }
+          else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 780 && mousepos.y <= 850)
+          {
+              testing = 4;
+              goto vest;
+          }
+          else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 880 && mousepos.y <= 950)
+          {
+              testing = 1;
+              goto beginning;
+          }
+            window.draw(menubg);
+            window.draw(Logo);
+            for (int i = 1; i < 4; i++)
+            {
+                window.draw(rectanglemainmenu[i]);
+            }
+            window.draw(rectanglecont);
+            window.draw(rectanglereturn);
+            window.draw(cont); 
+            window.draw(Options); 
+            window.draw(Leaderboard); 
+            window.draw(Credits); 
+            window.draw(ret); 
+        } 
+        if (testing == 6)
+        {
+            frommenu = false;
+            PlayerShooting();
+            bossmove();
+            PlayerMove();
+            scorecalc();
+            window.draw(_GameBackground);
+            window.draw(Player);
+            window.draw(rectangle1);
+            window.draw(rectangle2);
+            window.draw(bosssprite);
+            window.draw(health_bar);
+            window.draw(score);
+            window.draw(hp);
+            window.draw(foodscore); 
+            for (int i = 0; i < 5; i++)
+            {
+                window.draw(bossegg[i]);
+                window.draw(bossegg1[i]);
+                window.draw(bossegg2[i]);
+            }
+            for (int i = 0; i < 40; i++) 
+            {
+                window.draw(Bullets[i]);
+            }
+            if (Keyboard::isKeyPressed(Keyboard::Escape))
+            {
+                testing = 5;
+            }
+            
         }
         // window display
         window.display();
