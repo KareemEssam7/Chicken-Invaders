@@ -1176,6 +1176,7 @@ beginning: {};
             window.draw(Leaderboard);
             window.draw(Credits);
             window.draw(Quit);
+            window.draw(sprite);  
             for (int i = 0; i < 5; i++)
             {
                 window.draw(rectanglemainmenu[i]);
@@ -1217,6 +1218,7 @@ beginning: {};
             window.draw(menubg);
             window.draw(rectangleback);
             window.draw(back);
+            window.draw(sprite); 
             for (int i = 0; i < 5; i++)
             {
                 window.draw(rectanglelevels[i]);
@@ -1225,8 +1227,7 @@ beginning: {};
             if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 180 && mousepos.y <= 250 && Mouse::isButtonPressed(Mouse::Left))
             {
                 testing = 6;
-            }
-
+            } 
         }
         // options testing ==2
         if (testing == 2)
@@ -1246,7 +1247,8 @@ beginning: {};
                 window.draw(rectangleoption[i]);
             window.draw(controls);
             window.draw(sound);
-            window.draw(back);
+            window.draw(back); 
+            window.draw(sprite);  
         }
         // hall of fame testing ==3
         if (testing == 3)
@@ -1262,6 +1264,7 @@ beginning: {};
             window.draw(menubg);
             window.draw(rectangleback);
             window.draw(back);
+            window.draw(sprite);  
         }
         // credits testing ==4
         if (testing == 4)
@@ -1284,6 +1287,7 @@ beginning: {};
             window.draw(credits5);
             window.draw(credits6);
             window.draw(credits7);
+            window.draw(sprite);  
         }
         //pause
         if (testing == 5)
@@ -1327,6 +1331,7 @@ beginning: {};
             window.draw(Leaderboard); 
             window.draw(Credits); 
             window.draw(ret); 
+            window.draw(sprite); 
         } 
         if (testing == 6)
         {
@@ -1363,7 +1368,6 @@ beginning: {};
         sprite.setPosition(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window))); // Set position 
         // window display
         window.setView(fixed); 
-        window.draw(sprite); 
         window.display();
     }
     return 0;
