@@ -68,6 +68,7 @@ int tmp, meteortimer[40], meteorhp[40], meteorx = 0;
 int xmeteor=0, ymeteor=0;
 bool frommenu = true;
 bool soundon = true;
+bool checking = true;
 // Creating Game Window
 RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders",Style::Fullscreen);
 
@@ -91,6 +92,8 @@ Texture arrow1;
 Texture arrow2;
 Texture arrow3;
 Texture arrow4;
+Texture fork;
+Texture checkmark;
 
 // adding border
 RectangleShape rectangle1(Vector2f(60, 1080));
@@ -109,6 +112,7 @@ RectangleShape rectanglecont(Vector2f(350, 70));
 RectangleShape rectanglereturn(Vector2f(350, 70));
 RectangleShape rectanglelevels[5];
 RectangleShape rectanglecontrols[6][2];
+RectangleShape rectanglecheck[2];
 
 
 //adding texts
@@ -148,6 +152,8 @@ Text Right;
 Text Left;
 Text Fire2;
 Text Shift;
+Text musiccheck;
+Text soundeffectcheck;
 //adding font
 Font font1;
 Font font2;
@@ -167,11 +173,11 @@ Sprite meteor[40];
 Sprite bosssprite;
 Sprite Logo;
 Sprite menubg;
-Sprite arrow_l;
-Sprite arrow_r;
-Sprite arrow_up;
-Sprite arrow_dw;
-
+Sprite arrow_l[2];
+Sprite arrow_r[2];
+Sprite arrow_up[2];
+Sprite arrow_dw[2];
+Sprite checkbox[2];
 
 
 // Loading Ingame Files
@@ -217,6 +223,16 @@ void IngameImages()
         rectangleoption[i].setOutlineColor(Color(51, 153, 255, 60));
         rectangleoption[i].setOutlineThickness(2.8f);
     }
+
+    for (int i = 0; i < 2; i++)
+    {
+        rectanglecheck[i].setSize(Vector2f(70, 70));
+        rectanglecheck[i].setPosition(985, 480 + i * 100);
+        rectanglecheck[i].setFillColor(Color(0, 0, 255, 40));
+        rectanglecheck[i].setOutlineColor(Color(51, 153, 255, 60));
+        rectanglecheck[i].setOutlineThickness(2.8f);
+    }
+
     rectangleback.setPosition(50, 900);
     rectangleback.setFillColor(Color(0, 0, 255, 40));
     rectangleback.setOutlineColor(Color(51, 153, 255, 60));
@@ -303,24 +319,24 @@ void IngameImages()
 
     //continue text
     cont.setFont(font1);
-    cont.setCharacterSize(30);
-    cont.setPosition(870, 500);
+    cont.setCharacterSize(32);
+    cont.setPosition(900, 495);
     cont.setString("Continue");
     cont.setFillColor(Color(204, 229, 255, 225));
 
     //return text
     ret.setFont(font1);
-    ret.setCharacterSize(30);
-    ret.setPosition(880, 900);
-    ret.setString("Return");
+    ret.setCharacterSize(32);
+    ret.setPosition(895, 895);
+    ret.setString("Main Menu");
     ret.setFillColor(Color(204, 229, 255, 225));
 
     //levels text
     for (int i = 0; i < 5; i++)
     {
         levels[i].setFont(font1);
-        levels[i].setCharacterSize(30);
-        levels[i].setPosition(880, 200+i*120);
+        levels[i].setCharacterSize(32);
+        levels[i].setPosition(910, 195+i*120);
         levels[i].setString("Level " + to_string(i+1));
         levels[i].setFillColor(Color(204, 229, 255, 225));
     }
@@ -338,7 +354,21 @@ void IngameImages()
     player2.setString("Player 2");
     player2.setFillColor(Color(0, 128, 255, 255));
 
-    //Control Player1 Text
+    //music text
+    musiccheck.setFont(font1);
+    musiccheck.setCharacterSize(32);
+    musiccheck.setPosition(825, 495);
+    musiccheck.setString("Music");
+    musiccheck.setFillColor(Color(204, 229, 255, 225));
+
+    //sound effects text
+    soundeffectcheck.setFont(font1);
+    soundeffectcheck.setCharacterSize(32);
+    soundeffectcheck.setPosition(775, 595);
+    soundeffectcheck.setString("Sound Effects");
+    soundeffectcheck.setFillColor(Color(204, 229, 255, 225));
+
+    //Control Player 1 and 2 Text
     W.setFont(font1);
     W.setString("W");
     W.setScale(1.5, 1.5);
@@ -380,29 +410,64 @@ void IngameImages()
     Left.setScale(1.5, 1.5);
     Left.setPosition(1310, 585);
     Space.setFont(font1);
-    Space.setString("Space");
+    Space.setString("LeftClick");
     Space.setScale(1.5, 1.5);
-    Space.setPosition(1300, 885);
+    Space.setPosition(1230, 885);
     Fire2.setFont(font1);
     Fire2.setString("Fire");
     Fire2.setScale(1.5, 1.5);
     Fire2.setPosition(530, 885);
     Shift.setFont(font1);
-    Shift.setString("Shift");
+    Shift.setString("Space");
     Shift.setScale(1.5, 1.5);
-    Shift.setPosition(840, 885);
+    Shift.setPosition(830, 885);
     
     
-
+    //sound checkmark
+    checkmark.loadFromFile("checkmark.png");
+    for (int i = 0; i < 2; i++)
+    {
+        checkbox[i].setTexture(checkmark);
+        checkbox[i].setScale(0.3, 0.3);
+        checkbox[i].setPosition(985 , 480+i*100);
+        checkbox[i].setColor(Color::Green);
+    }
   
 
     //settings arrows for control menu
-    arrow1.loadFromFile("arrowleft.png");
-    arrow_l.setTexture(arrow1);
-    arrow_l.setScale(3, 3);
-    arrow_l.setPosition(800, 680);
+    arrow1.loadFromFile("arrow.png");
+    for (int i = 0; i < 2; i++)
+    {
+        arrow_l[i].setTexture(arrow1);
+        arrow_l[i].setScale(0.25, 0.25);
+        arrow_l[i].setPosition(515 + i * 470, 470);
+    }
  
+    for (int i = 0; i < 2; i++)
+    {
+        arrow_r[i].setTexture(arrow1);
+        arrow_r[i].setScale(0.25, 0.25);
+        arrow_r[i].setPosition(600 + i * 470, 660);
+        arrow_r[i].rotate(180);
+    }
     
+    for (int i = 0; i < 2; i++)
+    {
+        arrow_up[i].setTexture(arrow1);
+        arrow_up[i].setScale(0.25, 0.25);
+        arrow_up[i].setPosition(510 + i * 470, 745);
+        arrow_up[i].setTextureRect(IntRect(100, 0, 360, 360));
+        arrow_up[i].rotate(270);
+    }
+
+    for (int i = 0; i < 2; i++)
+    {
+        arrow_dw[i].setTexture(arrow1);
+        arrow_dw[i].setScale(0.25, 0.25);
+        arrow_dw[i].setPosition(599 + i * 470, 788);
+        arrow_dw[i].setTextureRect(IntRect(100, 0, 360, 360));
+        arrow_dw[i].rotate(90);
+    }
 
     // player image
     PlayerSkin.loadFromFile("Playerr.png");
@@ -951,6 +1016,19 @@ void mainmenu()
         }
     }
 
+    for (int i = 0; i < 2; i++)
+    {
+        if (mousepos.x >= 985 && mousepos.x <= 1055  && mousepos.y >= 480 + i * 100 && mousepos.y <= 550 + i * 100)
+        {
+            rectanglecheck[i].setFillColor(Color(0, 128, 255, 40));
+            rectanglecheck[i].setOutlineColor(Color(102, 178, 255, 255));
+        }
+        else
+        {
+            rectanglecheck[i].setFillColor(Color(0, 0, 255, 40));
+            rectanglecheck[i].setOutlineColor(Color(51, 153, 255, 60));
+        }
+    }
     if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 180 && mousepos.y <= 250)
     {
         // level1 on
@@ -1268,7 +1346,7 @@ int main()
     window.setMouseCursorVisible(false); // Hide cursor  
     View fixed = window.getView(); // Create a fixed view  
     // Load image and create sprite
-    Texture fork;
+    
     fork.loadFromFile("Fork.png");  
     Sprite sprite(fork);   
     sprite.setScale(1.4, 1); 
@@ -1278,7 +1356,6 @@ beginning: {};
     boss.bosshp = 50;
     boss.eggcooldownvar = 301;
     IngameImages();
-    cout << arrow_l.getPosition().x << " " << arrow_l.getPosition().y;
 
     // main game loop
     while (window.isOpen())
@@ -1390,6 +1467,10 @@ beginning: {};
             if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550)
             {
                 testing = 7;
+            }
+            if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 580 && mousepos.y <= 650)
+            {
+                testing = 8;
             }
 
         }
@@ -1522,7 +1603,13 @@ beginning: {};
             }
             window.draw(player1);
             window.draw(player2);
-            window.draw(arrow_l);
+            for (int i = 0; i < 2; i++)
+            {
+                window.draw(arrow_l[i]);
+                window.draw(arrow_r[i]);
+                window.draw(arrow_up[i]);
+                window.draw(arrow_dw[i]);
+            }
             window.draw(Up);
             window.draw(Down);
             window.draw(Right);
@@ -1535,9 +1622,6 @@ beginning: {};
             window.draw(W);
             window.draw(Fire2);
             window.draw(Shift);
-           
-
-
             if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left))
             {
                 testing = 2;
@@ -1547,7 +1631,31 @@ beginning: {};
             window.draw(sprite);
             
         }
-        sprite.setPosition(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window))); // Set position 
+        if (testing == 8)
+        {
+            mainmenu();
+            window.draw(menubg);
+            window.draw(Logo);
+            window.draw(rectangleback);
+            window.draw(back);
+            if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left))
+            {
+                testing = 2;
+            }
+            for (int i = 0; i < 2; i++)
+            {
+                window.draw(rectanglecheck[i]);
+            }
+            window.draw(musiccheck);
+            window.draw(soundeffectcheck);
+            if (checking == true) 
+            {
+                window.draw(checkbox[0]);
+                window.draw(checkbox[1]);
+            }
+            window.draw(sprite);
+        }
+        sprite.setPosition(static_cast<Vector2f>(Mouse::getPosition(window))); // Set position 
         // window display
         window.setView(fixed); 
         window.display();
