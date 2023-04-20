@@ -104,6 +104,7 @@ RectangleShape rectangleback(Vector2f(200, 70));
 RectangleShape rectanglecont(Vector2f(350, 70));
 RectangleShape rectanglereturn(Vector2f(350, 70));
 RectangleShape rectanglelevels[5];
+RectangleShape rectanglecontrols[6][2];
 
 //adding texts
 Text hp;
@@ -128,6 +129,8 @@ Text Option;
 Text cont;
 Text levels[5];
 Text ret;
+Text player1;
+Text player2;
 //adding font
 Font font1;
 Font font2;
@@ -151,7 +154,7 @@ Sprite menubg;
 void IngameImages()
 {
     //fonts
-    font1.loadFromFile("LATINWD.ttf");
+    font1.loadFromFile("RobotoCondensed-Bold.ttf");
     font2.loadFromFile("font1.ttf");
 
     // background
@@ -185,7 +188,7 @@ void IngameImages()
     for (int i = 0; i < 2; i++)
     {
         rectangleoption[i].setSize(Vector2f(350, 70));
-        rectangleoption[i].setPosition(785, 380 + i * 100);
+        rectangleoption[i].setPosition(785, 480 + i * 100);
         rectangleoption[i].setFillColor(Color(0, 0, 255, 40));
         rectangleoption[i].setOutlineColor(Color(51, 153, 255, 60));
         rectangleoption[i].setOutlineThickness(2.8f);
@@ -204,79 +207,86 @@ void IngameImages()
     rectanglereturn.setFillColor(Color(0, 0, 255, 40));
     rectanglereturn.setOutlineColor(Color(51, 153, 255, 60));
     rectanglereturn.setOutlineThickness(2.8f);
+
+    for (int j = 0; j < 2; j++)
+    {
+        for (int i = 0; i < 5; i++)
+        {
+            rectanglecontrols[i][j].setSize(Vector2f(450, 70));
+            rectanglecontrols[i][j].setPosition(500+j*470, 480 + i * 100);
+            rectanglecontrols[i][j].setFillColor(Color(0, 0, 255, 40));
+            rectanglecontrols[i][j].setOutlineColor(Color(51, 153, 255, 60));
+            rectanglecontrols[i][j].setOutlineThickness(2.8f);
+        }
+    }
+
     //Play text
     play.setFont(font1);
-    play.setCharacterSize(23);
-    play.setPosition(807, 500);
+    play.setCharacterSize(32);
+    play.setPosition(860, 495);
     play.setString("Save The World");
     play.setFillColor(Color(204, 229, 255,225));
 
     //Options text
     Options.setFont(font1);
-    Options.setCharacterSize(23);
-    Options.setPosition(880, 600); 
+    Options.setCharacterSize(32);
+    Options.setPosition(905, 595); 
     Options.setString("Options");
     Options.setFillColor(Color(204, 229, 255, 225));
   
     //Leaderboard text
     Leaderboard.setFont(font1);
-    Leaderboard.setCharacterSize(23);
-    Leaderboard.setPosition(830, 700);
+    Leaderboard.setCharacterSize(32);
+    Leaderboard.setPosition(880, 695);
     Leaderboard.setString("Hall Of Fame");
     Leaderboard.setFillColor(Color(204, 229, 255, 225));
 
     //Credits text
     Credits.setFont(font1);
-    Credits.setCharacterSize(23);
-    Credits.setPosition(885, 800);
+    Credits.setCharacterSize(32);
+    Credits.setPosition(910, 795);
     Credits.setString("Credits");
     Credits.setFillColor(Color(204, 229, 255, 225));
 
     //Quit text
     Quit.setFont(font1);
-    Quit.setCharacterSize(23);
-    Quit.setPosition(915, 900);
+    Quit.setCharacterSize(32);
+    Quit.setPosition(935, 895);
     Quit.setString("Quit");
     Quit.setFillColor(Color(204, 229, 255, 225));
 
     //controls text
     controls.setFont(font1);
-    controls.setCharacterSize(23);
-    controls.setPosition(875, 400);
+    controls.setCharacterSize(32);
+    controls.setPosition(900, 495);
     controls.setString("Controls");
     controls.setFillColor(Color(204, 229, 255, 225));
 
     //sound text
     sound.setFont(font1);
-    sound.setCharacterSize(23);
-    sound.setPosition(900, 500);
+    sound.setCharacterSize(32);
+    sound.setPosition(920, 595);
     sound.setString("Sound");
     sound.setFillColor(Color(204, 229, 255, 225));
 
     //back text
     back.setFont(font1); 
-    back.setCharacterSize(23);
-    back.setPosition(80, 920);
+    back.setCharacterSize(32);
+    back.setPosition(100, 915);
     back.setString("< Back");
     back.setFillColor(Color(204, 229, 255, 225));
 
-    //Option text
-    Option.setFont(font1);
-    Option.setCharacterSize(40);
-    Option.setPosition(830, 100);
-    Option.setString("Options");
-    Option.setFillColor(Color(255, 255, 255, 255));
 
     //continue text
     cont.setFont(font1);
-    cont.setCharacterSize(23);
+    cont.setCharacterSize(30);
     cont.setPosition(870, 500);
     cont.setString("Continue");
     cont.setFillColor(Color(204, 229, 255, 225));
 
     //return text
     ret.setFont(font1);
-    ret.setCharacterSize(23);
+    ret.setCharacterSize(30);
     ret.setPosition(880, 900);
     ret.setString("Return");
     ret.setFillColor(Color(204, 229, 255, 225));
@@ -285,11 +295,24 @@ void IngameImages()
     for (int i = 0; i < 5; i++)
     {
         levels[i].setFont(font1);
-        levels[i].setCharacterSize(23);
+        levels[i].setCharacterSize(30);
         levels[i].setPosition(880, 200+i*120);
         levels[i].setString("Level " + to_string(i+1));
         levels[i].setFillColor(Color(204, 229, 255, 225));
     }
+    // player1 text
+    player1.setFont(font1);
+    player1.setCharacterSize(50);
+    player1.setPosition(650, 400);
+    player1.setString("Player 1");
+    player1.setFillColor(Color(0, 128, 255, 255));
+
+    //player2 text
+    player2.setFont(font1);
+    player2.setCharacterSize(50);
+    player2.setPosition(1100, 400);
+    player2.setString("Player 2");
+    player2.setFillColor(Color(0, 128, 255, 255));
 
     // player image
     PlayerSkin.loadFromFile("Playerr.png");
@@ -818,6 +841,26 @@ void scorecalc() {
 void mainmenu()
 {
     Vector2i mousepos = Mouse::getPosition(window);
+
+    //controls button
+    for (int j = 0; j < 2; j++)
+    {
+        for (int i = 0; i < 5; i++)
+        {
+            if (mousepos.x >= 500 + j*470  && mousepos.x <= 950 +j*470  && mousepos.y >= 480 +i * 100 && mousepos.y <= 550 + i *100 )
+            {
+                rectanglecontrols[i][j].setFillColor(Color(0, 128, 255, 40));
+                rectanglecontrols[i][j].setOutlineColor(Color(102, 178, 255, 255));
+            }
+            else
+            {
+                rectanglecontrols[i][j].setFillColor(Color(0, 0, 255, 40));
+                rectanglecontrols[i][j].setOutlineColor(Color(51, 153, 255, 60));
+            }
+
+        }
+    }
+
     if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 180 && mousepos.y <= 250)
     {
         // level1 on
@@ -879,20 +922,20 @@ void mainmenu()
         rectanglelevels[4].setOutlineColor(Color(51, 153, 255, 60));
     }
 
-    if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 380 && mousepos.y <= 450)
+    if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550)
     {
-        // sound on 
+        // controls on 
         rectangleoption[0].setFillColor(Color(0, 128, 255, 40));
         rectangleoption[0].setOutlineColor(Color(102, 178, 255, 255));
     }
     else
     {
-        // sound off
+        // controls off
         rectangleoption[0].setFillColor(Color(0, 0, 255, 40));
         rectangleoption[0].setOutlineColor(Color(51, 153, 255, 60));
     }
 
-    if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550)
+    if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 580 && mousepos.y <= 650)
     {
         // sound on 
         rectangleoption[1].setFillColor(Color(0, 128, 255, 40));
@@ -1227,6 +1270,7 @@ beginning: {};
             if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 180 && mousepos.y <= 250 && Mouse::isButtonPressed(Mouse::Left))
             {
                 testing = 6;
+                pausecooldown == 0;
             } 
         }
         // options testing ==2
@@ -1241,6 +1285,7 @@ beginning: {};
             }
             mainmenu();
             window.draw(menubg);
+            window.draw(Logo);
             window.draw(Option);
             window.draw(rectangleback);
             for(int i =0 ; i < 2 ;i++)
@@ -1248,7 +1293,12 @@ beginning: {};
             window.draw(controls);
             window.draw(sound);
             window.draw(back); 
-            window.draw(sprite);  
+            window.draw(sprite);
+            if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550)
+            {
+                testing = 7;
+            }
+
         }
         // hall of fame testing ==3
         if (testing == 3)
@@ -1363,6 +1413,29 @@ beginning: {};
             {
                 testing = 5;
             }
+            
+        }
+        if (testing == 7)
+        {
+            mainmenu();
+            window.draw(menubg);
+            window.draw(Logo);
+            for (int j = 0; j < 2; j++)
+            {
+                for (int i = 0; i < 5; i++)
+                {
+                    window.draw(rectanglecontrols[i][j]);
+                }
+            }
+            window.draw(player1);
+            window.draw(player2);
+            if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left))
+            {
+                testing = 2;
+            }
+            window.draw(rectangleback);
+            window.draw(back);
+            window.draw(sprite);
             
         }
         sprite.setPosition(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window))); // Set position 
