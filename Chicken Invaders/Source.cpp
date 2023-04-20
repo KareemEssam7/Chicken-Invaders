@@ -55,7 +55,7 @@ int option = 0;
 int countback = 0;
 int borderadjust = 0;
 int animation = 0;
-long long testing = 0;
+long long page = 0;
 bool checkchickenanimation = true, check = true, bossanimation=true;
 ChickenStruct chicken;
 bulletstruct bullet;
@@ -67,12 +67,14 @@ int tmp, meteortimer[40], meteorhp[40], meteorx = 0;
 int xmeteor=0, ymeteor=0;
 bool frommenu = true;
 bool soundon = true;
-bool checking = true;
 int delay = 0;
 int backdelay = 0;
 int rotatecheck = 0;
+int checkdelay = 0;
 bool musicON = true;
 bool soundeffectON = true;
+bool ldbcheck[5] = {};
+int lastlevel = 1;
 // Creating Game Window
 RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders",Style::Fullscreen);
 
@@ -117,7 +119,7 @@ RectangleShape rectanglereturn(Vector2f(350, 70));
 RectangleShape rectanglelevels[5];
 RectangleShape rectanglecontrols[6][2];
 RectangleShape rectanglecheck[2];
-
+RectangleShape rectangleldbs[5];
 
 //adding texts
 Text hp;
@@ -158,6 +160,7 @@ Text Fire2;
 Text Shift;
 Text musiccheck;
 Text soundeffectcheck;
+Text ldb[5];
 //adding font
 Font font1;
 Font font2;
@@ -202,7 +205,7 @@ void IngameImages()
     Logo.setPosition(423.5, -25);
     Logo.setScale(1, 0.7f);
 
-    //Buttons
+    //Buttons in main menu
     for (int i = 0; i < 5; i++)
     {
         rectanglemainmenu[i].setSize(Vector2f(350, 70));
@@ -211,6 +214,7 @@ void IngameImages()
         rectanglemainmenu[i].setOutlineColor(Color(51, 153, 255, 60));
         rectanglemainmenu[i].setOutlineThickness(2.8f);
     }
+    //Buttons in levels selection
     for (int i = 0; i < 5; i++)
     {
         rectanglelevels[i].setSize(Vector2f(350, 70));
@@ -219,6 +223,7 @@ void IngameImages()
         rectanglelevels[i].setOutlineColor(Color(51, 153, 255, 60));
         rectanglelevels[i].setOutlineThickness(2.8f);
     }
+    //Buttons in options menu
     for (int i = 0; i < 2; i++)
     {
         rectangleoption[i].setSize(Vector2f(350, 70));
@@ -227,7 +232,7 @@ void IngameImages()
         rectangleoption[i].setOutlineColor(Color(51, 153, 255, 60));
         rectangleoption[i].setOutlineThickness(2.8f);
     }
-
+    //Buttons in sound menu
     for (int i = 0; i < 2; i++)
     {
         rectanglecheck[i].setSize(Vector2f(70, 70));
@@ -236,33 +241,44 @@ void IngameImages()
         rectanglecheck[i].setOutlineColor(Color(51, 153, 255, 60));
         rectanglecheck[i].setOutlineThickness(2.8f);
     }
-
-    rectangleback.setPosition(50, 900);
-    rectangleback.setFillColor(Color(0, 0, 255, 40));
-    rectangleback.setOutlineColor(Color(51, 153, 255, 60));
-    rectangleback.setOutlineThickness(2.8f);
-
-    rectanglecont.setPosition(785, 480);
-    rectanglecont.setFillColor(Color(0, 0, 255, 40));
-    rectanglecont.setOutlineColor(Color(51, 153, 255, 60));
-    rectanglecont.setOutlineThickness(2.8f);
-
-    rectanglereturn.setPosition(785, 880);
-    rectanglereturn.setFillColor(Color(0, 0, 255, 40));
-    rectanglereturn.setOutlineColor(Color(51, 153, 255, 60));
-    rectanglereturn.setOutlineThickness(2.8f);
-
+    //Buttons in control menu
     for (int j = 0; j < 2; j++)
     {
         for (int i = 0; i < 5; i++)
         {
             rectanglecontrols[i][j].setSize(Vector2f(450, 70));
-            rectanglecontrols[i][j].setPosition(500+j*470, 480 + i * 100);
+            rectanglecontrols[i][j].setPosition(500 + j * 470, 480 + i * 100);
             rectanglecontrols[i][j].setFillColor(Color(0, 0, 255, 40));
             rectanglecontrols[i][j].setOutlineColor(Color(51, 153, 255, 60));
             rectanglecontrols[i][j].setOutlineThickness(2.8f);
         }
     }
+    //Buttons in leaderboard menu
+    for (int i = 0; i < 5; i++)
+    {
+        rectangleldbs[i].setSize(Vector2f(350, 70));
+        rectangleldbs[i].setPosition(50+i*370, 25 );
+        rectangleldbs[i].setFillColor(Color(0, 0, 255, 40));
+        rectangleldbs[i].setOutlineColor(Color(51, 153, 255, 60));
+        rectangleldbs[i].setOutlineThickness(2.8f);
+    }
+ 
+    //Back Button
+    rectangleback.setPosition(50, 900);
+    rectangleback.setFillColor(Color(0, 0, 255, 40));
+    rectangleback.setOutlineColor(Color(51, 153, 255, 60));
+    rectangleback.setOutlineThickness(2.8f);
+    //continue Button
+    rectanglecont.setPosition(785, 480);
+    rectanglecont.setFillColor(Color(0, 0, 255, 40));
+    rectanglecont.setOutlineColor(Color(51, 153, 255, 60));
+    rectanglecont.setOutlineThickness(2.8f);
+    //back to main menu Button
+    rectanglereturn.setPosition(785, 880);
+    rectanglereturn.setFillColor(Color(0, 0, 255, 40));
+    rectanglereturn.setOutlineColor(Color(51, 153, 255, 60));
+    rectanglereturn.setOutlineThickness(2.8f);
+    
 
     //Play text
     play.setFont(font1);
@@ -344,6 +360,17 @@ void IngameImages()
         levels[i].setString("Level " + to_string(i+1));
         levels[i].setFillColor(Color(204, 229, 255, 225));
     }
+
+    //ldbs text
+    for (int i = 0; i < 5; i++)
+    {
+        ldb[i].setFont(font1);
+        ldb[i].setCharacterSize(32);
+        ldb[i].setPosition(180 + i * 370, 40);
+        ldb[i].setString("Level " + to_string(i + 1));
+        ldb[i].setFillColor(Color(204, 229, 255, 225));
+    }
+
     // player1 text
     player1.setFont(font1);
     player1.setCharacterSize(50);
@@ -425,8 +452,7 @@ void IngameImages()
     Shift.setString("Space");
     Shift.setScale(1.5, 1.5);
     Shift.setPosition(830, 885);
-    
-    
+
     //sound checkmark
     checkmark.loadFromFile("checkmark.png");
     for (int i = 0; i < 2; i++)
@@ -482,7 +508,8 @@ void IngameImages()
     Player.setTextureRect(IntRect(PlayerMovement * 60, 0, 60, 42));
     Player.setPosition(960, 850);
     Player.setScale(1.5, 1.5);
-    rotatecheck++;
+    rotatecheck=1;
+
     // Border Image
     rectangle1.setPosition(0, 0);
     rectangle1.setFillColor(Color::Transparent);
@@ -491,6 +518,7 @@ void IngameImages()
     rectangle3.setOrigin(1300 / 2, 200);
     rectangle3.setPosition(770, 400);
     rectangle3.setFillColor(Color::Transparent);
+
     //Credit Names
     credits1.setFont(font1);
     credits1.setPosition(650, 50);
@@ -513,6 +541,7 @@ void IngameImages()
     credits7.setFont(font1);
     credits7.setPosition(650, 950);
     credits7.setString("Omar Ahmed");
+
     //boss borders
     rectangle4.setPosition((window.getSize().x / 2), (window.getSize().y / 2)+200);
     rectangle4.setOrigin(window.getSize().x / 2, 75 / 2);
@@ -1004,34 +1033,55 @@ void mainmenu()
 {
     Vector2i mousepos = Mouse::getPosition(window);
 
-    //controls button
+    for (int i = 0; i < 5; i++)
+    {
+        if (mousepos.x >= 50 + i*370  && mousepos.x <= 400 + i * 370 && mousepos.y >= 25  && mousepos.y <= 95)
+        {
+            //ldbs buttons on
+            rectangleldbs[i].setFillColor(Color(0, 128, 255, 40));
+            rectangleldbs[i].setOutlineColor(Color(102, 178, 255, 255));
+        }
+        else
+        {
+            //ldbs buttons off
+            rectangleldbs[i].setFillColor(Color(0, 0, 255, 40));
+            rectangleldbs[i].setOutlineColor(Color(51, 153, 255, 60));
+        }
+    }
+
+
+
     for (int j = 0; j < 2; j++)
     {
         for (int i = 0; i < 5; i++)
         {
             if (mousepos.x >= 500 + j*470  && mousepos.x <= 950 +j*470  && mousepos.y >= 480 +i * 100 && mousepos.y <= 550 + i *100 )
             {
+                //controls button on
                 rectanglecontrols[i][j].setFillColor(Color(0, 128, 255, 40));
                 rectanglecontrols[i][j].setOutlineColor(Color(102, 178, 255, 255));
             }
             else
             {
+                //controls button off
                 rectanglecontrols[i][j].setFillColor(Color(0, 0, 255, 40));
                 rectanglecontrols[i][j].setOutlineColor(Color(51, 153, 255, 60));
             }
 
         }
     }
-
+ 
     for (int i = 0; i < 2; i++)
     {
         if (mousepos.x >= 985 && mousepos.x <= 1055  && mousepos.y >= 480 + i * 100 && mousepos.y <= 550 + i * 100)
         {
+            //check boxes on
             rectanglecheck[i].setFillColor(Color(0, 128, 255, 40));
             rectanglecheck[i].setOutlineColor(Color(102, 178, 255, 255));
         }
         else
         {
+            //check boxes off
             rectanglecheck[i].setFillColor(Color(0, 0, 255, 40));
             rectanglecheck[i].setOutlineColor(Color(51, 153, 255, 60));
         }
@@ -1386,7 +1436,7 @@ beginning: {};
         Vector2i mousepos = Mouse::getPosition(window);
         //draw window
         // main menu
-        if (testing == 0)
+        if (page == 0)
         {
             delay = 0;
             frommenu = true;
@@ -1405,39 +1455,40 @@ beginning: {};
             }
             if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550 )
             {
-                testing = 1;
-                goto vest;
+                page = 1;
+                goto pagecode;
             }
             else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 580 && mousepos.y <= 650 )
             {
-                testing = 2;
-                goto vest;
+                page = 2;
+                goto pagecode;
             }
             else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 680 && mousepos.y <= 750)
             {
-                testing = 3;
-                goto vest;
+                page = 3;
+                goto pagecode;
             }
             else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 780 && mousepos.y <= 850 )
             {
-                testing = 4;
-                goto vest;
+                page = 4;
+                goto pagecode;
             }
             else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 880 && mousepos.y <= 950 )
             {
                 window.close();
             }
         }
-    vest: {};
-        // select level testing ==1;
-        if (testing == 1)
+    pagecode: {};
+        // select level page ==1;
+        if (page == 1)
         {
             backdelay = 0;
             delay = 0;
+            checkdelay = 0;
             mainmenu();
             if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left))
             {
-                    testing = 0;
+                    page = 0;
             }
             window.draw(menubg);
             window.draw(rectangleback);
@@ -1450,23 +1501,24 @@ beginning: {};
             }
             if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 180 && mousepos.y <= 250 && Mouse::isButtonPressed(Mouse::Left))
             {
-                testing = 6;
+                page = 6;
                 pausecooldown = 0;
             } 
         }
-        // options testing ==2
-        if (testing == 2)
+        // options page ==2
+        if (page == 2)
         {
             // back
             backdelay++;
             delay++;
+            checkdelay = 0;
                 if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left) && backdelay>=5)
                 {
                     backdelay = 0;
                     if (frommenu)
-                        testing = 0;
+                        page = 0;
                     else
-                        testing = 5;
+                        page = 5;
                 }
                 mainmenu();
                 window.draw(menubg);
@@ -1482,43 +1534,74 @@ beginning: {};
                 if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550 &&delay>=5)
                 {
                     delay = 0;
-                    testing = 7;
+                    page = 7;
                 }
                 if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 580 && mousepos.y <= 650 && delay>=5)
                 {
                     delay = 0;
-                    testing = 8;
+                    page = 8;
                 }
         }
-        // hall of fame testing ==3
-        if (testing == 3)
+        // hall of fame page ==3
+        if (page == 3)
         {
             backdelay = 0;
+            checkdelay = 0;
             delay = 0;
             if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left))
             {
                 if (frommenu)
-                    testing = 0;
+                    page = 0;
                 else
-                    testing = 5;
+                    page = 5;
             }
             mainmenu();
+           
             window.draw(menubg);
+            for (int i = 0; i < 5; i++)
+            {
+                if (mousepos.x >= 50 + i * 370 && mousepos.x <= 400 + i * 370 && mousepos.y >= 25 && mousepos.y <= 95 && Mouse::isButtonPressed(Mouse::Left))
+                {
+                    ldbcheck[lastlevel - 1] = 0;
+                    ldbcheck[i] = 1;
+                    lastlevel = i + 1;
+                }
+                if (ldbcheck[i] == 1)
+                {
+                    rectangleldbs[i].setFillColor(Color(0, 128, 255, 40));
+                    rectangleldbs[i].setOutlineColor(Color(102, 178, 255, 255));
+                }
+                else
+                {
+                    
+                    rectangleldbs[i].setFillColor(Color(0, 0, 255, 40));
+                    rectangleldbs[i].setOutlineColor(Color(51, 153, 255, 60));
+                }
+            }
+            for (int i = 0; i < 5; i++)
+            {
+                window.draw(rectangleldbs[i]);
+            }
+            for (int i = 0; i < 5; i++)
+            {
+                window.draw(ldb[i]);
+            }
             window.draw(rectangleback);
             window.draw(back);
             window.draw(sprite);  
         }
-        // credits testing ==4
-        if (testing == 4)
+        // credits page ==4
+        if (page == 4)
         {
             backdelay = 0;
+            checkdelay = 0;
             delay = 0;
             if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left))
             {
                if (frommenu)
-                    testing = 0;
+                    page = 0;
                 else
-                    testing = 5;
+                    page = 5;
             }
             mainmenu();
             window.draw(menubg);
@@ -1534,35 +1617,36 @@ beginning: {};
             window.draw(sprite);  
         }
         //pause
-        if (testing == 5)
+        if (page == 5)
         {
             backdelay = 0;
+            checkdelay = 0;
             delay = 0;
             mainmenu();
           if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550)
           {
               pausecooldown = 0;
-              testing = 6;
-              goto vest;
+              page = 6;
+              goto pagecode;
           }
           else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 580 && mousepos.y <= 650)
           {
-             testing = 2;
-             goto vest;
+             page = 2;
+             goto pagecode;
           }
           else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 680 && mousepos.y <= 750)
           {
-             testing = 3;
-             goto vest;
+             page = 3;
+             goto pagecode;
           }
           else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 780 && mousepos.y <= 850)
           {
-              testing = 4;
-              goto vest;
+              page = 4;
+              goto pagecode;
           }
           else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 880 && mousepos.y <= 950)
           {
-              testing = 1;
+              page = 1;
               goto beginning;
           }
             window.draw(menubg);
@@ -1581,10 +1665,11 @@ beginning: {};
             window.draw(sprite); 
         } 
         // ingame
-        if (testing == 6)
+        if (page == 6)
         {
             backdelay = 0;
             delay = 0;
+            checkdelay = 0;
             frommenu = false;
             PlayerShooting();
             bossmove();
@@ -1611,14 +1696,15 @@ beginning: {};
             }
             if (Keyboard::isKeyPressed(Keyboard::Escape))
             {
-                testing = 5;
+                page = 5;
             }
             
         }
         // control
-        if (testing == 7)
+        if (page == 7)
         {
             delay = 0;
+            checkdelay = 0;
             backdelay++;
             mainmenu();
             window.draw(menubg);
@@ -1654,7 +1740,7 @@ beginning: {};
             if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left) &&backdelay>=5)
             {
                 backdelay = 0;
-                testing = 2;
+                page = 2;
             }
             window.draw(rectangleback);
             window.draw(back);
@@ -1662,10 +1748,11 @@ beginning: {};
             
         }
         // sound
-        if (testing == 8)
+        if (page == 8)
         {
             delay = 0;
             backdelay = 0;
+            checkdelay++;
             mainmenu();
             window.draw(menubg);
             window.draw(Logo);
@@ -1673,7 +1760,7 @@ beginning: {};
             window.draw(back);
             if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left))
             {
-                testing = 2;
+                page = 2;
             }
             for (int i = 0; i < 2; i++)
             {
@@ -1681,9 +1768,24 @@ beginning: {};
             }
             window.draw(musiccheck);
             window.draw(soundeffectcheck);
-            if (checking == true) 
+
+            if (mousepos.x >= 985 && mousepos.x <= 1055 && mousepos.y >= 480  && mousepos.y <= 550 && Mouse::isButtonPressed(Mouse::Left) && checkdelay>=5)
+            {
+                musicON = !musicON;
+                checkdelay = 0;
+            }
+            if (mousepos.x >= 985 && mousepos.x <= 1055 && mousepos.y >= 580 && mousepos.y <= 650 && Mouse::isButtonPressed(Mouse::Left) && checkdelay >= 5)
+            {
+                soundeffectON = !soundeffectON;
+                checkdelay = 0;
+            }
+
+            if (musicON == true) 
             {
                 window.draw(checkbox[0]);
+            }
+            if (soundeffectON == true)
+            {
                 window.draw(checkbox[1]);
             }
             window.draw(sprite);
