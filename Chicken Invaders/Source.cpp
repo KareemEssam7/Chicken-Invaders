@@ -87,6 +87,10 @@ Texture meteortex;
 Texture bossimage;
 Texture gamelogo;
 Texture gamemenubg;
+Texture arrow1;
+Texture arrow2;
+Texture arrow3;
+Texture arrow4;
 
 // adding border
 RectangleShape rectangle1(Vector2f(60, 1080));
@@ -105,6 +109,7 @@ RectangleShape rectanglecont(Vector2f(350, 70));
 RectangleShape rectanglereturn(Vector2f(350, 70));
 RectangleShape rectanglelevels[5];
 RectangleShape rectanglecontrols[6][2];
+
 
 //adding texts
 Text hp;
@@ -131,6 +136,18 @@ Text levels[5];
 Text ret;
 Text player1;
 Text player2;
+Text W;
+Text S;
+Text D;
+Text A;
+Text Fire;
+Text Space;
+Text Up;
+Text Down;
+Text Right;
+Text Left;
+Text Fire2;
+Text Shift;
 //adding font
 Font font1;
 Font font2;
@@ -150,6 +167,13 @@ Sprite meteor[40];
 Sprite bosssprite;
 Sprite Logo;
 Sprite menubg;
+Sprite arrow_l;
+Sprite arrow_r;
+Sprite arrow_up;
+Sprite arrow_dw;
+
+
+
 // Loading Ingame Files
 void IngameImages()
 {
@@ -313,6 +337,72 @@ void IngameImages()
     player2.setPosition(1100, 400);
     player2.setString("Player 2");
     player2.setFillColor(Color(0, 128, 255, 255));
+
+    //Control Player1 Text
+    W.setFont(font1);
+    W.setString("W");
+    W.setScale(1.5, 1.5);
+    W.setPosition(870, 680);
+    S.setFont(font1);
+    S.setString("S");
+    S.setScale(1.5, 1.5);
+    S.setPosition(875, 785);
+    D.setFont(font1);
+    D.setString("D");
+    D.setScale(1.5, 1.5);
+    D.setPosition(870, 485);
+    A.setFont(font1);
+    A.setString("A");
+    A.setScale(1.5, 1.5);
+    A.setPosition(870,585);
+    Fire.setFont(font1);
+    Fire.setString("Fire");
+    Fire.setScale(1.5, 1.5);
+    Fire.setPosition(1000, 885);
+    Space.setFont(font1);
+    Space.setString("Space");
+    Space.setScale(1.5, 1.5);
+    Space.setPosition(520, 882);
+    Up.setFont(font1);
+    Up.setString("Up");
+    Up.setScale(1.5, 1.5);
+    Up.setPosition(1330, 680);
+    Down.setFont(font1);
+    Down.setString("Down");
+    Down.setScale(1.5, 1.5);
+    Down.setPosition(1300, 785);
+    Right.setFont(font1);
+    Right.setString("Right");
+    Right.setScale(1.5, 1.5);
+    Right.setPosition(1300, 485);
+    Left.setFont(font1);
+    Left.setString("Left");
+    Left.setScale(1.5, 1.5);
+    Left.setPosition(1310, 585);
+    Space.setFont(font1);
+    Space.setString("Space");
+    Space.setScale(1.5, 1.5);
+    Space.setPosition(1300, 885);
+    Fire2.setFont(font1);
+    Fire2.setString("Fire");
+    Fire2.setScale(1.5, 1.5);
+    Fire2.setPosition(530, 885);
+    Shift.setFont(font1);
+    Shift.setString("Shift");
+    Shift.setScale(1.5, 1.5);
+    Shift.setPosition(840, 885);
+    
+    
+
+  
+
+    //settings arrows for control menu
+    arrow1.loadFromFile("arrowleft.png");
+    arrow_l.setTexture(arrow1);
+    arrow_l.setScale(3, 3);
+    arrow_l.setPosition(800, 680);
+ 
+    
 
     // player image
     PlayerSkin.loadFromFile("Playerr.png");
@@ -1174,6 +1264,7 @@ void bossmove() {
 
 int main()
 {
+
     window.setMouseCursorVisible(false); // Hide cursor  
     View fixed = window.getView(); // Create a fixed view  
     // Load image and create sprite
@@ -1187,6 +1278,8 @@ beginning: {};
     boss.bosshp = 50;
     boss.eggcooldownvar = 301;
     IngameImages();
+    cout << arrow_l.getPosition().x << " " << arrow_l.getPosition().y;
+
     // main game loop
     while (window.isOpen())
     {
@@ -1429,6 +1522,22 @@ beginning: {};
             }
             window.draw(player1);
             window.draw(player2);
+            window.draw(arrow_l);
+            window.draw(Up);
+            window.draw(Down);
+            window.draw(Right);
+            window.draw(Left);
+            window.draw(Fire);
+            window.draw(Space);
+            window.draw(A);
+            window.draw(D);
+            window.draw(S);
+            window.draw(W);
+            window.draw(Fire2);
+            window.draw(Shift);
+           
+
+
             if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left))
             {
                 testing = 2;
