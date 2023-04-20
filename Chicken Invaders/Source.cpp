@@ -53,7 +53,6 @@ int yolkvar = 10;
 int pausecooldown = 0;
 int option = 0;
 int countback = 0;
-int checkclick = 0;
 int borderadjust = 0;
 int animation = 0;
 long long testing = 0;
@@ -69,6 +68,11 @@ int xmeteor=0, ymeteor=0;
 bool frommenu = true;
 bool soundon = true;
 bool checking = true;
+int delay = 0;
+int backdelay = 0;
+int rotatecheck = 0;
+bool musicON = true;
+bool soundeffectON = true;
 // Creating Game Window
 RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders",Style::Fullscreen);
 
@@ -448,7 +452,8 @@ void IngameImages()
         arrow_r[i].setTexture(arrow1);
         arrow_r[i].setScale(0.25, 0.25);
         arrow_r[i].setPosition(600 + i * 470, 660);
-        arrow_r[i].rotate(180);
+        if(rotatecheck==0)
+            arrow_r[i].rotate(180);
     }
     
     for (int i = 0; i < 2; i++)
@@ -457,7 +462,8 @@ void IngameImages()
         arrow_up[i].setScale(0.25, 0.25);
         arrow_up[i].setPosition(510 + i * 470, 745);
         arrow_up[i].setTextureRect(IntRect(100, 0, 360, 360));
-        arrow_up[i].rotate(270);
+        if(rotatecheck==0)
+            arrow_up[i].rotate(270);
     }
 
     for (int i = 0; i < 2; i++)
@@ -466,7 +472,8 @@ void IngameImages()
         arrow_dw[i].setScale(0.25, 0.25);
         arrow_dw[i].setPosition(599 + i * 470, 788);
         arrow_dw[i].setTextureRect(IntRect(100, 0, 360, 360));
-        arrow_dw[i].rotate(90);
+        if(rotatecheck==0)
+            arrow_dw[i].rotate(90);
     }
 
     // player image
@@ -475,7 +482,7 @@ void IngameImages()
     Player.setTextureRect(IntRect(PlayerMovement * 60, 0, 60, 42));
     Player.setPosition(960, 850);
     Player.setScale(1.5, 1.5);
-
+    rotatecheck++;
     // Border Image
     rectangle1.setPosition(0, 0);
     rectangle1.setFillColor(Color::Transparent);
@@ -487,25 +494,25 @@ void IngameImages()
     //Credit Names
     credits1.setFont(font1);
     credits1.setPosition(650, 50);
-    credits1.setString("Omar Ahmed");
+    credits1.setString("Kareem Essam");
     credits2.setFont(font1);
     credits2.setPosition(650, 200);
-    credits2.setString("Kareem Essam");
+    credits2.setString("Mohamed Wael");
     credits3.setFont(font1);
     credits3.setPosition(650, 350);
-    credits3.setString("Mohamed Wael");
+    credits3.setString("Malek Ahmed");
     credits4.setFont(font1);
     credits4.setPosition(650, 500);
-    credits4.setString("Ahmed Alaa");
+    credits4.setString("Mohamed Akram");
     credits5.setFont(font1);
     credits5.setPosition(650, 650);
-    credits5.setString("Malek Ahmed");
+    credits5.setString("Ahmed Alaa");
     credits6.setFont(font1);
     credits6.setPosition(650, 800);
-    credits6.setString("Mohamed Akram");
+    credits6.setString("Ziad Khaled");
     credits7.setFont(font1);
     credits7.setPosition(650, 950);
-    credits7.setString("Ziad Khaled");
+    credits7.setString("Omar Ahmed");
     //boss borders
     rectangle4.setPosition((window.getSize().x / 2), (window.getSize().y / 2)+200);
     rectangle4.setOrigin(window.getSize().x / 2, 75 / 2);
@@ -1381,6 +1388,8 @@ beginning: {};
         // main menu
         if (testing == 0)
         {
+            delay = 0;
+            frommenu = true;
             window.draw(menubg);
             window.draw(Logo);
             mainmenu();
@@ -1423,6 +1432,8 @@ beginning: {};
         // select level testing ==1;
         if (testing == 1)
         {
+            backdelay = 0;
+            delay = 0;
             mainmenu();
             if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left))
             {
@@ -1440,43 +1451,50 @@ beginning: {};
             if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 180 && mousepos.y <= 250 && Mouse::isButtonPressed(Mouse::Left))
             {
                 testing = 6;
-                pausecooldown == 0;
+                pausecooldown = 0;
             } 
         }
         // options testing ==2
         if (testing == 2)
         {
-            if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left))
-            {
-                if (frommenu)
-                    testing = 0;
-                else
-                    testing = 5;
-            }
-            mainmenu();
-            window.draw(menubg);
-            window.draw(Logo);
-            window.draw(Option);
-            window.draw(rectangleback);
-            for(int i =0 ; i < 2 ;i++)
-                window.draw(rectangleoption[i]);
-            window.draw(controls);
-            window.draw(sound);
-            window.draw(back); 
-            window.draw(sprite);
-            if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550)
-            {
-                testing = 7;
-            }
-            if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 580 && mousepos.y <= 650)
-            {
-                testing = 8;
-            }
-
+            // back
+            backdelay++;
+            delay++;
+                if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left) && backdelay>=5)
+                {
+                    backdelay = 0;
+                    if (frommenu)
+                        testing = 0;
+                    else
+                        testing = 5;
+                }
+                mainmenu();
+                window.draw(menubg);
+                window.draw(Logo);
+                window.draw(Option);
+                window.draw(rectangleback);
+                for (int i = 0; i < 2; i++)
+                    window.draw(rectangleoption[i]);
+                window.draw(controls);
+                window.draw(sound);
+                window.draw(back);
+                window.draw(sprite);
+                if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550 &&delay>=5)
+                {
+                    delay = 0;
+                    testing = 7;
+                }
+                if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 580 && mousepos.y <= 650 && delay>=5)
+                {
+                    delay = 0;
+                    testing = 8;
+                }
         }
         // hall of fame testing ==3
         if (testing == 3)
         {
+            backdelay = 0;
+            delay = 0;
             if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left))
             {
                 if (frommenu)
@@ -1493,6 +1511,8 @@ beginning: {};
         // credits testing ==4
         if (testing == 4)
         {
+            backdelay = 0;
+            delay = 0;
             if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left))
             {
                if (frommenu)
@@ -1516,9 +1536,12 @@ beginning: {};
         //pause
         if (testing == 5)
         {
+            backdelay = 0;
+            delay = 0;
             mainmenu();
           if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550)
           {
+              pausecooldown = 0;
               testing = 6;
               goto vest;
           }
@@ -1557,8 +1580,11 @@ beginning: {};
             window.draw(ret); 
             window.draw(sprite); 
         } 
+        // ingame
         if (testing == 6)
         {
+            backdelay = 0;
+            delay = 0;
             frommenu = false;
             PlayerShooting();
             bossmove();
@@ -1589,8 +1615,11 @@ beginning: {};
             }
             
         }
+        // control
         if (testing == 7)
         {
+            delay = 0;
+            backdelay++;
             mainmenu();
             window.draw(menubg);
             window.draw(Logo);
@@ -1622,8 +1651,9 @@ beginning: {};
             window.draw(W);
             window.draw(Fire2);
             window.draw(Shift);
-            if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left))
+            if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left) &&backdelay>=5)
             {
+                backdelay = 0;
                 testing = 2;
             }
             window.draw(rectangleback);
@@ -1631,8 +1661,11 @@ beginning: {};
             window.draw(sprite);
             
         }
+        // sound
         if (testing == 8)
         {
+            delay = 0;
+            backdelay = 0;
             mainmenu();
             window.draw(menubg);
             window.draw(Logo);
