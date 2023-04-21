@@ -66,6 +66,9 @@ int delay = 0;
 int backdelay = 0;
 int rotatecheck = 0;
 int checkdelay = 0;
+int modeselectdelay = 0;
+int soundeffectstart = 0;
+int coopclick = 0;
 bool musicON = true;
 bool soundeffectON = true;
 bool ldbcheck[5] = {};
@@ -118,6 +121,8 @@ RectangleShape rectanglelevels[5];
 RectangleShape rectanglecontrols[6][2];
 RectangleShape rectanglecheck[2];
 RectangleShape rectangleldbs[5];
+RectangleShape rectangleselectmode[2];
+
 
 //adding texts
 Text hp;
@@ -153,6 +158,8 @@ Text musiccheck;
 Text soundeffectcheck;
 Text ldb[5];
 Text Cred[7];
+Text single;
+Text coop;
 //adding font
 Font font1;
 Font font3;
@@ -236,6 +243,17 @@ void IngameImages()
         rectangleoption[i].setOutlineColor(Color(51, 153, 255, 60));
         rectangleoption[i].setOutlineThickness(2.8f);
     }
+
+    //Buttons in select mode menu
+    for (int i = 0; i < 2; i++)
+    {
+        rectangleselectmode[i].setSize(Vector2f(350, 70));
+        rectangleselectmode[i].setPosition(585+i*400 , 480);
+        rectangleselectmode[i].setFillColor(Color(0, 0, 255, 40));
+        rectangleselectmode[i].setOutlineColor(Color(51, 153, 255, 60));
+        rectangleselectmode[i].setOutlineThickness(2.8f);
+    }
+
     //Buttons in sound menu
     for (int i = 0; i < 2; i++)
     {
@@ -355,6 +373,20 @@ void IngameImages()
     ret.setPosition(895, 895);
     ret.setString("Main Menu");
     ret.setFillColor(Color(204, 229, 255, 225));
+
+    //single text
+    single.setFont(font1);
+    single.setCharacterSize(32);
+    single.setPosition(715, 495);
+    single.setString("Single");
+    single.setFillColor(Color(204, 229, 255, 225));
+
+    //coop text
+    coop.setFont(font1);
+    coop.setCharacterSize(32);
+    coop.setPosition(1115, 495);
+    coop.setString("Coop");
+    coop.setFillColor(Color(204, 229, 255, 225));
 
     //levels text
     for (int i = 0; i < 5; i++)
@@ -1036,6 +1068,24 @@ void mainmenu()
 {
     Vector2i mousepos = Mouse::getPosition(window);
 
+
+    //Buttons in select mode menu
+    for (int i = 0; i < 2; i++)
+    {
+        if (mousepos.x >= 585 + i * 400 && mousepos.x <= 935+ i * 400 && mousepos.y >= 480 && mousepos.y <= 550)
+        {
+            //Buttons in select mode menu on
+            rectangleselectmode[i].setFillColor(Color(0, 128, 255, 40));
+            rectangleselectmode[i].setOutlineColor(Color(102, 178, 255, 255));
+        }
+        else
+        {
+            //Buttons in select mode menu off
+            rectangleselectmode[i].setFillColor(Color(0, 0, 255, 40));
+            rectangleselectmode[i].setOutlineColor(Color(51, 153, 255, 60));
+        }
+    }
+
     for (int i = 0; i < 5; i++)
     {
         if (mousepos.x >= 50 + i*370  && mousepos.x <= 400 + i * 370 && mousepos.y >= 25  && mousepos.y <= 95)
@@ -1444,6 +1494,7 @@ beginning: {};
         // main menu
         if (page == 0)
         {
+            modeselectdelay = 0;
             delay = 0;
             frommenu = true;
             window.draw(menubg);
@@ -1496,39 +1547,43 @@ beginning: {};
         // select level page ==1;
         if (page == 1)
         {
-            backdelay = 0;
+            modeselectdelay = 0;
+            backdelay++;
             delay = 0;
             checkdelay = 0;
             mainmenu();
-            if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left))
+            //back
+            if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left) && backdelay>=5 )
             {
                 if (soundeffectON)
                     MenuClick.play();
+                backdelay = 0;
                     page = 0;
             }
             window.draw(menubg);
             window.draw(rectangleback);
             window.draw(back);
-            window.draw(sprite); 
+           
             for (int i = 0; i < 5; i++)
             {
                 window.draw(rectanglelevels[i]);
                 window.draw(levels[i]);
             }
+            //level1
             if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 180 && mousepos.y <= 250 && Mouse::isButtonPressed(Mouse::Left))
             {
                 if (soundeffectON)
                     MenuClick.play();
-                MainMusicPlaying = false;
-                page = 6;
-                pausecooldown = 0;
-                goto beginning;
+                page = 9;
+ 
             } 
+            window.draw(sprite);
         }
         // options page ==2
         if (page == 2)
         {
             // back
+            modeselectdelay = 0;
             backdelay++;
             delay++;
             checkdelay = 0;
@@ -1571,6 +1626,7 @@ beginning: {};
         // hall of fame page ==3
         if (page == 3)
         {
+            modeselectdelay = 0;
             backdelay = 0;
             checkdelay = 0;
             delay = 0;
@@ -1590,8 +1646,6 @@ beginning: {};
             {
                 if (mousepos.x >= 50 + i * 370 && mousepos.x <= 400 + i * 370 && mousepos.y >= 25 && mousepos.y <= 95 && Mouse::isButtonPressed(Mouse::Left))
                 {
-                    if (soundeffectON)
-                        MenuClick.play();
                     ldbcheck[lastlevel - 1] = 0;
                     ldbcheck[i] = 1;
                     lastlevel = i + 1;
@@ -1623,6 +1677,7 @@ beginning: {};
         // credits page ==4
         if (page == 4)
         {
+            modeselectdelay = 0;
             backdelay = 0;
             checkdelay = 0;
             delay = 0;
@@ -1682,9 +1737,10 @@ beginning: {};
             }
             window.draw(sprite);  
         }
-        //pause
+        //pause menu
         if (page == 5)
         {
+            modeselectdelay = 0;
             backdelay = 0;
             checkdelay = 0;
             delay = 0;
@@ -1743,7 +1799,8 @@ beginning: {};
         // ingame
         if (page == 6)
         {
-
+            
+            modeselectdelay = 0;
             backdelay = 0;
             delay = 0;
             checkdelay = 0;
@@ -1780,6 +1837,7 @@ beginning: {};
         // control
         if (page == 7)
         {
+            modeselectdelay = 0;
             delay = 0;
             checkdelay = 0;
             backdelay++;
@@ -1829,6 +1887,7 @@ beginning: {};
         // sound
         if (page == 8)
         {
+            modeselectdelay = 0;
             delay = 0;
             backdelay = 0;
             checkdelay++;
@@ -1890,7 +1949,55 @@ beginning: {};
             window.draw(sprite);
         }
 
-
+        if (page == 9)
+        {
+            mainmenu();
+            modeselectdelay++;
+            coopclick++;
+            backdelay=0;
+            window.draw(menubg);
+            window.draw(Logo);
+            for (int i = 0; i < 2; i++)
+            {
+                window.draw(rectangleselectmode[i]);
+            }
+            //single
+            if (mousepos.x >= 585 && mousepos.x <= 935 && mousepos.y >= 480 && mousepos.y <= 550 && Mouse::isButtonPressed(Mouse::Left) && modeselectdelay >= 5)
+            {
+                if (soundeffectON)
+                {
+                    MenuClick.play();
+                }
+                MainMusicPlaying = false;
+                page = 6;
+                pausecooldown = 0;
+                modeselectdelay = 0;
+                    goto beginning;
+            }
+            //coop
+            if (mousepos.x >= 985 && mousepos.x <= 1335 && mousepos.y >= 480 && mousepos.y <= 550 && Mouse::isButtonPressed(Mouse::Left) && modeselectdelay >= 5)
+            {
+             
+                if (soundeffectON && coopclick >= 5)
+                {
+                    MenuClick.play();
+                    coopclick = 0;
+                }
+            }
+            //back
+            if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left) )
+            {
+                if (soundeffectON)
+                    MenuClick.play();
+                page = 1;
+            }
+            window.draw(rectangleback);
+            window.draw(back);
+            window.draw(single);
+            window.draw(coop);
+            window.draw(sprite);
+         
+        }
         sprite.setPosition(static_cast<Vector2f>(Mouse::getPosition(window))); // Set position 
         // window display
         window.setView(fixed); 
