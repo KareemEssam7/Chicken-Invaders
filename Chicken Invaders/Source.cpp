@@ -69,6 +69,7 @@ int checkdelay = 0;
 bool musicON = true;
 bool soundeffectON = true;
 bool ldbcheck[5] = {};
+bool MainMusicPlaying = true;
 int lastlevel = 1;
 double curscale[7] = {1, 1, 1, 1, 1, 1, 1};
 // Creating Game Window
@@ -101,8 +102,12 @@ RectangleShape rectangle3(Vector2f(1300, 200));
 //borders for boss!!
 RectangleShape rectangle4(Vector2f(window.getSize().x, 75));
 RectangleShape rectangle5(Vector2f(window.getSize().x, 75));
-
-
+// sound buffers
+SoundBuffer Select;
+// sounds
+Sound MenuClick;
+//music
+Music MenuMusic;
 //Buttons
 RectangleShape rectanglemainmenu[5];
 RectangleShape rectangleoption[2]; 
@@ -182,7 +187,11 @@ void IngameImages()
     //fonts
     font1.loadFromFile("RobotoCondensed-Bold.ttf");
     font3.loadFromFile("Wedgie_Regular.ttf");
-    
+    // audio
+    Select.loadFromFile("Select.wav");
+    MenuClick.setBuffer(Select);
+    // music
+    MenuMusic.openFromFile("IntroMenu.wav");
     // background
     Background.loadFromFile("IngameBackground.jpg");
     _GameBackground.setTexture(Background);
@@ -1390,7 +1399,6 @@ void bossmove() {
 
 }
 
-
 int main()
 {
 
@@ -1409,6 +1417,11 @@ beginning: {};
     IngameImages();
 
     // main game loop
+    if (MainMusicPlaying)
+    {
+        MenuMusic.play();
+    }
+    MainMusicPlaying = false;
     while (window.isOpen())
     {
         // set framelimit
@@ -1423,7 +1436,6 @@ beginning: {};
                 window.close();
             }
         }
-            
         //clear window
         window.clear();
 
@@ -1449,21 +1461,29 @@ beginning: {};
             }
             if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550 )
             {
+                if (soundeffectON)
+                    MenuClick.play();
                 page = 1;
                 goto pagecode;
             }
             else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 580 && mousepos.y <= 650 )
             {
+                if (soundeffectON)
+                    MenuClick.play();
                 page = 2;
                 goto pagecode;
             }
             else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 680 && mousepos.y <= 750)
             {
+                if (soundeffectON)
+                    MenuClick.play();
                 page = 3;
                 goto pagecode;
             }
             else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 780 && mousepos.y <= 850 )
             {
+                if (soundeffectON)
+                    MenuClick.play();
                 page = 4;
                 goto pagecode;
             }
@@ -1482,6 +1502,8 @@ beginning: {};
             mainmenu();
             if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left))
             {
+                if (soundeffectON)
+                    MenuClick.play();
                     page = 0;
             }
             window.draw(menubg);
@@ -1495,8 +1517,12 @@ beginning: {};
             }
             if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 180 && mousepos.y <= 250 && Mouse::isButtonPressed(Mouse::Left))
             {
+                if (soundeffectON)
+                    MenuClick.play();
+                MainMusicPlaying = false;
                 page = 6;
                 pausecooldown = 0;
+                goto beginning;
             } 
         }
         // options page ==2
@@ -1508,6 +1534,8 @@ beginning: {};
             checkdelay = 0;
                 if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left) && backdelay>=5)
                 {
+                    if (soundeffectON)
+                        MenuClick.play();
                     backdelay = 0;
                     if (frommenu)
                         page = 0;
@@ -1527,11 +1555,15 @@ beginning: {};
                 window.draw(sprite);
                 if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550 &&delay>=5)
                 {
+                    if (soundeffectON)
+                        MenuClick.play();
                     delay = 0;
                     page = 7;
                 }
                 if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 580 && mousepos.y <= 650 && delay>=5)
                 {
+                    if (soundeffectON)
+                        MenuClick.play();
                     delay = 0;
                     page = 8;
                 }
@@ -1544,6 +1576,8 @@ beginning: {};
             delay = 0;
             if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left))
             {
+                if (soundeffectON)
+                    MenuClick.play();
                 if (frommenu)
                     page = 0;
                 else
@@ -1556,6 +1590,8 @@ beginning: {};
             {
                 if (mousepos.x >= 50 + i * 370 && mousepos.x <= 400 + i * 370 && mousepos.y >= 25 && mousepos.y <= 95 && Mouse::isButtonPressed(Mouse::Left))
                 {
+                    if (soundeffectON)
+                        MenuClick.play();
                     ldbcheck[lastlevel - 1] = 0;
                     ldbcheck[i] = 1;
                     lastlevel = i + 1;
@@ -1593,6 +1629,8 @@ beginning: {};
             //credit positioning
             if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left))
             {
+                if (soundeffectON)
+                    MenuClick.play();
                if (frommenu)
                {
                    page = 0;
@@ -1607,6 +1645,8 @@ beginning: {};
                
                else
                {
+                   if (soundeffectON)
+                       MenuClick.play();
                    page = 5;
                    for (int i = 0; i < 7; i++)
                    {
@@ -1651,27 +1691,37 @@ beginning: {};
             mainmenu();
           if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550)
           {
+              if (soundeffectON)
+                  MenuClick.play();
               pausecooldown = 0;
               page = 6;
               goto pagecode;
           }
           else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 580 && mousepos.y <= 650)
           {
+              if (soundeffectON)
+                  MenuClick.play();
              page = 2;
              goto pagecode;
           }
           else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 680 && mousepos.y <= 750)
           {
+              if (soundeffectON)
+                  MenuClick.play();
              page = 3;
              goto pagecode;
           }
           else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 780 && mousepos.y <= 850)
           {
+              if (soundeffectON)
+                  MenuClick.play();
               page = 4;
               goto pagecode;
           }
           else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 880 && mousepos.y <= 950)
           {
+              if (soundeffectON)
+                  MenuClick.play();
               page = 1;
               goto beginning;
           }
@@ -1693,6 +1743,7 @@ beginning: {};
         // ingame
         if (page == 6)
         {
+
             backdelay = 0;
             delay = 0;
             checkdelay = 0;
@@ -1765,6 +1816,8 @@ beginning: {};
             window.draw(Shift);
             if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left) &&backdelay>=5)
             {
+                if(soundeffectON)
+                    MenuClick.play();
                 backdelay = 0;
                 page = 2;
             }
@@ -1786,6 +1839,8 @@ beginning: {};
             window.draw(back);
             if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left))
             {
+                if (soundeffectON)
+                    MenuClick.play();
                 page = 2;
             }
             for (int i = 0; i < 2; i++)
@@ -1797,11 +1852,25 @@ beginning: {};
 
             if (mousepos.x >= 985 && mousepos.x <= 1055 && mousepos.y >= 480  && mousepos.y <= 550 && Mouse::isButtonPressed(Mouse::Left) && checkdelay>=5)
             {
+                if (soundeffectON)
+                    MenuClick.play();
                 musicON = !musicON;
+                if (musicON)
+                {
+                    MainMusicPlaying = true;
+                    goto beginning;
+                }
+                else
+                {
+                    MainMusicPlaying = false;
+                    goto beginning;
+                }
                 checkdelay = 0;
             }
             if (mousepos.x >= 985 && mousepos.x <= 1055 && mousepos.y >= 580 && mousepos.y <= 650 && Mouse::isButtonPressed(Mouse::Left) && checkdelay >= 5)
             {
+                if (soundeffectON)
+                    MenuClick.play();
                 soundeffectON = !soundeffectON;
                 checkdelay = 0;
             }
