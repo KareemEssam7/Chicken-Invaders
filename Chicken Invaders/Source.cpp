@@ -75,6 +75,7 @@ bool musicON = true;
 bool soundeffectON = true;
 bool ldbcheck[5] = {};
 int lastlevel = 1;
+double curscale = 4.5;
 // Creating Game Window
 RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders",Style::Fullscreen);
 
@@ -100,7 +101,7 @@ Texture arrow3;
 Texture arrow4;
 Texture fork;
 Texture checkmark;
-
+Texture earth;
 // adding border
 RectangleShape rectangle1(Vector2f(60, 1080));
 RectangleShape rectangle2(Vector2f(60, 1080));
@@ -161,13 +162,16 @@ Text Shift;
 Text musiccheck;
 Text soundeffectcheck;
 Text ldb[5];
+Text Cred[7];
 //adding font
 Font font1;
 Font font2;
+Font font3;
 // Ingame Sprites
 Sprite _GameBackground;
 Sprite Player;
 Sprite Chicken[8][6];
+Sprite Chicken2[8][6];
 Sprite Bullets[40];
 Sprite health_bar;
 Sprite Eggs[8][5];
@@ -185,7 +189,7 @@ Sprite arrow_r[2];
 Sprite arrow_up[2];
 Sprite arrow_dw[2];
 Sprite checkbox[2];
-
+Sprite Earth;
 
 // Loading Ingame Files
 void IngameImages()
@@ -193,7 +197,7 @@ void IngameImages()
     //fonts
     font1.loadFromFile("RobotoCondensed-Bold.ttf");
     font2.loadFromFile("font1.ttf");
-
+    font3.loadFromFile("Wedgie_Regular.ttf");
     // background
     Background.loadFromFile("IngameBackground.jpg");
     _GameBackground.setTexture(Background);
@@ -204,7 +208,13 @@ void IngameImages()
     Logo.setTexture(gamelogo);
     Logo.setPosition(423.5, -25);
     Logo.setScale(1, 0.7f);
-
+    earth.loadFromFile("earth.png");
+    Earth.setTexture(earth);
+    Earth.setScale(2.5, 2.5);
+    Earth.setOrigin(175, 175.5);
+    Earth.setPosition(1860, 890);
+    earth.setSmooth(true);
+  
     //Buttons in main menu
     for (int i = 0; i < 5; i++)
     {
@@ -452,7 +462,15 @@ void IngameImages()
     Shift.setString("Space");
     Shift.setScale(1.5, 1.5);
     Shift.setPosition(830, 885);
+    for (int i = 0; i < 7; i++)
+    {
 
+        Cred[i].setFont(font3);
+        Cred[i].setPosition(660, 1400 + i * 100);
+        Cred[i].setScale(1.5, 1.5);
+        Cred[i].setFillColor(Color(255, 255, 255, 255));
+        Cred[i].setString("HELLO WORLD");
+    }
     //sound checkmark
     checkmark.loadFromFile("checkmark.png");
     for (int i = 0; i < 2; i++)
@@ -541,7 +559,7 @@ void IngameImages()
     credits7.setFont(font1);
     credits7.setPosition(650, 950);
     credits7.setString("Omar Ahmed");
-
+    
     //boss borders
     rectangle4.setPosition((window.getSize().x / 2), (window.getSize().y / 2)+200);
     rectangle4.setOrigin(window.getSize().x / 2, 75 / 2);
@@ -608,7 +626,6 @@ void IngameImages()
     bosssprite.setPosition(Vector2f(200, 200));
     bosssprite.setScale(4.5 , 4.5);
     bosssprite.setTextureRect(IntRect(75*animation, 0, 75, 68));
-   
     //setting bullet textures
     for (int i = 0; i < 40; i++)
     {
@@ -650,10 +667,8 @@ void IngameImages()
             chicken_legs[i][j].setPosition(-100, -100);
         }
     }
-    
 
 }
-
 // function for player movement
 void PlayerMove()
 {
@@ -1599,21 +1614,36 @@ beginning: {};
             if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left))
             {
                if (frommenu)
-                    page = 0;
+               {
+                   page = 0;
+                   curscale = 4.5;
+                   for(int i =0 ; i < 7 ;i++)
+                    Cred[i].setPosition(660, 1400+i*100);
+               }
                 else
-                    page = 5;
+               {
+                   page = 5;
+                   curscale = 4.5;
+                   for (int i = 0; i < 7; i++)
+                       Cred[i].setPosition(660, 1400 + i * 100);
+               }
             }
             mainmenu();
             window.draw(menubg);
             window.draw(rectangleback);
             window.draw(back);
-            window.draw(credits1);
-            window.draw(credits2);
-            window.draw(credits3);
-            window.draw(credits4);
-            window.draw(credits5);
-            window.draw(credits6);
-            window.draw(credits7);
+            for(int i =0 ; i < 7;i++)
+                Cred[i].move(1.2, -10);
+            if (curscale > 0)
+            {
+                curscale -= 0.030;
+            }
+            for (int i = 0; i < 7; i++)
+            {
+
+                Cred[i].setScale(curscale, curscale);
+                window.draw(Cred[i]);
+            }
             window.draw(sprite);  
         }
         //pause
