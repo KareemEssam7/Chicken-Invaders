@@ -75,7 +75,7 @@ bool musicON = true;
 bool soundeffectON = true;
 bool ldbcheck[5] = {};
 int lastlevel = 1;
-double curscale = 4.5;
+double curscale[7] = {1, 1, 1, 1, 1, 1, 1};
 // Creating Game Window
 RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders",Style::Fullscreen);
 
@@ -198,6 +198,7 @@ void IngameImages()
     font1.loadFromFile("RobotoCondensed-Bold.ttf");
     font2.loadFromFile("font1.ttf");
     font3.loadFromFile("Wedgie_Regular.ttf");
+    
     // background
     Background.loadFromFile("IngameBackground.jpg");
     _GameBackground.setTexture(Background);
@@ -462,15 +463,23 @@ void IngameImages()
     Shift.setString("Space");
     Shift.setScale(1.5, 1.5);
     Shift.setPosition(830, 885);
+    // initializing credits
     for (int i = 0; i < 7; i++)
     {
-
+       
         Cred[i].setFont(font3);
-        Cred[i].setPosition(660, 1400 + i * 100);
-        Cred[i].setScale(1.5, 1.5);
-        Cred[i].setFillColor(Color(255, 255, 255, 255));
-        Cred[i].setString("HELLO WORLD");
+        Cred[i].setPosition(400, 1400 + i * 500);
+        Cred[i].setCharacterSize(100);
+        Cred[i].setFillColor(Color(255, 255, 255, 255));  
     }
+    //inputing the names
+    Cred[0].setString("Kareem Essam");
+    Cred[1].setString("Mohamed Wael");
+    Cred[2].setString("Mohamed Akram");
+    Cred[3].setString("Malek Ahmed");
+    Cred[4].setString("Ahmed Alaa");
+    Cred[5].setString("Ziad Khaled");
+    Cred[6].setString("Omar Ahmed");
     //sound checkmark
     checkmark.loadFromFile("checkmark.png");
     for (int i = 0; i < 2; i++)
@@ -1611,37 +1620,54 @@ beginning: {};
             backdelay = 0;
             checkdelay = 0;
             delay = 0;
+            //credit positioning
             if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left))
             {
                if (frommenu)
                {
                    page = 0;
-                   curscale = 4.5;
-                   for(int i =0 ; i < 7 ;i++)
-                    Cred[i].setPosition(660, 1400+i*100);
+
+                   
+                   for (int i = 0; i < 7;i++)
+                   {
+                       Cred[i].setPosition(400, 1400 + i * 500);
+                       curscale[i] = 1;
+                   }        
                }
-                else
+               
+               else
                {
                    page = 5;
-                   curscale = 4.5;
                    for (int i = 0; i < 7; i++)
-                       Cred[i].setPosition(660, 1400 + i * 100);
+                   {
+                       Cred[i].setPosition(400, 1400 + i * 500);
+                       curscale[i] = 1;
+                   }
+
                }
             }
             mainmenu();
             window.draw(menubg);
             window.draw(rectangleback);
             window.draw(back);
+
+            //credit scrolling
             for(int i =0 ; i < 7;i++)
-                Cred[i].move(1.2, -10);
-            if (curscale > 0)
+                Cred[i].move(0, -10);
+
+            //credit scaling
+            for (int i = 0; i < 7; i++)
             {
-                curscale -= 0.030;
+                if (curscale[i] > 0 && Cred[i].getPosition().y < 540)
+                {
+                    curscale[i] -= 0.01;
+                }
             }
+            
             for (int i = 0; i < 7; i++)
             {
 
-                Cred[i].setScale(curscale, curscale);
+                Cred[i].setScale(curscale[i], curscale[i]);
                 window.draw(Cred[i]);
             }
             window.draw(sprite);  
@@ -1820,6 +1846,8 @@ beginning: {};
             }
             window.draw(sprite);
         }
+
+
         sprite.setPosition(static_cast<Vector2f>(Mouse::getPosition(window))); // Set position 
         // window display
         window.setView(fixed); 
