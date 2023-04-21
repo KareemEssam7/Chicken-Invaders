@@ -46,14 +46,10 @@ double PlayerMovement = 9, PlayerSpeed = 12;
 double ChickenDir = 0, ChickenPositionX = 0, ChickenPositionY = 0,rectdir,bossdir=0;
 int ChickenMovement = 0 ;
 int timer[8][5];
-int eggtimer = 0;
 int x = 0, y = 0, z = 0 ,n=15;
 int yolkcnt = 0;
 int yolkvar = 10;
 int pausecooldown = 0;
-int option = 0;
-int countback = 0;
-int borderadjust = 0;
 int animation = 0;
 long long page = 0;
 bool checkchickenanimation = true, check = true, bossanimation=true;
@@ -66,7 +62,6 @@ int foodcnt = 0;
 int tmp, meteortimer[40], meteorhp[40], meteorx = 0;
 int xmeteor=0, ymeteor=0;
 bool frommenu = true;
-bool soundon = true;
 int delay = 0;
 int backdelay = 0;
 int rotatecheck = 0;
@@ -79,8 +74,6 @@ double curscale[7] = {1, 1, 1, 1, 1, 1, 1};
 // Creating Game Window
 RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders",Style::Fullscreen);
 
-//delay when starting
-
 
 // adding textures
 Texture Background;
@@ -88,7 +81,7 @@ Texture PlayerSkin;
 Texture ChickenSkin;
 Texture bulletImage;
 Texture healthbar;
-Texture eggTex;
+Texture eggTex; 
 Texture eggbreak;
 Texture Chickenlegs;
 Texture meteortex;
@@ -96,16 +89,15 @@ Texture bossimage;
 Texture gamelogo;
 Texture gamemenubg;
 Texture arrow1;
-Texture arrow2;
-Texture arrow3;
-Texture arrow4;
 Texture fork;
 Texture checkmark;
 Texture earth;
+
 // adding border
 RectangleShape rectangle1(Vector2f(60, 1080));
 RectangleShape rectangle2(Vector2f(60, 1080));
 RectangleShape rectangle3(Vector2f(1300, 200));
+
 //borders for boss!!
 RectangleShape rectangle4(Vector2f(window.getSize().x, 75));
 RectangleShape rectangle5(Vector2f(window.getSize().x, 75));
@@ -131,13 +123,6 @@ Text Options;
 Text Leaderboard;
 Text Credits;
 Text Quit;
-Text credits1;
-Text credits2;
-Text credits3;
-Text credits4;
-Text credits5;
-Text credits6;
-Text credits7;
 Text controls;
 Text sound;
 Text back;
@@ -165,8 +150,8 @@ Text ldb[5];
 Text Cred[7];
 //adding font
 Font font1;
-Font font2;
 Font font3;
+
 // Ingame Sprites
 Sprite _GameBackground;
 Sprite Player;
@@ -196,7 +181,6 @@ void IngameImages()
 {
     //fonts
     font1.loadFromFile("RobotoCondensed-Bold.ttf");
-    font2.loadFromFile("font1.ttf");
     font3.loadFromFile("Wedgie_Regular.ttf");
     
     // background
@@ -279,17 +263,18 @@ void IngameImages()
     rectangleback.setFillColor(Color(0, 0, 255, 40));
     rectangleback.setOutlineColor(Color(51, 153, 255, 60));
     rectangleback.setOutlineThickness(2.8f);
+
     //continue Button
     rectanglecont.setPosition(785, 480);
     rectanglecont.setFillColor(Color(0, 0, 255, 40));
     rectanglecont.setOutlineColor(Color(51, 153, 255, 60));
     rectanglecont.setOutlineThickness(2.8f);
+
     //back to main menu Button
     rectanglereturn.setPosition(785, 880);
     rectanglereturn.setFillColor(Color(0, 0, 255, 40));
     rectanglereturn.setOutlineColor(Color(51, 153, 255, 60));
     rectanglereturn.setOutlineThickness(2.8f);
-    
 
     //Play text
     play.setFont(font1);
@@ -466,20 +451,27 @@ void IngameImages()
     // initializing credits
     for (int i = 0; i < 7; i++)
     {
-       
+        Cred[0].setOrigin(332, 16);
+        Cred[1].setOrigin(332, 16);
+        Cred[2].setOrigin(348, 16);
+        Cred[3].setOrigin(316, 16);
+        Cred[4].setOrigin(300, 16);
+        Cred[5].setOrigin(316, 16);
+        Cred[6].setOrigin(300, 16);
         Cred[i].setFont(font3);
-        Cred[i].setPosition(400, 1400 + i * 500);
+        Cred[i].setPosition(900, 1400 + i * 150);
         Cred[i].setCharacterSize(100);
         Cred[i].setFillColor(Color(255, 255, 255, 255));  
+        
     }
     //inputing the names
     Cred[0].setString("Kareem Essam");
     Cred[1].setString("Mohamed Wael");
     Cred[2].setString("Mohamed Akram");
-    Cred[3].setString("Malek Ahmed");
-    Cred[4].setString("Ahmed Alaa");
-    Cred[5].setString("Ziad Khaled");
-    Cred[6].setString("Omar Ahmed");
+    Cred[3].setString(" Malek Ahmed");
+    Cred[4].setString("  Ahmed Alaa");
+    Cred[5].setString("  Ziad Khaled");
+    Cred[6].setString("  Omar Ahmed");
     //sound checkmark
     checkmark.loadFromFile("checkmark.png");
     for (int i = 0; i < 2; i++)
@@ -546,28 +538,6 @@ void IngameImages()
     rectangle3.setPosition(770, 400);
     rectangle3.setFillColor(Color::Transparent);
 
-    //Credit Names
-    credits1.setFont(font1);
-    credits1.setPosition(650, 50);
-    credits1.setString("Kareem Essam");
-    credits2.setFont(font1);
-    credits2.setPosition(650, 200);
-    credits2.setString("Mohamed Wael");
-    credits3.setFont(font1);
-    credits3.setPosition(650, 350);
-    credits3.setString("Malek Ahmed");
-    credits4.setFont(font1);
-    credits4.setPosition(650, 500);
-    credits4.setString("Mohamed Akram");
-    credits5.setFont(font1);
-    credits5.setPosition(650, 650);
-    credits5.setString("Ahmed Alaa");
-    credits6.setFont(font1);
-    credits6.setPosition(650, 800);
-    credits6.setString("Ziad Khaled");
-    credits7.setFont(font1);
-    credits7.setPosition(650, 950);
-    credits7.setString("Omar Ahmed");
     
     //boss borders
     rectangle4.setPosition((window.getSize().x / 2), (window.getSize().y / 2)+200);
@@ -1630,7 +1600,7 @@ beginning: {};
                    
                    for (int i = 0; i < 7;i++)
                    {
-                       Cred[i].setPosition(400, 1400 + i * 500);
+                       Cred[i].setPosition(900, 1400 + i * 150);
                        curscale[i] = 1;
                    }        
                }
@@ -1640,7 +1610,7 @@ beginning: {};
                    page = 5;
                    for (int i = 0; i < 7; i++)
                    {
-                       Cred[i].setPosition(400, 1400 + i * 500);
+                       Cred[i].setPosition(900, 1400 + i * 150);
                        curscale[i] = 1;
                    }
 
@@ -1653,7 +1623,7 @@ beginning: {};
 
             //credit scrolling
             for(int i =0 ; i < 7;i++)
-                Cred[i].move(0, -10);
+                Cred[i].move(0, -7);
 
             //credit scaling
             for (int i = 0; i < 7; i++)
