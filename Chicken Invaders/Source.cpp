@@ -1853,7 +1853,11 @@ beginning: {};
             if (mousepos.x >= 985 && mousepos.x <= 1055 && mousepos.y >= 480  && mousepos.y <= 550 && Mouse::isButtonPressed(Mouse::Left) && checkdelay>=5)
             {
                 if (soundeffectON)
+                {
                     MenuClick.play();
+                    MenuMusic.play();
+                    MenuMusic.play();
+                }
                 musicON = !musicON;
                 if (musicON)
                 {
