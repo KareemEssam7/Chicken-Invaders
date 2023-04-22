@@ -44,6 +44,7 @@ struct bossstruct {
 sf::View view1(sf::Vector2f(960.f, 540.f), sf::Vector2f(1920.f, 1080.f));
 
 // Intialized Variables
+int exp_x=0,exp_y=0 ;
 long long cnt = 0;  //counter for
  int health = 3;
 int rockets = 0;
@@ -58,6 +59,7 @@ int pausecooldown = 0;
 int animation = 0;
 long long page = 0;
 bool checkchickenanimation = true, check = true, bossanimation=true;
+bool playeralive=true;
 ChickenStruct chicken;
 bulletstruct bullet;
 meteorstruct meteors;
@@ -78,6 +80,7 @@ int coopclick = 0;
 int yolkanime = 0;
 int yolkvar = 100;
 int eggvar = 501;
+int expbool = 0;
 bool musicON = true;
 bool soundeffectON = true;
 bool ldbcheck[5] = {};
@@ -190,7 +193,7 @@ Sprite _GameBackground;
 Sprite Player;
 Sprite Chicken[8][6];
 Sprite Chicken2[8][6];
-Sprite explosion[7][3];
+Sprite explosion;
 Sprite Bullets[40];
 Sprite health_bar;
 Sprite Eggs[8][5];
@@ -247,7 +250,8 @@ void IngameImages()
     Gamebar.setScale(1.5, 1.5);
     //player explosion
     explosionimage.loadFromFile("PlayerDeath.png");
-
+    explosion.setTexture(explosionimage);
+   
 
 
     //Buttons in main menu
@@ -754,6 +758,7 @@ void PlayerMove()
         // changing ship to be facing to the right
         Player.setTextureRect(IntRect(PlayerMovement * 60, 0, 60, 42));
         Player.move(PlayerSpeed, 0);
+    
         if (PlayerMovement < 18)
         {
             PlayerMovement++;
@@ -936,7 +941,6 @@ void ChickenMove()
 //reducing heart by 1  (ahmed,ziad)
 void playerdamage() {
 
-
     for (int j = 0; j < 5; j++)
     {
         for (int i = 0; i < 8; i++)
@@ -949,7 +953,34 @@ void playerdamage() {
 
         }
     }
-  
+    if (health == 0) {
+       
+        playeralive = false;
+
+  }
+    if (playeralive == false) {
+        
+        if (expbool == 0) {
+            expbool = 1;
+            explosion.setPosition(Player.getPosition());
+        }
+        Player.setPosition(6000, 6000);
+        explosion.setTextureRect(IntRect(96.6 * exp_x, 90.6 * exp_y, 96.6, 90.6));
+        exp_x++;
+        if (exp_x == 7 && exp_y < 3) {
+            exp_y++;
+            exp_x = 0;
+        }
+        if (exp_y == 2&&exp_x==5) {
+            exp_y = 0;
+            exp_x = 0;
+            health--;
+            
+        playeralive = true;
+        expbool = 0;
+        }
+    }
+   
 }
 
 
@@ -2038,7 +2069,7 @@ beginning: {};
             window.draw(hp);
             window.draw(rocket);
             window.draw(powerlvl);
-            
+            window.draw(explosion); 
             for (int i = 0; i < 40; i++) 
             {
                 window.draw(Bullets[i]);
@@ -2222,13 +2253,9 @@ beginning: {};
         // window display
         window.setView(view1);
 
-      /*  for (int j = 0; j < 8; j++)
-        {
-            for (int i = 0; i < 3; i++)
-            {
-                window.draw(explosion[i][j]);
-            }
-        }*/
+        
+       
+        
         window.display();
     }
     return 0;
