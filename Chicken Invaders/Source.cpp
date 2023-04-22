@@ -811,7 +811,7 @@ void PlayerShooting() {
 void rocketshooting()
 {
     //shooting
-    if (Keyboard::isKeyPressed(Keyboard::Q) && activemissile == false && rockets > 0)
+    if (Mouse::isButtonPressed(Mouse::Right) && activemissile == false && rockets > 0)
     {
         activemissile = true;
         missile.setPosition(Player.getPosition().x + 29, Player.getPosition().y - 45);
@@ -1170,11 +1170,11 @@ void scorecalc() {
                 {
                     cnt += 1000;
                     score.setString(to_string(cnt));
-                    Bullets[i].setPosition(3000, 3000);
+                    Bullets[i].setPosition(-10000, -10000);
                     chicken_legs[j][z].setPosition(Chicken[j][z].getPosition().x, Chicken[j][z].getPosition().y);
-                    Chicken[j][z].setPosition(4000, 4000);
-                    missileScoreCount += 1;
-                    if (missileScoreCount == 5)
+                    Chicken[j][z].setPosition(10000, 100000);
+                    missileScoreCount += 1000;
+                    if (missileScoreCount == 70000)
                     {
                         missileScoreCount = 0;
                         rockets += 1;
@@ -1588,6 +1588,7 @@ void reset()
     health = 3;
     powerlvls = 0;
     rockets = 0;
+    missileScoreCount = 0;
 }
 int main()
 {
