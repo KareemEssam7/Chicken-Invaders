@@ -54,7 +54,6 @@ int ChickenMovement = 0 ;
 int timer[8][5];
 int x = 0, y = 0, z = 0 ,n=15;
 int yolkcnt = 0;
-int yolkvar = 10;
 int pausecooldown = 0;
 int animation = 0;
 long long page = 0;
@@ -65,6 +64,7 @@ meteorstruct meteors;
 bossstruct boss;
 int chickenpx[8][6] = {}, chickenpy[8][6] = {};
 int foodcnt = 0;
+int yolktimer[8][5] = {} ;
 int tmp, meteortimer[40], meteorhp[40], meteorx = 0;
 int xmeteor=0, ymeteor=0;
 bool frommenu = true;
@@ -75,6 +75,9 @@ int checkdelay = 0;
 int modeselectdelay = 0;
 int soundeffectstart = 0;
 int coopclick = 0;
+int yolkanime = 0;
+int yolkvar = 100;
+int eggvar = 501;
 bool musicON = true;
 bool soundeffectON = true;
 bool ldbcheck[5] = {};
@@ -86,6 +89,7 @@ bool arr[5] = {};
 //missile variables
 int missileScoreCount = 0, camerashakelength = 6;
 bool activemissile = false, explosioncamerashake = false;
+bool yolk[8][5] = { };
 // Creating Game Window
 RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders",Style::Fullscreen);
 
@@ -190,7 +194,7 @@ Sprite explosion[7][3];
 Sprite Bullets[40];
 Sprite health_bar;
 Sprite Eggs[8][5];
-Sprite eggyolk[5];
+Sprite eggyolk[8][5];
 Sprite bossegg[5];
 Sprite bossegg1[5];
 Sprite bossegg2[5];
@@ -625,6 +629,7 @@ void IngameImages()
     eggbreak.loadFromFile("eggBreak.png");
 
 
+
     // chicken leg
     Chickenlegs.loadFromFile("chicken leg.png");
 
@@ -718,6 +723,12 @@ void IngameImages()
             bossegg2[j].setTexture(eggTex);
             bossegg2[j].setScale(0.25, 0.25);
             bossegg2[j].setPosition(10000, 10000);
+
+            eggyolk[i][j].setTexture(eggbreak);
+            eggyolk[i][j].setTextureRect(IntRect(28 * 5, 0, 28, 24));
+            eggyolk[i][j].setScale(2, 2);
+
+            yolktimer[i][j] = 50;
         }
 
     }
@@ -872,6 +883,7 @@ void ChickenMove()
     {
         for (int i = 0; i < 8; i++)
         {
+
             Chicken[i][j].setTexture(ChickenSkin);
             Chicken[i][j].setScale(2.75, 2.75);
             if (chickeninitialpos == 0) 
@@ -952,7 +964,7 @@ void eggmovement()
             for (int i = 0; i < 8; i++)
             {
 
-                timer[i][j] = rand() % 501;
+                timer[i][j] = rand() % eggvar;
 
             }
 
@@ -969,9 +981,10 @@ void eggmovement()
             {
                 timer[i][j]--;
             }
-             
+            
             if(timer[i][j]==0)
             { 
+                eggyolk[i][j].setScale(0, 0);
                 Eggs[i][j].setScale(0.13, 0.13);
                 Eggs[i][j].setPosition(Chicken[i][j].getPosition().x + 53.45, Chicken[i][j].getPosition().y + 75);
                 timer[i][j]--;
@@ -980,11 +993,26 @@ void eggmovement()
             {
                 Eggs[i][j].move(0, 9.8f);
             }
-            if (Eggs[i][j].getPosition().y > Player.getPosition().y + 42)
+            if (Eggs[i][j].getPosition().y > Player.getPosition().y + 150)
             {
-                timer[i][j] = rand() % 501;
+
+                yolk[i][j] = 1;
+                eggyolk[i][j].setPosition(Eggs[i][j].getPosition().x, Player.getPosition().y + 150);
+                timer[i][j] = rand() % eggvar;
                 timer[i][j]--;
-                Eggs[i][j].setScale(0, 0);              
+                Eggs[i][j].setScale(0,0);
+                eggyolk[i][j].setScale(2,2);
+                /*if (yolktimer[i][j] >= 0)
+                {
+                    eggyolk[i][j].setScale(2, 2);
+                    yolktimer[i][j]--;
+                }
+                if (yolktimer[i][j] == 0)
+                {
+                    
+                    yolktimer[i][j] = 50;
+                }*/
+                
             }
 
             //collision egg
@@ -1168,6 +1196,7 @@ void scorecalc() {
 
                 if (Bullets[i].getGlobalBounds().intersects(Chicken[j][z].getGlobalBounds())) 
                 {
+                    eggvar -= 5;
                     cnt += 1000;
                     score.setString(to_string(cnt));
                     Bullets[i].setPosition(-10000, -10000);
@@ -1962,6 +1991,8 @@ beginning: {};
         // ingame
         if (page == 6)
         {
+           
+
             if (temptest2 == 1)
             {
                 if (soundeffectON)
@@ -1985,6 +2016,20 @@ beginning: {};
             window.draw(Player);
             window.draw(rectangle1);
             window.draw(rectangle2);
+            
+            
+            for (int j = 0; j < 5; j++)
+            {
+                
+                for (int i = 0; i < 8; i++)
+                {
+
+                    window.draw(eggyolk[i][j]);                
+                    window.draw(Chicken[i][j]);
+                    window.draw(Eggs[i][j]);
+                }
+            }
+            
             window.draw(health_bar);
             window.draw(Gamebar);
             window.draw(score);
@@ -1993,14 +2038,7 @@ beginning: {};
             window.draw(hp);
             window.draw(rocket);
             window.draw(powerlvl);
-            for (int j = 0; j < 5; j++)
-            {
-                for (int i = 0; i < 8; i++)
-                {
-                    window.draw(Chicken[i][j]);
-                    window.draw(Eggs[i][j]);
-                }
-            }
+            
             for (int i = 0; i < 40; i++) 
             {
                 window.draw(Bullets[i]);
@@ -2009,6 +2047,7 @@ beginning: {};
                     Bullets[i].setPosition(4000,4000);
                 }
             }
+
             //drawing missile
             window.draw(missile);
             if (Keyboard::isKeyPressed(Keyboard::Escape))
