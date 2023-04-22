@@ -808,7 +808,7 @@ void PlayerShooting() {
 }
 
 //missile shooting function
-void missileshooting()
+void rocketshooting()
 {
     //shooting
     if (Keyboard::isKeyPressed(Keyboard::Q) && activemissile == false && rockets > 0)
@@ -1587,6 +1587,7 @@ void reset()
     foodcnt = 0;
     health = 3;
     powerlvls = 0;
+    rockets = 0;
 }
 int main()
 {
@@ -1972,7 +1973,7 @@ beginning: {};
             checkdelay = 0;
             frommenu = false;
             PlayerShooting();
-            missileshooting();
+            rocketshooting();
             playerdamage();
             ChickenMove();
             eggmovement();
