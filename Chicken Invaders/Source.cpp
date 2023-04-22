@@ -41,7 +41,7 @@ struct bossstruct {
 };
 // Intialized Variables
 long long cnt = 0;  //counter for
-int health = 3;
+ int health = 3;
 int rockets = 0;
 int powerlvls = 0;
 double PlayerMovement = 9, PlayerSpeed = 12;
@@ -102,6 +102,7 @@ Texture checkmark;
 Texture earth;
 Texture GameBarSkin;
 Texture BottomBarSkin;
+Texture explosionimage;
 // adding border
 RectangleShape rectangle1(Vector2f(60, 1080));
 RectangleShape rectangle2(Vector2f(60, 1080));
@@ -176,6 +177,7 @@ Sprite _GameBackground;
 Sprite Player;
 Sprite Chicken[8][6];
 Sprite Chicken2[8][6];
+Sprite explosion[7][3];
 Sprite Bullets[40];
 Sprite health_bar;
 Sprite Eggs[8][5];
@@ -229,6 +231,11 @@ void IngameImages()
     Gamebar.setTexture(GameBarSkin);
     Gamebar.setPosition(0, 0);
     Gamebar.setScale(1.5, 1.5);
+    //player explosion
+    explosionimage.loadFromFile("PlayerDeath.png");
+
+
+
     //Buttons in main menu
     for (int i = 0; i < 5; i++)
     {
@@ -839,6 +846,26 @@ void ChickenMove()
         ChickenMovement++;
 
 }
+//reducing heart by 1  (ahmed,ziad)
+void playerdamage() {
+
+
+    for (int j = 0; j < 5; j++)
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            if (Eggs[i][j].getGlobalBounds().intersects(Player.getGlobalBounds())) {
+                health -= 1;
+                hp.setString(to_string(health));
+                Eggs[i][j].setPosition(4000, 5000);
+            }
+
+        }
+    }
+  
+}
+
+
 
 // egg movement function
 void eggmovement()
@@ -1855,6 +1882,7 @@ beginning: {};
             checkdelay = 0;
             frommenu = false;
             PlayerShooting();
+            playerdamage();
             ChickenMove();
             eggmovement();
             PlayerMove();
@@ -2057,6 +2085,13 @@ beginning: {};
         sprite.setPosition(static_cast<Vector2f>(Mouse::getPosition(window))); // Set position 
         // window display
         window.setView(fixed); 
+      /*  for (int j = 0; j < 8; j++)
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                window.draw(explosion[i][j]);
+            }
+        }*/
         window.display();
     }
     return 0;
