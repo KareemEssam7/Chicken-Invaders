@@ -40,10 +40,12 @@ struct bossstruct {
 
 };
 // Intialized Variables
-long long cnt = 0;  //counter for score
-int health = 100;
+long long cnt = 0;  //counter for
+int health = 3;
+int rockets = 0;
+int powerlvls = 0;
 double PlayerMovement = 9, PlayerSpeed = 12;
-double ChickenDir = 0, ChickenPositionX = 0, ChickenPositionY = 0,rectdir,bossdir=0;
+double ChickenDir = 0,rectdir,bossdir=0,chickeninitialpos=0;
 int ChickenMovement = 0 ;
 int timer[8][5];
 int x = 0, y = 0, z = 0 ,n=15;
@@ -129,7 +131,9 @@ RectangleShape rectangleselectmode[2];
 
 //adding texts
 Text hp;
+Text rocket;
 Text score;
+Text powerlvl;
 Text foodscore;
 Text play;
 Text Options;
@@ -613,18 +617,27 @@ void IngameImages()
     //bullet image
     bulletImage.loadFromFile("Bullet1Image.png");
 
-    //setting health and score bar
-    healthbar.loadFromFile("Button1.png");
-    health_bar.setTexture(healthbar);
-    health_bar.setPosition(0, window.getSize().y - 150);
-    health_bar.setScale(1.3, 1.3);
-
     //health
     hp.setFont(font1);
-    hp.setCharacterSize(20);
+    hp.setCharacterSize(35);
     hp.setOrigin(0, 0);
-    hp.setPosition(30, window.getSize().y - 130);
-    hp.setString("health : " + to_string(health));
+    hp.setPosition(70, window.getSize().y - 58);
+    hp.setString(to_string(health));
+
+    // rockets
+    rocket.setFont(font1);
+    rocket.setCharacterSize(35);
+    rocket.setOrigin(0, 0);
+    rocket.setPosition(160, window.getSize().y - 58);
+    rocket.setString(to_string(rockets));
+
+    // powerlvl
+    powerlvl.setFont(font1);
+    powerlvl.setCharacterSize(35);
+    powerlvl.setOrigin(0, 0);
+    powerlvl.setPosition(260, window.getSize().y - 58);
+    powerlvl.setString(to_string(powerlvls));
+
     //score
     score.setFont(font2);
     score.setCharacterSize(45);
@@ -634,10 +647,10 @@ void IngameImages()
 
     //foodscore
     foodscore.setFont(font1);
-    foodscore.setCharacterSize(21);
+    foodscore.setCharacterSize(35);
     foodscore.setOrigin(0, 0);
-    foodscore.setPosition(30, window.getSize().y - 82);
-    foodscore.setString("food = " + to_string(foodcnt));
+    foodscore.setPosition(350, window.getSize().y - 58);
+    foodscore.setString( to_string(foodcnt));
 
     //meteor
     meteortex.loadFromFile("Stones.png");
@@ -646,9 +659,6 @@ void IngameImages()
         meteor[i].setTexture(meteortex);
         meteor[i].setTextureRect(IntRect(62.625 * xmeteor, 62.25 * ymeteor, 62.625f, 62.25f));
     }
-
-    //setting chicken textures and positions
-   
 
     //boss texture and position
     bosssprite.setTexture(bossimage);
@@ -776,22 +786,22 @@ void PlayerShooting() {
 void ChickenMove()
 {
     // mohamed wael and kareem essam
-
     for (int j = 0; j < 5; j++)
     {
         for (int i = 0; i < 8; i++)
         {
             Chicken[i][j].setTexture(ChickenSkin);
             Chicken[i][j].setScale(2.75, 2.75);
-            Chicken[i][j].setPosition(120 + (ChickenPositionX * 170), 50 + (ChickenPositionY * 100));
+            if (chickeninitialpos == 0) 
+            {
+                Chicken[i][j].setPosition(120 + (i * 170), 70 + (j * 100));
+            }
             Chicken[i][j].setTextureRect(IntRect(ChickenMovement * 46.9, 0, 46.9, 38));
-            ChickenPositionX++;
         }
-        ChickenPositionX = 0;
-        ChickenPositionY++;
     }
+    chickeninitialpos = 1;
 
-    for (int j = 0; j < 5; j++)
+     for (int j = 0; j < 5; j++)
     {
         for (int i = 0; i < 8; i++)
         {
@@ -1054,7 +1064,8 @@ void scorecalc() {
         for (int j = 0; j < 8; j++) {
             for (int z = 0; z < 5; z++) {
 
-                if (Bullets[i].getGlobalBounds().intersects(Chicken[j][z].getGlobalBounds())) {
+                if (Bullets[i].getGlobalBounds().intersects(Chicken[j][z].getGlobalBounds())) 
+                {
                     cnt += 1000;
                     score.setString(to_string(cnt));
                     Bullets[i].setPosition(3000, 3000);
@@ -1062,10 +1073,11 @@ void scorecalc() {
                     Chicken[j][z].setPosition(4000, 4000);
                 }
 
-                if (chicken_legs[j][z].getGlobalBounds().intersects(Player.getGlobalBounds())) {
+                if (chicken_legs[j][z].getGlobalBounds().intersects(Player.getGlobalBounds())) 
+                {
                     chicken_legs[j][z].setPosition(4000, -100);
-                    foodcnt += 200;
-                    foodscore.setString("food : " + to_string(foodcnt));
+                    foodcnt += 1;
+                    foodscore.setString(to_string(foodcnt));
                 }
             }
         }
@@ -1835,23 +1847,29 @@ beginning: {};
             checkdelay = 0;
             frommenu = false;
             PlayerShooting();
-            bossmove();
+            ChickenMove();
+            eggmovement();
             PlayerMove();
             scorecalc();
             window.draw(_GameBackground);
             window.draw(Player);
             window.draw(rectangle1);
             window.draw(rectangle2);
-            window.draw(bosssprite);
             window.draw(health_bar);
             window.draw(Gamebar);
             window.draw(score);
             window.draw(Bottombar);
-            for (int i = 0; i < 5; i++)
+            window.draw(foodscore);
+            window.draw(hp);
+            window.draw(rocket);
+            window.draw(powerlvl);
+            for (int j = 0; j < 5; j++)
             {
-                window.draw(bossegg[i]);
-                window.draw(bossegg1[i]);
-                window.draw(bossegg2[i]);
+                for (int i = 0; i < 8; i++)
+                {
+                    window.draw(Chicken[i][j]);
+                    window.draw(Eggs[i][j]);
+                }
             }
             for (int i = 0; i < 40; i++) 
             {
