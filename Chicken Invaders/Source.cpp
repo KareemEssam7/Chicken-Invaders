@@ -81,6 +81,7 @@ int yolkanime = 0;
 int yolkvar = 100;
 int eggvar = 501;
 int expbool = 0;
+int health2 = health;
 bool musicON = true;
 bool soundeffectON = true;
 bool ldbcheck[5] = {};
@@ -251,7 +252,7 @@ void IngameImages()
     //player explosion
     explosionimage.loadFromFile("PlayerDeath.png");
     explosion.setTexture(explosionimage);
-   
+    explosion.setPosition(7000, 7000);
 
 
     //Buttons in main menu
@@ -953,7 +954,7 @@ void playerdamage() {
 
         }
     }
-    if (health == 0) {
+    if (health <health2) {
        
         playeralive = false;
 
