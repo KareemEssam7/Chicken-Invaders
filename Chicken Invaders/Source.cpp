@@ -39,6 +39,10 @@ struct bossstruct {
     int eggcooldownvar = 301;
 
 };
+
+//camera
+sf::View view1(sf::Vector2f(960.f, 540.f), sf::Vector2f(1920.f, 1080.f));
+
 // Intialized Variables
 long long cnt = 0;  //counter for
  int health = 3;
@@ -79,6 +83,9 @@ int lastlevel = 1;
 double curscale[7] = {1, 1, 1, 1, 1, 1, 1};
 int temptest = 0, temptest2 = 0,temptest3=0;
 bool arr[5] = {};
+//missile variables
+int missileScoreCount = 0, camerashakelength = 6;
+bool activemissile = false, explosioncamerashake = false;
 // Creating Game Window
 RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders",Style::Fullscreen);
 
@@ -103,6 +110,8 @@ Texture earth;
 Texture GameBarSkin;
 Texture BottomBarSkin;
 Texture explosionimage;
+Texture missileTexture;
+
 // adding border
 RectangleShape rectangle1(Vector2f(60, 1080));
 RectangleShape rectangle2(Vector2f(60, 1080));
@@ -198,6 +207,7 @@ Sprite checkbox[2];
 Sprite Earth;
 Sprite Gamebar;
 Sprite Bottombar;
+Sprite missile;
 // Loading Ingame Files
 void IngameImages()
 {
@@ -667,6 +677,13 @@ void IngameImages()
         meteor[i].setTextureRect(IntRect(62.625 * xmeteor, 62.25 * ymeteor, 62.625f, 62.25f));
     }
 
+    //missile image
+    missileTexture.loadFromFile("missile.png");
+    missile.setTexture(missileTexture);
+    missile.setPosition(10000, 10000);
+    missile.setScale(0.05, 0.05);
+    
+
     //boss texture and position
     bosssprite.setTexture(bossimage);
     bosssprite.setPosition(Vector2f(200, 200));
@@ -789,6 +806,64 @@ void PlayerShooting() {
         Bullets[i].move(0, -bullet.bulletSpeed);
     }
 }
+
+//missile shooting function
+void missileshooting()
+{
+    //shooting
+    if (Keyboard::isKeyPressed(Keyboard::Q) && activemissile == false && rockets > 0)
+    {
+        activemissile = true;
+        missile.setPosition(Player.getPosition().x + 29, Player.getPosition().y - 45);
+        rockets--;
+        rocket.setString(to_string(rockets));
+    }
+
+    //missile moving
+    if (activemissile == true)
+    {
+        missile.move(0, -bullet.bulletSpeed * 2);
+    }
+
+
+    //missile explosion
+    if (missile.getPosition().y <= 400)
+    {
+        activemissile = false;
+        missile.setPosition(10000, 100000);
+        explosioncamerashake = true;
+        for (int j = 0; j < 5; j++)
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                Chicken[i][j].setPosition(10000, 10000);
+            }
+        }
+    }
+
+}
+
+//camera shake
+void camerashake()
+{
+    if (camerashakelength > 0 && camerashakelength % 2 == 0 && explosioncamerashake)
+    {
+        view1.zoom(0.9f);
+        camerashakelength--;
+    }
+    else if (camerashakelength > 0 && explosioncamerashake)
+    {
+        view1.zoom(1.1f);
+        camerashakelength--;
+    }
+    if (camerashakelength == 0)
+    {
+        view1.setSize(sf::Vector2f(1920.f, 1080.f));
+        explosioncamerashake = false;
+        camerashakelength = 6;
+    }
+}
+
 // function for chicken movement
 void ChickenMove()
 {
@@ -1098,6 +1173,15 @@ void scorecalc() {
                     Bullets[i].setPosition(3000, 3000);
                     chicken_legs[j][z].setPosition(Chicken[j][z].getPosition().x, Chicken[j][z].getPosition().y);
                     Chicken[j][z].setPosition(4000, 4000);
+                    missileScoreCount += 1;
+                    if (missileScoreCount == 5)
+                    {
+                        missileScoreCount = 0;
+                        rockets += 1;
+                        rocket.setString(to_string(rockets));
+                    }
+
+
                 }
 
                 if (chicken_legs[j][z].getGlobalBounds().intersects(Player.getGlobalBounds())) 
@@ -1509,6 +1593,9 @@ int main()
 
     window.setMouseCursorVisible(false); // Hide cursor  
     View fixed = window.getView(); // Create a fixed view  
+
+    
+
     // Load image and create sprite
     
     fork.loadFromFile("Fork.png");  
@@ -1529,8 +1616,11 @@ beginning: {};
     MainMusicPlaying = false;
     while (window.isOpen())
     {
+        
+
         // set framelimit
         window.setFramerateLimit(30);
+
         //Event
         Event event;
         while (window.pollEvent(event))
@@ -1882,11 +1972,13 @@ beginning: {};
             checkdelay = 0;
             frommenu = false;
             PlayerShooting();
+            missileshooting();
             playerdamage();
             ChickenMove();
             eggmovement();
             PlayerMove();
             scorecalc();
+            camerashake();
             window.draw(_GameBackground);
             window.draw(Player);
             window.draw(rectangle1);
@@ -1915,6 +2007,8 @@ beginning: {};
                     Bullets[i].setPosition(4000,4000);
                 }
             }
+            //drawing missile
+            window.draw(missile);
             if (Keyboard::isKeyPressed(Keyboard::Escape))
             {
                 page = 5;
@@ -2083,8 +2177,10 @@ beginning: {};
          
         }
         sprite.setPosition(static_cast<Vector2f>(Mouse::getPosition(window))); // Set position 
+        
         // window display
-        window.setView(fixed); 
+        window.setView(view1);
+
       /*  for (int j = 0; j < 8; j++)
         {
             for (int i = 0; i < 3; i++)
