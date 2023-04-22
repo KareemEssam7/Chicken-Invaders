@@ -1469,7 +1469,14 @@ void bossmove() {
 
 
 }
-
+void reset()
+{
+    chickeninitialpos = 0;
+    cnt = 0;
+    foodcnt = 0;
+    health = 3;
+    powerlvls = 0;
+}
 int main()
 {
 
@@ -1526,7 +1533,7 @@ beginning: {};
             window.draw(Leaderboard);
             window.draw(Credits);
             window.draw(Quit);
-            window.draw(sprite);  
+            window.draw(sprite);
             for (int i = 0; i < 5; i++)
             {
                 window.draw(rectanglemainmenu[i]);
@@ -1815,6 +1822,7 @@ beginning: {};
           {
               temptest = 1;
               page = 1;
+              reset();
               goto beginning;
           }
             window.draw(menubg);
