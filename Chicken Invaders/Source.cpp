@@ -75,6 +75,8 @@ bool ldbcheck[5] = {};
 bool MainMusicPlaying = true;
 int lastlevel = 1;
 double curscale[7] = {1, 1, 1, 1, 1, 1, 1};
+int temptest = 0, temptest2 = 0,temptest3=0;
+bool arr[5] = {};
 // Creating Game Window
 RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders",Style::Fullscreen);
 
@@ -96,7 +98,8 @@ Texture arrow1;
 Texture fork;
 Texture checkmark;
 Texture earth;
-
+Texture GameBarSkin;
+Texture BottomBarSkin;
 // adding border
 RectangleShape rectangle1(Vector2f(60, 1080));
 RectangleShape rectangle2(Vector2f(60, 1080));
@@ -163,7 +166,7 @@ Text coop;
 //adding font
 Font font1;
 Font font3;
-
+Font font2;
 // Ingame Sprites
 Sprite _GameBackground;
 Sprite Player;
@@ -187,13 +190,15 @@ Sprite arrow_up[2];
 Sprite arrow_dw[2];
 Sprite checkbox[2];
 Sprite Earth;
-
+Sprite Gamebar;
+Sprite Bottombar;
 // Loading Ingame Files
 void IngameImages()
 {
     //fonts
     font1.loadFromFile("RobotoCondensed-Bold.ttf");
     font3.loadFromFile("Wedgie_Regular.ttf");
+    font2.loadFromFile("Lobster-Regular.ttf");
     // audio
     Select.loadFromFile("Select.wav");
     MenuClick.setBuffer(Select);
@@ -209,13 +214,17 @@ void IngameImages()
     Logo.setTexture(gamelogo);
     Logo.setPosition(423.5, -25);
     Logo.setScale(1, 0.7f);
-    earth.loadFromFile("earth.png");
-    Earth.setTexture(earth);
-    Earth.setScale(2.5, 2.5);
-    Earth.setOrigin(175, 175.5);
-    Earth.setPosition(1860, 890);
-    earth.setSmooth(true);
-  
+    // ingame images
+    GameBarSkin.setSmooth(true);
+    GameBarSkin.loadFromFile("TopBar.png");
+    BottomBarSkin.loadFromFile("BottomBar.png");
+    BottomBarSkin.setSmooth(true);
+    Bottombar.setTexture(BottomBarSkin);
+    Bottombar.setPosition(0, 975);
+    Bottombar.setScale(1.5, 1.5);
+    Gamebar.setTexture(GameBarSkin);
+    Gamebar.setPosition(0, 0);
+    Gamebar.setScale(1.5, 1.5);
     //Buttons in main menu
     for (int i = 0; i < 5; i++)
     {
@@ -617,11 +626,11 @@ void IngameImages()
     hp.setPosition(30, window.getSize().y - 130);
     hp.setString("health : " + to_string(health));
     //score
-    score.setFont(font1);
-    score.setCharacterSize(20);
+    score.setFont(font2);
+    score.setCharacterSize(45);
     score.setOrigin(0, 0);
-    score.setPosition(30, window.getSize().y - 107);
-    score.setString("score = " + to_string(cnt));
+    score.setPosition(10, 5);
+    score.setString(to_string(cnt));
 
     //foodscore
     foodscore.setFont(font1);
@@ -1047,7 +1056,7 @@ void scorecalc() {
 
                 if (Bullets[i].getGlobalBounds().intersects(Chicken[j][z].getGlobalBounds())) {
                     cnt += 1000;
-                    score.setString("score : " + to_string(cnt));
+                    score.setString(to_string(cnt));
                     Bullets[i].setPosition(3000, 3000);
                     chicken_legs[j][z].setPosition(Chicken[j][z].getPosition().x, Chicken[j][z].getPosition().y);
                     Chicken[j][z].setPosition(4000, 4000);
@@ -1378,7 +1387,7 @@ void bossmove() {
             {
                 bosssprite.setPosition(10000, 10000);
                 cnt += 5000;
-                score.setString("score : " + to_string(cnt));
+                score.setString(to_string(cnt));
             }
             Bullets[i].setPosition(-2000, -2000);
         }
@@ -1547,6 +1556,12 @@ beginning: {};
         // select level page ==1;
         if (page == 1)
         {
+            if (temptest == 1)
+            {
+                if (soundeffectON)
+                    MenuClick.play();
+                temptest = 0;
+            }
             modeselectdelay = 0;
             backdelay++;
             delay = 0;
@@ -1626,6 +1641,7 @@ beginning: {};
         // hall of fame page ==3
         if (page == 3)
         {
+            temptest3++;
             modeselectdelay = 0;
             backdelay = 0;
             checkdelay = 0;
@@ -1649,6 +1665,11 @@ beginning: {};
                     ldbcheck[lastlevel - 1] = 0;
                     ldbcheck[i] = 1;
                     lastlevel = i + 1;
+                    if (soundeffectON && temptest3>=5)
+                    {
+                        MenuClick.play();
+                        temptest3 = 0;
+                    }
                 }
                 if (ldbcheck[i] == 1)
                 {
@@ -1736,6 +1757,10 @@ beginning: {};
                 window.draw(Cred[i]);
             }
             window.draw(sprite);  
+            if (Cred[6].getScale().x <= 0.15)
+            {
+                page = 0;
+            }
         }
         //pause menu
         if (page == 5)
@@ -1776,8 +1801,7 @@ beginning: {};
           }
           else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 880 && mousepos.y <= 950)
           {
-              if (soundeffectON)
-                  MenuClick.play();
+              temptest = 1;
               page = 1;
               goto beginning;
           }
@@ -1799,7 +1823,12 @@ beginning: {};
         // ingame
         if (page == 6)
         {
-            
+            if (temptest2 == 1)
+            {
+                if (soundeffectON)
+                    MenuClick.play();
+                temptest2 = 0;
+            }
             modeselectdelay = 0;
             backdelay = 0;
             delay = 0;
@@ -1815,9 +1844,9 @@ beginning: {};
             window.draw(rectangle2);
             window.draw(bosssprite);
             window.draw(health_bar);
+            window.draw(Gamebar);
             window.draw(score);
-            window.draw(hp);
-            window.draw(foodscore); 
+            window.draw(Bottombar);
             for (int i = 0; i < 5; i++)
             {
                 window.draw(bossegg[i]);
@@ -1827,6 +1856,10 @@ beginning: {};
             for (int i = 0; i < 40; i++) 
             {
                 window.draw(Bullets[i]);
+                if (Bullets[i].getGlobalBounds().intersects(Gamebar.getGlobalBounds()))
+                {
+                    Bullets[i].setPosition(4000,4000);
+                }
             }
             if (Keyboard::isKeyPressed(Keyboard::Escape))
             {
@@ -1948,7 +1981,7 @@ beginning: {};
             }
             window.draw(sprite);
         }
-
+        // coop or single menu
         if (page == 9)
         {
             mainmenu();
@@ -1964,10 +1997,7 @@ beginning: {};
             //single
             if (mousepos.x >= 585 && mousepos.x <= 935 && mousepos.y >= 480 && mousepos.y <= 550 && Mouse::isButtonPressed(Mouse::Left) && modeselectdelay >= 5)
             {
-                if (soundeffectON)
-                {
-                    MenuClick.play();
-                }
+                temptest2 = 1;
                 MainMusicPlaying = false;
                 page = 6;
                 pausecooldown = 0;
