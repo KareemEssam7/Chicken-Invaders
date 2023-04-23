@@ -94,6 +94,8 @@ bool arr[5] = {};
 int missileScoreCount = 0, camerashakelength = 6;
 bool activemissile = false, explosioncamerashake = false;
 bool yolk[8][5] = { };
+int Timer=2;
+bool gameover=false;
 // Creating Game Window
 RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders",Style::Fullscreen);
 
@@ -954,7 +956,7 @@ void playerdamage() {
 
         }
     }
-    if (health <health2) {
+    if (health<health2) {
        
         playeralive = false;
 
@@ -966,22 +968,39 @@ void playerdamage() {
             explosion.setPosition(Player.getPosition());
         }
         Player.setPosition(6000, 6000);
-        explosion.setTextureRect(IntRect(96.6 * exp_x, 90.6 * exp_y, 96.6, 90.6));
+        explosion.setTextureRect(IntRect(96.6 * exp_x, 5+(90.6 * exp_y), 96.6, 90.6));
         exp_x++;
         if (exp_x == 7 && exp_y < 3) {
             exp_y++;
             exp_x = 0;
-        }
-        if (exp_y == 2&&exp_x==5) {
+        }       
+        if (exp_y == 2 && exp_x == 5) {
             exp_y = 0;
             exp_x = 0;
-            health--;
-            
-        playeralive = true;
-        expbool = 0;
+            health2 = health;
+            expbool = 0;
+             
+            if (Timer <= 0) {
+                playeralive = true;
+
+                Timer = 2;
+
+              
+                if (health == 0) {
+                    gameover = true;
+                }
+                else
+                    Player.setPosition(960, 850);
+
+
+            }
+            else
+                Timer--;
+          
         }
+     
     }
-   
+    
 }
 
 
@@ -1025,11 +1044,11 @@ void eggmovement()
             {
                 Eggs[i][j].move(0, 9.8f);
             }
-            if (Eggs[i][j].getPosition().y > Player.getPosition().y + 150)
+            if (Eggs[i][j].getPosition().y >= 1000)
             {
 
                 yolk[i][j] = 1;
-                eggyolk[i][j].setPosition(Eggs[i][j].getPosition().x, Player.getPosition().y + 150);
+                eggyolk[i][j].setPosition(Eggs[i][j].getPosition().x, 1000);
                 timer[i][j] = rand() % eggvar;
                 timer[i][j]--;
                 Eggs[i][j].setScale(0,0);
@@ -1647,9 +1666,15 @@ void reset()
     cnt = 0;
     foodcnt = 0;
     health = 3;
+    health2 = 3;
     powerlvls = 0;
     rockets = 0;
     missileScoreCount = 0;
+    Timer = 2;
+    cnt = 0;
+    boss.bosshp = 50;
+    boss.eggcooldownvar = 301;
+
 }
 int main()
 {
@@ -2000,10 +2025,13 @@ beginning: {};
           }
           else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 880 && mousepos.y <= 950)
           {
+              gameover = false;
+
               temptest = 1;
               page = 1;
               reset();
               goto beginning;
+
           }
             window.draw(menubg);
             window.draw(Logo);
@@ -2048,6 +2076,16 @@ beginning: {};
             window.draw(Player);
             window.draw(rectangle1);
             window.draw(rectangle2);
+
+            if (gameover == true) {
+                gameover = false;
+
+                temptest = 1;
+                page = 1;
+                reset();
+                goto beginning;
+
+            }
             
             
             for (int j = 0; j < 5; j++)
