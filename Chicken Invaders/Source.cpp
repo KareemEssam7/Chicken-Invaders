@@ -88,7 +88,7 @@ int health2 = health;
 bool musicON = true;
 bool soundeffectON = true;
 bool ldbcheck[5] = {};
-bool MainMusicPlaying = true;
+bool MainMusicPlaying = true, IngameMusicPlay = false, IngameMusicPlaying = false;
 int lastlevel = 1;
 double curscale[7] = {1, 1, 1, 1, 1, 1, 1};
 int temptest = 0, temptest2 = 0,temptest3=0;
@@ -100,6 +100,12 @@ bool yolk[8][5] = { };
 int Timer=2;
 int timer2 = 1;
 bool gameover=false;
+//sound variables
+int currentshootsfx = 0, currentchickensfx = 0, currenteggshootsfx = 0;
+//shield variables
+bool bullet_shot = 0;
+bool shield_on = 0;
+
 // Creating Game Window
 RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders",Style::Fullscreen);
 
@@ -138,10 +144,21 @@ RectangleShape rectangle4(Vector2f(window.getSize().x, 75));
 RectangleShape rectangle5(Vector2f(window.getSize().x, 75));
 // sound buffers
 SoundBuffer Select;
+SoundBuffer shoot1sfx;
+SoundBuffer chickensfx;
+SoundBuffer eggshootsfx;
+SoundBuffer rocketshootsfx;
+SoundBuffer explodingsfx;
 // sounds
 Sound MenuClick;
+Sound shoot1[2];
+Sound chickenhurt[2];
+Sound eggshoot[2];
+Sound rocketshoot;
+Sound exploding;
 //music
 Music MenuMusic;
+Music ingamemusic;
 //Buttons
 RectangleShape rectanglemainmenu[5];
 RectangleShape rectangleoption[2]; 
@@ -153,6 +170,8 @@ RectangleShape rectanglecontrols[6][2];
 RectangleShape rectanglecheck[2];
 RectangleShape rectangleldbs[5];
 RectangleShape rectangleselectmode[2];
+//shield
+CircleShape Shield(60);
 
 
 //adding texts
@@ -236,8 +255,28 @@ void IngameImages()
     // audio
     Select.loadFromFile("Select.wav");
     MenuClick.setBuffer(Select);
+    shoot1sfx.loadFromFile("weapon1.wav");
+    for (int i = 0; i < 2; i++)
+    {
+        shoot1[i].setBuffer(shoot1sfx);
+    }
+    chickensfx.loadFromFile("chicken.wav");
+    for (int i = 0; i < 2; i++)
+    {
+        chickenhurt[i].setBuffer(chickensfx);
+    }
+    eggshootsfx.loadFromFile("eggshoot.wav");
+    for (int i = 0; i < 2; i++)
+    {
+        eggshoot[i].setBuffer(eggshootsfx);
+    }
+    rocketshootsfx.loadFromFile("rocketshoot.wav");
+    rocketshoot.setBuffer(rocketshootsfx);
+    explodingsfx.loadFromFile("explosion.wav");
+    exploding.setBuffer(explodingsfx);
     // music
     MenuMusic.openFromFile("IntroMenu.wav");
+    ingamemusic.openFromFile("ingame.wav");
     // background
     Background.loadFromFile("IngameBackground.jpg");
     _GameBackground.setTexture(Background);
@@ -266,6 +305,10 @@ void IngameImages()
     sparkimage.loadFromFile("sparkspink.png");
     spark.setTexture(sparkimage);
     spark.setPosition(8000, 8000);
+
+    //Shield
+    Shield.setFillColor(Color(0, 102, 204, 140));
+    Shield.setPosition(10000, 10000);
 
     //Buttons in main menu
     for (int i = 0; i < 5; i++)
@@ -828,18 +871,18 @@ void spark_fog() {
         if (sparkx == 10) {
             sparkx = 0;
 
-            if (timer2 <= 0) {
+           // if (timer2 <= 0) {
                 chickenalive = true;
 
-                timer2= 1;
+            //    timer2= 1;
 
 
               
 
 
-            }
-            else
-                timer2--;
+           // }
+           // else
+           //     timer2--;
             if(chickenalive==true)
                 spark.setPosition(4000,5000);
         }
@@ -853,15 +896,31 @@ void PlayerShooting() {
 
     //Shooting
     
+
     if ((Keyboard::isKeyPressed(Keyboard::Space)) && bullet.bulletCoolDown == 0 && pausecooldown == 0 || (Mouse::isButtonPressed(Mouse::Left)) && bullet.bulletCoolDown == 0 && pausecooldown == 0)
     {
         bullet.bulletCoolDown = bullet.bulletCoolDownvar;
         pausecooldown = 1;
+        Shield.setPosition(10000, 10000);
+
+
     }
-    if ((Keyboard::isKeyPressed(Keyboard::Space)) && bullet.bulletCoolDown == 0 && pausecooldown==1 || (Mouse::isButtonPressed(Mouse::Left)) && bullet.bulletCoolDown == 0 && pausecooldown == 1)
+    if ((Keyboard::isKeyPressed(Keyboard::Space)) && bullet.bulletCoolDown == 0 && pausecooldown == 1 || (Mouse::isButtonPressed(Mouse::Left)) && bullet.bulletCoolDown == 0 && pausecooldown == 1)
     {
         bullet.bulletCoolDown = bullet.bulletCoolDownvar;
+        bullet_shot = 0;
+        shield_on = 0;
         Bullets[bullet.currentBullet].setPosition(Player.getPosition().x + 29, Player.getPosition().y - 45);
+
+        if (soundeffectON && playeralive)
+        {
+            shoot1[currentshootsfx].play();
+            currentshootsfx++;
+            if (currentshootsfx == 2)
+            {
+                currentshootsfx = 0;
+            }
+        }
 
         if (bullet.currentBullet == 39) {
             bullet.currentBullet = 0;
@@ -886,6 +945,10 @@ void rocketshooting()
     if (Mouse::isButtonPressed(Mouse::Right) && activemissile == false && rockets > 0)
     {
         activemissile = true;
+        if (soundeffectON) 
+        {
+            rocketshoot.play();
+        }
         missile.setPosition(Player.getPosition().x + 29, Player.getPosition().y - 45);
         rockets--;
         rocket.setString(to_string(rockets));
@@ -904,6 +967,10 @@ void rocketshooting()
         activemissile = false;
         missile.setPosition(10000, 100000);
         explosioncamerashake = true;
+        if (soundeffectON)
+        {
+            exploding.play();
+        }
         for (int j = 0; j < 5; j++)
         {
             for (int i = 0; i < 8; i++)
@@ -997,66 +1064,88 @@ void ChickenMove()
 //reducing heart by 1  (ahmed,ziad)
 void playerdamage() {
 
-    for (int j = 0; j < 5; j++)
+    if (shield_on == 0)
     {
-        for (int i = 0; i < 8; i++)
+        for (int j = 0; j < 5; j++)
         {
-            if (Eggs[i][j].getGlobalBounds().intersects(Player.getGlobalBounds())) {
-                health -= 1;
-                hp.setString(to_string(health));
-                Eggs[i][j].setPosition(4000, 5000);
+            for (int i = 0; i < 8; i++)
+            {
+                if (Eggs[i][j].getGlobalBounds().intersects(Player.getGlobalBounds())) {
+                    health -= 1;
+                    if (soundeffectON)
+                    {
+                        exploding.play();
+                    }
+                    hp.setString(to_string(health));
+                    Eggs[i][j].setPosition(4000, 5000);
+                }
+
             }
+        }
+        if (health < health2) {
+
+            playeralive = false;
 
         }
-    }
-    if (health<health2) {
-       
-        playeralive = false;
+        if (playeralive == false) {
 
-  }
-    if (playeralive == false) {
-        
-        if (expbool == 0) {
-            expbool = 1;
-            explosion.setPosition(Player.getPosition());
-        }
-        Player.setPosition(6000, 6000);
-        explosion.setTextureRect(IntRect(96.6 * exp_x, 5+(90.6 * exp_y), 96.6, 90.6));
-        exp_x++;
-        if (exp_x == 7 && exp_y < 3) {
-            exp_y++;
-            exp_x = 0;
-        }       
-        if (exp_y == 2 && exp_x == 5) {
-            exp_y = 0;
-            exp_x = 0;
-            health2 = health;
-            expbool = 0;
-             
-            if (Timer <= 0) {
-                playeralive = true;
+            if (expbool == 0) {
+                expbool = 1;
+                explosion.setPosition(Player.getPosition());
+            }
+            Player.setPosition(6000, 6000);
+            explosion.setTextureRect(IntRect(96.6 * exp_x, 5 + (90.6 * exp_y), 96.6, 90.6));
+            exp_x++;
+            if (exp_x == 7 && exp_y < 3) {
+                exp_y++;
+                exp_x = 0;
+            }
+            if (exp_y == 2 && exp_x == 5) {
+                exp_y = 0;
+                exp_x = 0;
+                health2 = health;
+                expbool = 0;
 
-                Timer = 2;
+                if (Timer <= 0) {
+                    playeralive = true;
 
-              
-                if (health == 0) {
-                    gameover = true;
+                    Timer = 2;
+
+
+                    if (health == 0) {
+                        gameover = true;
+                    }
+                    else
+                    {
+                        Player.setPosition(960, 850);
+                        Shield.setPosition(Player.getPosition().x - 18, Player.getPosition().y - 25);
+                        shield_on = 1;
+
+                    }
+
                 }
                 else
-                    Player.setPosition(960, 850);
-
+                    Timer--;
 
             }
-            else
-                Timer--;
-          
+
         }
-     
     }
-    
 }
 
+//Shield movement
+void shield_move()
+{
+    if (shield_on == 1)
+    {
+        Shield.setPosition(Player.getPosition().x - 18, Player.getPosition().y - 25);
+    }
+    else
+    {
+        Shield.setPosition(10000, 10000);
+    }
 
+}
 
 // egg movement function
 void eggmovement()
@@ -1091,6 +1180,17 @@ void eggmovement()
                 eggyolk[i][j].setScale(0, 0);
                 Eggs[i][j].setScale(0.13, 0.13);
                 Eggs[i][j].setPosition(Chicken[i][j].getPosition().x + 53.45, Chicken[i][j].getPosition().y + 75);
+
+
+                if (soundeffectON && Eggs[i][j].getPosition().x < 1920)
+                {
+                    eggshoot[currenteggshootsfx].play();
+                    currenteggshootsfx++;
+                    if (currenteggshootsfx == 2)
+                    {
+                        currenteggshootsfx = 0;
+                    }
+                }
                 timer[i][j]--;
             }
             if (timer[i][j]==-1)
@@ -1117,6 +1217,10 @@ void eggmovement()
                     yolktimer[i][j] = 50;
                 }*/
                 
+            }
+            if (Eggs[i][j].getGlobalBounds().intersects(Shield.getGlobalBounds()))
+            {
+                Eggs[i][j].setPosition(10000, 10000);
             }
 
             //collision egg
@@ -1313,7 +1417,16 @@ void scorecalc() {
                         rockets += 1;
                         rocket.setString(to_string(rockets));
                     }
-
+                    if (soundeffectON)
+                    {
+                        chickenhurt[currentchickensfx].play();
+                        currentchickensfx++;
+                        if (currentchickensfx == 2)
+                        {
+                            currentchickensfx = 0;
+                        }
+                    }
+                    
 
                 }
 
@@ -1727,6 +1840,14 @@ void reset()
     cnt = 0;
     boss.bosshp = 50;
     boss.eggcooldownvar = 301;
+    for (int j = 0; j < 5; j++)
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            eggyolk[i][j].setPosition(10000, 10000);
+        }
+    }
+
 
 }
 int main()
@@ -1754,6 +1875,15 @@ beginning: {};
     {
         MenuMusic.play();
     }
+    if (musicON)
+    {
+        IngameMusicPlay = true;
+    }
+    else
+    {
+        IngameMusicPlay = false;
+    }
+
     MainMusicPlaying = false;
     while (window.isOpen())
     {
@@ -2104,8 +2234,7 @@ beginning: {};
         // ingame
         if (page == 6)
         {
-           
-
+            
             if (temptest2 == 1)
             {
                 if (soundeffectON)
@@ -2117,6 +2246,13 @@ beginning: {};
             delay = 0;
             checkdelay = 0;
             frommenu = false;
+            if (IngameMusicPlay)
+            {
+                ingamemusic.play();
+                IngameMusicPlay = false;
+                IngameMusicPlaying = true;
+            }
+
             PlayerShooting();
             rocketshooting();
             playerdamage();
@@ -2172,11 +2308,16 @@ beginning: {};
                 }
             }
 
+            shield_move();
+            window.draw(Shield);
+
             //drawing missile
             window.draw(missile);
+
             if (Keyboard::isKeyPressed(Keyboard::Escape))
             {
                 page = 5;
+                MainMusicPlaying = true;
             }
             
         }
@@ -2257,24 +2398,47 @@ beginning: {};
 
             if (mousepos.x >= 985 && mousepos.x <= 1055 && mousepos.y >= 480  && mousepos.y <= 550 && Mouse::isButtonPressed(Mouse::Left) && checkdelay>=5)
             {
-                if (soundeffectON)
+                if (!IngameMusicPlaying)
                 {
-                    MenuClick.play();
-                    MenuMusic.play();
-                    MenuMusic.play();
-                }
-                musicON = !musicON;
-                if (musicON)
-                {
-                    MainMusicPlaying = true;
-                    goto beginning;
+                    if (soundeffectON)
+                    {
+                        MenuClick.play();
+                        MenuMusic.play();
+                        MenuMusic.play();
+                    }
+                    musicON = !musicON;
+                    if (musicON)
+                    {
+                        MainMusicPlaying = true;
+                        goto beginning;
+                    }
+                    else
+                    {
+                        MainMusicPlaying = false;
+                        goto beginning;
+                    }
+                    checkdelay = 0;
                 }
                 else
                 {
-                    MainMusicPlaying = false;
-                    goto beginning;
+                    if (soundeffectON)
+                    {
+                        MenuClick.play();
+                    }
+                    musicON = !musicON;
+                    if (musicON)
+                    {
+                        IngameMusicPlay = true;
+                        goto beginning;
+                    }
+                    else
+                    {
+                        IngameMusicPlay = false;
+                        goto beginning;
+                    }
+                    checkdelay = 0;
                 }
-                checkdelay = 0;
+                
             }
             if (mousepos.x >= 985 && mousepos.x <= 1055 && mousepos.y >= 580 && mousepos.y <= 650 && Mouse::isButtonPressed(Mouse::Left) && checkdelay >= 5)
             {
