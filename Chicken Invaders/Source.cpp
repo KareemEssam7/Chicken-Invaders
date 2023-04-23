@@ -45,6 +45,7 @@ sf::View view1(sf::Vector2f(960.f, 540.f), sf::Vector2f(1920.f, 1080.f));
 
 // Intialized Variables
 int exp_x=0,exp_y=0 ;
+int sparkx = 0;
 long long cnt = 0;  //counter for
  int health = 3;
 int rockets = 0;
@@ -60,6 +61,7 @@ int animation = 0;
 long long page = 0;
 bool checkchickenanimation = true, check = true, bossanimation=true;
 bool playeralive=true;
+bool chickenalive = true;
 ChickenStruct chicken;
 bulletstruct bullet;
 meteorstruct meteors;
@@ -81,6 +83,7 @@ int yolkanime = 0;
 int yolkvar = 100;
 int eggvar = 501;
 int expbool = 0;
+int sparkbool = 0;
 int health2 = health;
 bool musicON = true;
 bool soundeffectON = true;
@@ -95,6 +98,7 @@ int missileScoreCount = 0, camerashakelength = 6;
 bool activemissile = false, explosioncamerashake = false;
 bool yolk[8][5] = { };
 int Timer=2;
+int timer2 = 1;
 bool gameover=false;
 // Creating Game Window
 RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders",Style::Fullscreen);
@@ -121,6 +125,8 @@ Texture GameBarSkin;
 Texture BottomBarSkin;
 Texture explosionimage;
 Texture missileTexture;
+Texture sparkimage;
+Texture fogimage;
 
 // adding border
 RectangleShape rectangle1(Vector2f(60, 1080));
@@ -218,6 +224,8 @@ Sprite Earth;
 Sprite Gamebar;
 Sprite Bottombar;
 Sprite missile;
+Sprite spark;
+Sprite fog;
 // Loading Ingame Files
 void IngameImages()
 {
@@ -255,7 +263,9 @@ void IngameImages()
     explosionimage.loadFromFile("PlayerDeath.png");
     explosion.setTexture(explosionimage);
     explosion.setPosition(7000, 7000);
-
+    sparkimage.loadFromFile("sparkspink.png");
+    spark.setTexture(sparkimage);
+    spark.setPosition(8000, 8000);
 
     //Buttons in main menu
     for (int i = 0; i < 5; i++)
@@ -793,6 +803,49 @@ void PlayerMove()
             Player.setTextureRect(IntRect(PlayerMovement * 60, 0, 60, 42));
         }
     }
+}
+//spark and fog
+void spark_fog() {
+
+
+    for (int i = 0; i < 40; i++) {
+        for (int j = 0; j < 8; j++) {
+            for (int z = 0; z < 5; z++) {
+                if (Bullets[i].getGlobalBounds().intersects(Chicken[j][z].getGlobalBounds())) {
+
+                    chickenalive = false;
+                    spark.setPosition(Chicken[j][z].getPosition()-Vector2f(50,50));
+                }
+
+
+
+            }
+        }
+    }
+    if (chickenalive == false) {
+        spark.setTextureRect(IntRect(277 * sparkx, 0, 277, 269));
+        sparkx++;
+        if (sparkx == 10) {
+            sparkx = 0;
+
+            if (timer2 <= 0) {
+                chickenalive = true;
+
+                timer2= 1;
+
+
+              
+
+
+            }
+            else
+                timer2--;
+            if(chickenalive==true)
+                spark.setPosition(4000,5000);
+        }
+
+    }
+   
 }
 
 //shooting function
@@ -2070,6 +2123,7 @@ beginning: {};
             ChickenMove();
             eggmovement();
             PlayerMove();
+            spark_fog();
             scorecalc();
             camerashake();
             window.draw(_GameBackground);
@@ -2292,7 +2346,7 @@ beginning: {};
         // window display
         window.setView(view1);
 
-        
+        window.draw(spark);
        
         
         window.display();
