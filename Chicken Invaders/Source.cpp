@@ -45,7 +45,7 @@ sf::View view1(sf::Vector2f(960.f, 540.f), sf::Vector2f(1920.f, 1080.f));
 
 // Intialized Variables
 int exp_x=0,exp_y=0 ;
-int sparkx = 0;
+int sparkx = 0,fogx=0,fogy=0;
 long long cnt = 0;  //counter for
  int health = 3;
 int rockets = 0;
@@ -61,7 +61,7 @@ int animation = 0;
 long long page = 0;
 bool checkchickenanimation = true, check = true, bossanimation=true;
 bool playeralive=true;
-bool chickenalive = true;
+bool chickenalive = true,chickenalive2=true;
 ChickenStruct chicken;
 bulletstruct bullet;
 meteorstruct meteors;
@@ -314,6 +314,10 @@ void IngameImages()
     sparkimage.loadFromFile("sparkspink.png");
     spark.setTexture(sparkimage);
     spark.setPosition(8000, 8000);
+    fogimage.loadFromFile("fogwhite.png"); 
+    fog.setTexture(fogimage);
+    fog.setPosition(9000, 9000);
+    
 
     //Shield
     Shield.setFillColor(Color(0, 102, 204, 140));
@@ -881,7 +885,7 @@ void spark_fog() {
                 if (Bullets[i].getGlobalBounds().intersects(Chicken[j][z].getGlobalBounds())) {
 
                     chickenalive = false;
-                    spark.setPosition(Chicken[j][z].getPosition()-Vector2f(50,50));
+                    spark.setPosition(Chicken[j][z].getPosition() - Vector2f(50, 50));
                 }
 
 
@@ -895,24 +899,45 @@ void spark_fog() {
         if (sparkx == 10) {
             sparkx = 0;
 
-           // if (timer2 <= 0) {
-                chickenalive = true;
 
-            //    timer2= 1;
-
-
-              
-
-
-           // }
-           // else
-           //     timer2--;
-            if(chickenalive==true)
-                spark.setPosition(4000,5000);
+            chickenalive = true;
+            if (chickenalive == true)
+                spark.setPosition(4000, 5000);
         }
 
     }
-   
+    for (int i = 0; i < 40; i++) {
+        for (int j = 0; j < 8; j++) {
+            for (int z = 0; z < 5; z++) {
+                if (Bullets[i].getGlobalBounds().intersects(Chicken[j][z].getGlobalBounds())) {
+
+                    chickenalive2 = false;
+                    fog.setPosition(Chicken[j][z].getPosition() - Vector2f(-50, -20));
+                }
+
+
+
+            }
+        }
+    }
+    if (chickenalive2 == false) {
+        fog.setTextureRect(IntRect(64 * fogx, 0, 64, 62));
+        fogx++;
+        if (fogx == 10) {
+
+            fogx = 0;
+
+
+            chickenalive2 = true;
+            if (chickenalive2 == true) {
+                fog.setPosition(6000, 5000);
+
+
+            }
+        }
+
+    }
+
 }
 
 //shooting function
@@ -1137,6 +1162,8 @@ void playerdamage() {
 
                     if (health == 0) {
                         gameover = true;
+                        MainMusicPlaying = true;
+                        IngameMusicPlaying = false;
                     }
                     else
                     {
@@ -2438,6 +2465,7 @@ beginning: {};
                     //drawing missile
                     window.draw(missile);
                     window.draw(spark);
+                    window.draw(fog);
 
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
@@ -2556,6 +2584,7 @@ beginning: {};
                     //drawing missile
                     window.draw(missile);
                     window.draw(spark);
+                    window.draw(fog);
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
                         page = 5;
@@ -2683,6 +2712,7 @@ beginning: {};
                     //drawing missile
                     window.draw(missile);
                     window.draw(spark);
+                    window.draw(fog);
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
                         page = 5;
