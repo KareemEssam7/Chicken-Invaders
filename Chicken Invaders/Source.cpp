@@ -2741,6 +2741,125 @@ beginning: {};
                     }
                 }
             }
+            if (Wave4 == true)
+            {
+                meteoralive = 0;
+                wave1second.setString("Wave " + to_string(prevwave - 48));
+                if (prevwave == '3')
+                {
+                    clock3.restart();
+                    clock4.restart();
+                    for (int i = 0; i < 8; i++)
+                    {
+                        for (int a = 0; a < 5; a++)
+                        {
+                            Chicken[i][a].setPosition(-2000, 2000);
+                            eggyolk[i][a].setPosition(10000, 10000);
+                            chickendead[i][a] = 0;
+                        }
+                    }
+                    chickeninitialpos = 0;
+                }
+                prevwave = '4';
+                if (clock4.getElapsedTime().asSeconds() >= 9)
+                {
+                    meteorfast();
+                    PlayerShooting();
+                    rocketshooting();
+                    spark_fog();
+                    scorecalc();
+                    camerashake();
+                    window.draw(_GameBackground);
+                    window.draw(rectangle1);
+                    window.draw(rectangle2);
+
+                    if (gameover == true) {
+                        gameover = false;
+
+                        temptest = 1;
+                        page = 1;
+                        reset();
+                        goto beginning;
+
+                    }
+                    for (int i = 0; i <= 20; i++)
+                    {
+                        window.draw(meteor[i]);
+                    }
+                    for (int i = 0; i < 40; i++)
+                    {
+                        if (meteor[i].getPosition().y < 1100 && meteor[i].getPosition().x < 3000)
+                        {
+                            meteoralive++;
+                        }
+                    }
+                    if (meteoralive == 0)
+                    {
+                        Wave4 = false;
+                        Wave5 = true;
+
+                        clock4.restart();
+                        clock3.restart();
+                        for (int i = 0; i < 40; i++)
+                        {
+                            Bullets[i].setPosition(9000, 9000);
+                        }
+                        spark.setPosition(9000, 9000);
+
+                    }
+                    window.draw(health_bar);
+                    window.draw(Gamebar);
+                    window.draw(score);
+                    window.draw(Bottombar);
+                    window.draw(foodscore);
+                    window.draw(hp);
+                    window.draw(rocket);
+                    window.draw(powerlvl);
+                    window.draw(explosion);
+                    for (int i = 0; i < 40; i++)
+                    {
+                        window.draw(Bullets[i]);
+                        if (Bullets[i].getGlobalBounds().intersects(Gamebar.getGlobalBounds()))
+                        {
+                            Bullets[i].setPosition(4000, 4000);
+                        }
+                    }
+                    shield_move();
+                    window.draw(Shield);
+
+                    //drawing missile
+                    window.draw(missile);
+                    window.draw(spark);
+                    window.draw(fog);
+                    if (Keyboard::isKeyPressed(Keyboard::Escape))
+                    {
+                        page = 5;
+
+
+                    }
+                }
+                else
+                {
+                    window.draw(_GameBackground);
+                    window.draw(health_bar);
+                    window.draw(Gamebar);
+                    window.draw(score);
+                    window.draw(Bottombar);
+                    window.draw(foodscore);
+                    window.draw(hp);
+                    window.draw(rocket);
+                    window.draw(powerlvl);
+                    if (clock3.getElapsedTime().asSeconds() <= 8)
+                    {
+                        if (clock3.getElapsedTime().asSeconds() <= 5)
+                        {
+                            window.draw(endofwave1);
+                        }
+                        window.draw(wave1second);
+                    }
+                }
+
+            }
             playerdamage();
             PlayerMove();
             window.draw(Player);
