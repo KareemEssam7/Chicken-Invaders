@@ -1613,7 +1613,7 @@ void scorecalc() {
                     score.setString(to_string(cnt));
                     Bullets[i].setPosition(-10000, -10000);
                     chicken_legs[j][z].setPosition(Chicken[j][z].getPosition().x, Chicken[j][z].getPosition().y);
-                    Chicken[j][z].setPosition(10000, 100000);
+                    Chicken[j][z].setPosition(10000, 10000);
                     missileScoreCount += 1000;
                     if (missileScoreCount == 70000)
                     {
@@ -2513,7 +2513,6 @@ beginning: {};
 
                     for (int j = 0; j < 5; j++)
                     {
-
                         for (int i = 0; i < 8; i++)
                         {
 
@@ -2558,11 +2557,8 @@ beginning: {};
                         for (int i = 0; i < 40; i++)
                         {
                             Bullets[i].setPosition(9000, 9000);
-                        spark[i].setPosition(9000, 9000);
+                            spark[i].setPosition(9000, 9000);
                         }
-
-
-
                     }
                     shield_move();
                     window.draw(Shield);
@@ -2571,7 +2567,7 @@ beginning: {};
                     window.draw(missile);
                     for (int i = 0; i < 40; i++) {
                         window.draw(spark[i]);
-                     window.draw(fog[i]);
+                        window.draw(fog[i]);
                     }
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
@@ -2612,7 +2608,7 @@ beginning: {};
                     {
                         for (int a = 0; a < 5; a++)
                         {
-                            Chicken[i][a].setPosition(-2000, 2000);
+                            Chicken[i][a].setPosition(10000, 10000);
                             eggyolk[i][a].setPosition(10000, 10000);
                             Eggs[i][a].setPosition(10000, 10000);
                             chickendead[i][a] = 0;
@@ -2664,7 +2660,7 @@ beginning: {};
                         for (int i = 0; i < 40; i++)
                         {
                             Bullets[i].setPosition(9000, 9000);
-                        spark[i].setPosition(9000, 9000);
+                            spark[i].setPosition(9000, 9000);
                         }
 
                     }
@@ -2731,6 +2727,10 @@ beginning: {};
                     clock3.restart();
                     clock4.restart();
                     meteorx = 0;
+                    for (int i = 0; i < 40; i++)
+                    {
+                        meteor[i].setPosition(10000, 10000);
+                    }
                 }
                 prevwave = '3';
 
@@ -2787,6 +2787,7 @@ beginning: {};
                             Bullets[i].setPosition(4000, 4000);
                         }
                     }
+
                     for (int i = 0; i < 8; i++)
                     {
                         for (int j = 0; j < 5; j++)
@@ -2864,8 +2865,9 @@ beginning: {};
                     {
                         for (int a = 0; a < 5; a++)
                         {
-                            Chicken[i][a].setPosition(-2000, 2000);
+                            Chicken[i][a].setPosition(10000, 10000);
                             eggyolk[i][a].setPosition(10000, 10000);
+                            Eggs[i][a].setPosition(10000, 10000);
                             chickendead[i][a] = 0;
                         }
                     }
@@ -2914,7 +2916,7 @@ beginning: {};
                         for (int i = 0; i < 40; i++)
                         {
                             Bullets[i].setPosition(9000, 9000);
-                        spark[i].setPosition(9000, 9000);
+                            spark[i].setPosition(9000, 9000);
                         }
 
                     }
@@ -2981,6 +2983,10 @@ beginning: {};
                     clock3.restart();
                     clock4.restart();
                     meteorx = 0;
+                    for (int i = 0; i < 40; i++)
+                    {
+                        meteor[i].setPosition(10000, 10000);
+                    }
                 }
                 prevwave = '5';
 
@@ -3031,6 +3037,10 @@ beginning: {};
                             Bullets[i].setPosition(4000, 4000);
                         }
                     }
+                    for (int i = 0; i < 40; i++)
+                    {
+                        window.draw(meteor[i]);
+                    }
                     if (boss.bosshp == 0)
                         aliveboss = 0;
                     camerashake();
@@ -3048,7 +3058,7 @@ beginning: {};
                         {
                             for (int a = 0; a < 5; a++)
                             {
-                                Chicken[i][a].setPosition(-2000, 2000);
+                                Chicken[i][a].setPosition(10000, 10000);
                             }
                         }
                     }
