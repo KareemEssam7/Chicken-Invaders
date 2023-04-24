@@ -1971,18 +1971,15 @@ beginning: {};
     IngameImages();
 
     // main game loop
-    if (MainMusicPlaying)
+    if (MainMusicPlaying && musicON && IngameMusicPlaying == false)
     {
         MenuMusic.play();
     }
-    if (musicON)
+    if (musicON && IngameMusicPlaying && MainMusicPlaying == false)
     {
-        IngameMusicPlay = true;
+        ingamemusic.play();
     }
-    else
-    {
-        IngameMusicPlay = false;
-    }
+
 
     MainMusicPlaying = false;
     while (window.isOpen())
@@ -2312,6 +2309,8 @@ beginning: {};
 
               temptest = 1;
               page = 1;
+              IngameMusicPlaying = false;
+              MainMusicPlaying = true;
               reset();
               goto beginning;
 
@@ -2346,12 +2345,12 @@ beginning: {};
             delay = 0;
             checkdelay = 0;
             frommenu = false;
-            if (IngameMusicPlay)
+            /*if (IngameMusicPlay)
             {
                 ingamemusic.play();
                 IngameMusicPlay = false;
                 IngameMusicPlaying = true;
-            }
+            }*/
             if (Wave1 == true)
             {
                 prevwave = '1';
@@ -2439,10 +2438,12 @@ beginning: {};
                     //drawing missile
                     window.draw(missile);
                     window.draw(spark);
+
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
                         page = 5;
-                        MainMusicPlaying = true;
+
+
                     }
                 }
                 else
@@ -2558,7 +2559,8 @@ beginning: {};
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
                         page = 5;
-                        MainMusicPlaying = true;
+
+
                     }
                 }
                 else
@@ -2684,7 +2686,7 @@ beginning: {};
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
                         page = 5;
-                        MainMusicPlaying = true;
+
                     }
                 }
                 else
@@ -2870,6 +2872,7 @@ beginning: {};
             {
                 temptest2 = 1;
                 MainMusicPlaying = false;
+                IngameMusicPlaying = true;
                 page = 6;
                 pausecooldown = 0;
                 modeselectdelay = 0;
