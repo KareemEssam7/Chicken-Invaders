@@ -105,7 +105,12 @@ int currentshootsfx = 0, currentchickensfx = 0, currenteggshootsfx = 0;
 //shield variables
 bool bullet_shot = 0;
 bool shield_on = 0;
-
+Clock clock4;
+Clock clock3;
+bool Wave1 = 1, Wave2 =0, Wave3 = 0, Wave4 = 0, Wave5 = 0;
+char prevwave = '1';
+bool chickendead[8][5];
+int alivechicken = 0;
 // Creating Game Window
 RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders",Style::Fullscreen);
 
@@ -212,6 +217,9 @@ Text ldb[5];
 Text Cred[7];
 Text single;
 Text coop;
+Text wave1first;
+Text wave1second;
+Text endofwave1;
 //adding font
 Font font1;
 Font font3;
@@ -417,7 +425,22 @@ void IngameImages()
     Leaderboard.setPosition(880, 695);
     Leaderboard.setString("Hall Of Fame");
     Leaderboard.setFillColor(Color(204, 229, 255, 225));
-
+    // first wave texts
+    wave1first.setFont(font1);
+    wave1first.setCharacterSize(50);
+    wave1first.setPosition(860, 500);
+    wave1first.setString("Get Ready!");
+    wave1first.setFillColor(Color(204, 229, 255, 225));
+    wave1second.setFont(font1);
+    wave1second.setCharacterSize(30);
+    wave1second.setPosition(920, 600);
+    wave1second.setString("Wave "+to_string(prevwave-48));
+    wave1second.setFillColor(Color(204, 229, 255, 225));
+    endofwave1.setFont(font1);
+    endofwave1.setCharacterSize(50);
+    endofwave1.setPosition(860, 500);
+    endofwave1.setString("Well Played!");
+    endofwave1.setFillColor(Color(204, 229, 255, 225));
     //Credits text
     Credits.setFont(font1);
     Credits.setCharacterSize(32);
@@ -1002,7 +1025,6 @@ void camerashake()
         camerashakelength = 6;
     }
 }
-
 // function for chicken movement
 void ChickenMove()
 {
@@ -1320,8 +1342,61 @@ void meteormove()
         }
     }
     for (int i = 0; i < 40; i++) {
-          if (Player.getGlobalBounds().intersects(meteor[i].getGlobalBounds())) {
-              Player.setPosition(10000, 10000);
+          if (Player.getGlobalBounds().intersects(meteor[i].getGlobalBounds()) && shield_on==false) {
+              health -= 1;
+              if (soundeffectON)
+              {
+                  exploding.play();
+              }
+              hp.setString(to_string(health));
+              if (health < health2) {
+
+                  playeralive = false;
+
+              }
+              if (playeralive == false) {
+
+                  if (expbool == 0) {
+                      expbool = 1;
+                      explosion.setPosition(Player.getPosition());
+                  }
+                  Player.setPosition(6000, 6000);
+                  explosion.setTextureRect(IntRect(96.6 * exp_x, 5 + (90.6 * exp_y), 96.6, 90.6));
+                  exp_x++;
+                  if (exp_x == 7 && exp_y < 3) {
+                      exp_y++;
+                      exp_x = 0;
+                  }
+                  if (exp_y == 2 && exp_x == 5) {
+                      exp_y = 0;
+                      exp_x = 0;
+                      health2 = health;
+                      expbool = 0;
+
+                      if (Timer <= 0) {
+                          playeralive = true;
+
+                          Timer = 2;
+
+
+                          if (health == 0) {
+                              gameover = true;
+                          }
+                          else
+                          {
+                              Player.setPosition(960, 850);
+                              Shield.setPosition(Player.getPosition().x - 18, Player.getPosition().y - 25);
+                              shield_on = 1;
+
+                          }
+
+                      }
+                      else
+                          Timer--;
+
+                  }
+
+              }
           }
     }
 
@@ -1404,6 +1479,7 @@ void scorecalc() {
 
                 if (Bullets[i].getGlobalBounds().intersects(Chicken[j][z].getGlobalBounds())) 
                 {
+                    chickendead[j][z] = 1;
                     eggvar -= 5;
                     cnt += 1000;
                     score.setString(to_string(cnt));
@@ -1847,8 +1923,30 @@ void reset()
             eggyolk[i][j].setPosition(10000, 10000);
         }
     }
-
-
+    tmp = 100;
+    for (int i = 0; i <= 20; i++)
+    {
+        meteor[i].setPosition(-100 + tmp, -200);
+        meteor[i].setTextureRect(IntRect(62.625 * xmeteor, 62.25 * ymeteor, 62.625f, 62.25f));
+        int randscale = rand() % 2 + 1;
+        meteorhp[i] = 1 * randscale;
+        meteor[i].setScale(randscale, randscale);
+        tmp += 100;
+        meteortimer[i] = rand() % 400 + 100;
+    }
+    tmp = 100;
+    for (int i = 21; i <= 39; i++)
+    {
+        meteor[i].setPosition(-200, 0 + tmp);
+        meteor[i].setTextureRect(IntRect(62.625 * xmeteor, 62.25 * ymeteor, 62.625f, 62.25f));
+        int randscale = rand() % 2 + 1;
+        meteorhp[i] = 1 * randscale;
+        meteor[i].setScale(randscale, randscale);
+        tmp += 50;
+        meteortimer[i] = rand() % 400 + 100;
+    }
+    prevwave = '1';
+    Wave2 = false,Wave3=false,Wave4=false,Wave5=false,Wave1=true;
 }
 int main()
 {
@@ -2234,7 +2332,6 @@ beginning: {};
         // ingame
         if (page == 6)
         {
-            
             if (temptest2 == 1)
             {
                 if (soundeffectON)
@@ -2252,74 +2349,208 @@ beginning: {};
                 IngameMusicPlay = false;
                 IngameMusicPlaying = true;
             }
-
-            PlayerShooting();
-            rocketshooting();
-            playerdamage();
-            ChickenMove();
-            eggmovement();
-            PlayerMove();
-            spark_fog();
-            scorecalc();
-            camerashake();
-            window.draw(_GameBackground);
-            window.draw(Player);
-            window.draw(rectangle1);
-            window.draw(rectangle2);
-
-            if (gameover == true) {
-                gameover = false;
-
-                temptest = 1;
-                page = 1;
-                reset();
-                goto beginning;
-
-            }
-            
-            
-            for (int j = 0; j < 5; j++)
+            if (Wave1 == true)
             {
-                
-                for (int i = 0; i < 8; i++)
+                prevwave = '1';
+                alivechicken = 0;
+                if (clock4.getElapsedTime().asSeconds() >= 9)
                 {
 
-                    window.draw(eggyolk[i][j]);                
-                    window.draw(Chicken[i][j]);
-                    window.draw(Eggs[i][j]);
+                    PlayerShooting();
+                    rocketshooting();
+                    playerdamage();
+                    ChickenMove();
+                    eggmovement();
+                    PlayerMove();
+                    spark_fog();
+                    scorecalc();
+                    camerashake();
+                    window.draw(_GameBackground);
+                    window.draw(Player);
+                    window.draw(rectangle1);
+                    window.draw(rectangle2);
+
+                    if (gameover == true) {
+                        gameover = false;
+
+                        temptest = 1;
+                        page = 1;
+                        reset();
+                        goto beginning;
+
+                    }
+
+
+                    for (int j = 0; j < 5; j++)
+                    {
+
+                        for (int i = 0; i < 8; i++)
+                        {
+
+                            window.draw(eggyolk[i][j]);
+                            window.draw(Chicken[i][j]);
+                            window.draw(Eggs[i][j]);
+                        }
+                    }
+
+                    window.draw(health_bar);
+                    window.draw(Gamebar);
+                    window.draw(score);
+                    window.draw(Bottombar);
+                    window.draw(foodscore);
+                    window.draw(hp);
+                    window.draw(rocket);
+                    window.draw(powerlvl);
+                    window.draw(explosion);
+                    for (int i = 0; i < 40; i++)
+                    {
+                        window.draw(Bullets[i]);
+                        if (Bullets[i].getGlobalBounds().intersects(Gamebar.getGlobalBounds()))
+                        {
+                            Bullets[i].setPosition(4000, 4000);
+                        }
+                    }
+                    for (int i = 0; i < 8; i++)
+                    {
+                        for (int j = 0; j < 5; j++)
+                        {
+                            if (chickendead[i][j] == 0)
+                                alivechicken++;
+                        }
+                    }
+                    if (alivechicken == 0)
+                    {
+                        Wave1 = false;
+                        Wave2 = true;
+                        clock4.restart();
+                        clock3.restart();
+                        for (int i = 0; i < 40; i++)
+                        {
+                            Bullets[i].setPosition(9000, 9000);
+                        }
+                        spark.setPosition(9000, 9000);
+                    }
+                    shield_move();
+                    window.draw(Shield);
+
+                    //drawing missile
+                    window.draw(missile);
+                    window.draw(spark);
+                    if (Keyboard::isKeyPressed(Keyboard::Escape))
+                    {
+                        page = 5;
+                        MainMusicPlaying = true;
+                    }
                 }
-            }
-            
-            window.draw(health_bar);
-            window.draw(Gamebar);
-            window.draw(score);
-            window.draw(Bottombar);
-            window.draw(foodscore);
-            window.draw(hp);
-            window.draw(rocket);
-            window.draw(powerlvl);
-            window.draw(explosion); 
-            for (int i = 0; i < 40; i++) 
-            {
-                window.draw(Bullets[i]);
-                if (Bullets[i].getGlobalBounds().intersects(Gamebar.getGlobalBounds()))
+                else
                 {
-                    Bullets[i].setPosition(4000,4000);
+                    window.draw(_GameBackground);
+                    window.draw(health_bar);
+                    window.draw(Gamebar);
+                    window.draw(score);
+                    window.draw(Bottombar);
+                    window.draw(foodscore);
+                    window.draw(hp);
+                    window.draw(rocket);
+                    window.draw(powerlvl);
+                    if (clock3.getElapsedTime().asSeconds() <= 8)
+                    {
+                        if (clock3.getElapsedTime().asSeconds() <= 5)
+                        {
+                            window.draw(wave1second);
+                        }
+                        window.draw(wave1first);
+                    }
                 }
             }
-
-            shield_move();
-            window.draw(Shield);
-
-            //drawing missile
-            window.draw(missile);
-
-            if (Keyboard::isKeyPressed(Keyboard::Escape))
+            if (Wave2 == true)
             {
-                page = 5;
-                MainMusicPlaying = true;
+                wave1second.setString("Wave " + to_string(prevwave - 48));
+                if (prevwave == '1')
+                {
+                    clock3.restart();
+                    clock4.restart();
+                }
+                prevwave = '2';
+                if (clock4.getElapsedTime().asSeconds() >= 9)
+                {
+                    meteormove();
+                    PlayerShooting();
+                    rocketshooting();
+                    playerdamage();
+                    PlayerMove();
+                    spark_fog();
+                    scorecalc();
+                    camerashake();
+                    window.draw(_GameBackground);
+                    window.draw(Player);
+                    window.draw(rectangle1);
+                    window.draw(rectangle2);
+
+                    if (gameover == true) {
+                        gameover = false;
+
+                        temptest = 1;
+                        page = 1;
+                        reset();
+                        goto beginning;
+
+                    }
+                    for (int i = 0; i <= 39; i++)
+                    {
+                        window.draw(meteor[i]);
+                    }
+                    window.draw(health_bar);
+                    window.draw(Gamebar);
+                    window.draw(score);
+                    window.draw(Bottombar);
+                    window.draw(foodscore);
+                    window.draw(hp);
+                    window.draw(rocket);
+                    window.draw(powerlvl);
+                    window.draw(explosion);
+                    for (int i = 0; i < 40; i++)
+                    {
+                        window.draw(Bullets[i]);
+                        if (Bullets[i].getGlobalBounds().intersects(Gamebar.getGlobalBounds()))
+                        {
+                            Bullets[i].setPosition(4000, 4000);
+                        }
+                    }
+                    shield_move();
+                    window.draw(Shield);
+
+                    //drawing missile
+                    window.draw(missile);
+                    window.draw(spark);
+                    if (Keyboard::isKeyPressed(Keyboard::Escape))
+                    {
+                        page = 5;
+                        MainMusicPlaying = true;
+                    }
+                }
+                else
+                {
+                    window.draw(_GameBackground);
+                    window.draw(health_bar);
+                    window.draw(Gamebar);
+                    window.draw(score);
+                    window.draw(Bottombar);
+                    window.draw(foodscore);
+                    window.draw(hp);
+                    window.draw(rocket);
+                    window.draw(powerlvl);
+                    if (clock3.getElapsedTime().asSeconds() <= 8)
+                    {
+                        if (clock3.getElapsedTime().asSeconds() <= 5)
+                        {
+                            window.draw(endofwave1);
+                        }
+                        window.draw(wave1second);
+                    }
+                }
+
             }
-            
         }
         // control
         if (page == 7)
@@ -2461,6 +2692,8 @@ beginning: {};
         // coop or single menu
         if (page == 9)
         {
+            clock3.restart();
+            clock4.restart();
             mainmenu();
             modeselectdelay++;
             coopclick++;
@@ -2509,10 +2742,7 @@ beginning: {};
         
         // window display
         window.setView(view1);
-
-        window.draw(spark);
-       
-        
+     
         window.display();
     }
     return 0;
