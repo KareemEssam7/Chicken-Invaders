@@ -29,6 +29,12 @@ struct spark_struct {
     float sparkcooldown = 0;
 
 };
+struct fogstruct {
+    int currentfog = 0;
+    float fogcooldownvar = 8;
+    float fogcooldown = 0;
+
+};
 
 //Meteor Struct
 struct meteorstruct {
@@ -74,6 +80,7 @@ bulletstruct bullet;
 meteorstruct meteors;
 bossstruct boss;
 spark_struct Spark;
+fogstruct Fog;
 int chickenpx[8][6] = {}, chickenpy[8][6] = {};
 int foodcnt = 0;
 int yolktimer[8][5] = {} ;
@@ -267,7 +274,7 @@ Sprite Gamebar;
 Sprite Bottombar;
 Sprite missile;
 Sprite spark[40];
-Sprite fog;
+Sprite fog[40];
 // Loading Ingame Files
 void IngameImages()
 {
@@ -329,10 +336,10 @@ void IngameImages()
     for (int i = 0; i < 40; i++) {
         spark[i].setTexture(sparkimage);
         spark[i].setPosition(8000, 8000);
-    }
     fogimage.loadFromFile("fogwhite.png"); 
-    fog.setTexture(fogimage);
-    fog.setPosition(9000, 9000);
+    fog[i].setTexture(fogimage);
+    fog[i].setPosition(9000, 9000);
+    }
     
 
     //Shield
@@ -913,9 +920,11 @@ void spark_fog() {
         for (int j = 0; j < 8; j++) {
             for (int z = 0; z < 5; z++) {
                 if (Bullets[i].getGlobalBounds().intersects(Chicken[j][z].getGlobalBounds())) {
+                    Fog.fogcooldown = Fog.fogcooldownvar;
                     Spark.sparkcooldown = Spark.sparkcooldownvar;
                     chickenalive = false;
                     spark[i].setPosition(Chicken[j][z].getPosition() - Vector2f(50, 50));
+                    fog[i].setPosition(Chicken[j][z].getPosition() - Vector2f(-50, -20));
                 }
 
 
@@ -926,16 +935,22 @@ void spark_fog() {
     if (chickenalive == false) {
         for (int i = 0; i < 40; i++) {
             spark[i].setTextureRect(IntRect(277 * sparkx, 0, 277, 269));
+            fog[i].setTextureRect(IntRect(64 * fogx, 0, 64, 62));
         }
+        fogx++;
         sparkx++;
-        if (sparkx == 10) {
+        if (sparkx == 10 && fogx == 10) {
             sparkx = 0;
+            fogx = 0;
+
+
 
 
             chickenalive = true;
             if (chickenalive == true)
                 for (int i = 0; i < 40; i++) {
                     spark[i].setPosition(4000, 5000);
+                    fog[i].setPosition(6000, 5000);
                 }
         }
 
@@ -947,41 +962,18 @@ void spark_fog() {
     if (Spark.sparkcooldown > 0) {
         Spark.sparkcooldown--;
     }
-
-
-    for (int i = 0; i < 40; i++) {
-        for (int j = 0; j < 8; j++) {
-            for (int z = 0; z < 5; z++) {
-                if (Bullets[i].getGlobalBounds().intersects(Chicken[j][z].getGlobalBounds())) {
-
-                    chickenalive2 = false;
-                    fog.setPosition(Chicken[j][z].getPosition() - Vector2f(-50, -20));
-                }
-
-
-
-            }
-        }
+    if (Fog.currentfog == 39) {
+        Fog.currentfog = 0;
     }
-    if (chickenalive2 == false) {
-        fog.setTextureRect(IntRect(64 * fogx, 0, 64, 62));
-        fogx++;
-        if (fogx == 10) {
-
-            fogx = 0;
-
-
-            chickenalive2 = true;
-            if (chickenalive2 == true) {
-                fog.setPosition(6000, 5000);
-
-
-            }
-        }
-
+    Fog.currentfog++;
+    if (Fog.fogcooldown > 0) {
+        Fog.fogcooldown--;
     }
-
+    
 }
+    
+
+
 
 //shooting function
 void PlayerShooting() {
@@ -2579,8 +2571,8 @@ beginning: {};
                     window.draw(missile);
                     for (int i = 0; i < 40; i++) {
                         window.draw(spark[i]);
+                     window.draw(fog[i]);
                     }
-                     window.draw(fog);
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
                         page = 5;
@@ -2700,8 +2692,8 @@ beginning: {};
                     window.draw(missile);
                     for (int i = 0; i < 40; i++) {
                         window.draw(spark[i]);
+                    window.draw(fog[i]);
                     }
-                    window.draw(fog);
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
                         page = 5;
@@ -2830,8 +2822,8 @@ beginning: {};
                     window.draw(missile);
                     for (int i = 0; i < 40; i++) {
                         window.draw(spark[i]);
+                    window.draw(fog[i]);
                     }
-                    window.draw(fog);
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
                         page = 5;
@@ -2950,8 +2942,8 @@ beginning: {};
                     window.draw(missile);
                     for (int i = 0; i < 40; i++) {
                         window.draw(spark[i]);
+                    window.draw(fog[i]);
                     }
-                    window.draw(fog);
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
                         page = 5;
@@ -3067,8 +3059,8 @@ beginning: {};
                     window.draw(missile);
                     for (int i = 0; i < 40; i++) {
                         window.draw(spark[i]);
+                    window.draw(fog[i]);
                     }
-                    window.draw(fog);
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
                         page = 5;
