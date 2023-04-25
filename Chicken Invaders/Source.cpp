@@ -21,6 +21,8 @@ struct bulletstruct
     int currentBullet = 0;
     float bulletCoolDownvar = 8;
     float bulletCoolDown = 0;
+    float bulletCoolDown2 = 0;
+    const int numberofbullets = 50;
 };
 //spark struct
 struct spark_struct {
@@ -63,7 +65,7 @@ long long cnt = 0;  //counter for
  int health = 3;
 int rockets = 0;
 int powerlvls = 0;
-double PlayerMovement = 9, PlayerSpeed = 12;
+double PlayerMovement = 9, PlayerSpeed = 12, Player2Movement = 9, Player2Speed = 12;
 double ChickenDir = 0,rectdir,bossdir=0,chickeninitialpos=0;
 int ChickenMovement = 0 ;
 int timer[8][5];
@@ -73,7 +75,7 @@ int pausecooldown = 0;
 int animation = 0;
 long long page = 0;
 bool checkchickenanimation = true, check = true, bossanimation=true;
-bool playeralive=true;
+bool playeralive=true, player2alive = true;
 bool chickenalive = true,chickenalive2=true;
 ChickenStruct chicken;
 bulletstruct bullet;
@@ -116,7 +118,7 @@ int Timer=2;
 int timer2 = 1;
 bool gameover=false;
 //sound variables
-int currentshootsfx = 0, currentchickensfx = 0, currenteggshootsfx = 0;
+int currentshootsfx = 0, currentchickensfx = 0, currenteggshootsfx = 0, numberofshootsfx = 3;
 //shield variables
 bool bullet_shot = 0;
 bool shield_on = 0;
@@ -130,6 +132,7 @@ int meteoralive = 0;
 int aliveboss = 1;
 int shield_timervar = 60;
 int shield_timer = 0;
+bool coopon = false;
 // Creating Game Window
 RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders",Style::Fullscreen);
 
@@ -137,6 +140,7 @@ RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders",Style::Fullscreen)
 // adding textures
 Texture Background;
 Texture PlayerSkin;
+Texture Player2Skin;
 Texture ChickenSkin;
 Texture bulletImage;
 Texture healthbar;
@@ -175,7 +179,7 @@ SoundBuffer rocketshootsfx;
 SoundBuffer explodingsfx;
 // sounds
 Sound MenuClick;
-Sound shoot1[2];
+Sound shoot1[3];
 Sound chickenhurt[2];
 Sound eggshoot[2];
 Sound rocketshoot;
@@ -249,10 +253,11 @@ Font font2;
 // Ingame Sprites
 Sprite _GameBackground;
 Sprite Player;
+Sprite Player2ship;
 Sprite Chicken[8][6];
 Sprite Chicken2[8][6];
 Sprite explosion;
-Sprite Bullets[40];
+Sprite Bullets[50];
 Sprite health_bar;
 Sprite Eggs[8][5];
 Sprite eggyolk[8][5];
@@ -286,7 +291,7 @@ void IngameImages()
     Select.loadFromFile("Select.wav");
     MenuClick.setBuffer(Select);
     shoot1sfx.loadFromFile("weapon1.wav");
-    for (int i = 0; i < 2; i++)
+    for (int i = 0; i < numberofshootsfx; i++)
     {
         shoot1[i].setBuffer(shoot1sfx);
     }
@@ -729,6 +734,15 @@ void IngameImages()
     Player.setScale(1.5, 1.5);
     rotatecheck=1;
 
+    // player 2 image
+    Player2Skin.loadFromFile("playerr2.png");
+    Player2ship.setTexture(Player2Skin);
+    Player2ship.setTextureRect(IntRect(Player2Movement * 60, 0, 60, 42));
+    Player2ship.setPosition(960, 850);
+    Player2ship.setScale(1.5, 1.5);
+
+
+
     // Border Image
     rectangle1.setPosition(0, 0);
     rectangle1.setFillColor(Color::Transparent);
@@ -820,11 +834,12 @@ void IngameImages()
     bosssprite.setScale(4.5 , 4.5);
     bosssprite.setTextureRect(IntRect(75*animation, 0, 75, 68));
     //setting bullet textures
-    for (int i = 0; i < 40; i++)
+    for (int i = 0; i < bullet.numberofbullets; i++)
     {
         Bullets[i].setTexture(bulletImage);
         Bullets[i].setScale(2, 2);
-        Bullets[i].setPosition(-100, -100);
+        Bullets[i].setPosition(-1000, -1000);
+
     }
 
     //Eggs textures
@@ -868,18 +883,18 @@ void IngameImages()
     }
 
 }
+
 // function for player movement
 void PlayerMove()
 {
-    bool right = false;
     // Kareem Essam and Mohamed Wael
     // Creating Movement For Right Direction
-    if ((Keyboard::isKeyPressed(Keyboard::D) || Keyboard::isKeyPressed(Keyboard::Right)) && Player.getPosition().x <= 1800)
+    if (Keyboard::isKeyPressed(Keyboard::D)&& Player.getPosition().x <= 1800)
     {
         // changing ship to be facing to the right
         Player.setTextureRect(IntRect(PlayerMovement * 60, 0, 60, 42));
         Player.move(PlayerSpeed, 0);
-    
+
         if (PlayerMovement < 18)
         {
             PlayerMovement++;
@@ -887,7 +902,7 @@ void PlayerMove()
 
     }
     //Creating Movement For Left Direction
-    else if ((Keyboard::isKeyPressed(Keyboard::A) || Keyboard::isKeyPressed(Keyboard::Left)) && Player.getPosition().x >= 15)
+    else if (Keyboard::isKeyPressed(Keyboard::A) && Player.getPosition().x >= 15)
     {
 
         Player.setTextureRect(IntRect(PlayerMovement * 60, 0, 60, 42));
@@ -911,6 +926,44 @@ void PlayerMove()
             Player.setTextureRect(IntRect(PlayerMovement * 60, 0, 60, 42));
         }
     }
+
+    if (Keyboard::isKeyPressed(Keyboard::Right) && Player2ship.getPosition().x <= 1800)
+    {
+        // changing ship to be facing to the right
+        Player2ship.setTextureRect(IntRect(Player2Movement * 60, 0, 60, 42));
+        Player2ship.move(PlayerSpeed, 0);
+
+        if (Player2Movement < 18)
+        {
+            Player2Movement++;
+        }
+
+    }
+    //Creating Movement For Left Direction
+    else if (Keyboard::isKeyPressed(Keyboard::Left) && Player2ship.getPosition().x >= 15)
+    {
+
+        Player2ship.setTextureRect(IntRect(Player2Movement * 60, 0, 60, 42));
+        // changing ship to be facing to the left
+        Player2ship.move(-PlayerSpeed, 0);
+        if (Player2Movement > 0)
+        {
+            Player2Movement--;
+        }
+    }
+    else
+    {
+        if (Player2Movement > 9)
+        {
+            Player2Movement--;
+            Player2ship.setTextureRect(IntRect(Player2Movement * 60, 0, 60, 42));
+        }
+        else if (Player2Movement < 9)
+        {
+            Player2Movement++;
+            Player2ship.setTextureRect(IntRect(Player2Movement * 60, 0, 60, 42));
+        }
+    }
 }
 //spark and fog
 void spark_fog() {
@@ -923,12 +976,11 @@ void spark_fog() {
                     Fog.fogcooldown = Fog.fogcooldownvar;
                     Spark.sparkcooldown = Spark.sparkcooldownvar;
                     chickenalive = false;
-                    spark[i].setPosition(Chicken[j][z].getPosition() - Vector2f(50, 50));
-                    fog[i].setPosition(Chicken[j][z].getPosition() - Vector2f(-50, -20));
+                    if (i < 40) {
+                        spark[i].setPosition(Chicken[j][z].getPosition() - Vector2f(50, 50));
+                        fog[i].setPosition(Chicken[j][z].getPosition() - Vector2f(-50, -20));
+                    }
                 }
-
-
-
             }
         }
     }
@@ -989,35 +1041,63 @@ void PlayerShooting() {
 
 
     }
-    if ((Keyboard::isKeyPressed(Keyboard::Space)) && bullet.bulletCoolDown == 0 && pausecooldown == 1 || (Mouse::isButtonPressed(Mouse::Left)) && bullet.bulletCoolDown == 0 && pausecooldown == 1)
+
+    if ((Keyboard::isKeyPressed(Keyboard::Space)) && bullet.bulletCoolDown == 0 && pausecooldown == 1)
     {
         bullet.bulletCoolDown = bullet.bulletCoolDownvar;
         bullet_shot = 0;
-       // shield_on = 0;
         Bullets[bullet.currentBullet].setPosition(Player.getPosition().x + 29, Player.getPosition().y - 45);
 
+        //sfx
         if (soundeffectON && playeralive)
         {
             shoot1[currentshootsfx].play();
             currentshootsfx++;
-            if (currentshootsfx == 2)
+            if (currentshootsfx == numberofshootsfx)
             {
                 currentshootsfx = 0;
             }
         }
+        //current bullet for shooting
+        if (bullet.currentBullet == bullet.numberofbullets - 1) {
+            bullet.currentBullet = 0;
+        }
+        bullet.currentBullet++;
+        
+    }
+    if ((Mouse::isButtonPressed(Mouse::Left)) && bullet.bulletCoolDown2 == 0 && pausecooldown == 1 && coopon)
+    {
+        bullet.bulletCoolDown2 = bullet.bulletCoolDownvar;
+        bullet_shot = 0;
+        Bullets[bullet.currentBullet].setPosition(Player2ship.getPosition().x + 29, Player2ship.getPosition().y - 45);
 
-        if (bullet.currentBullet == 39) {
+        //sfx
+        if (soundeffectON && playeralive)
+        {
+            shoot1[currentshootsfx].play();
+            currentshootsfx++;
+            if (currentshootsfx == numberofshootsfx)
+            {
+                currentshootsfx = 0;
+            }
+        }
+        //current bullet for shooting
+        if (bullet.currentBullet == bullet.numberofbullets - 1) {
             bullet.currentBullet = 0;
         }
         bullet.currentBullet++;
     }
 
+
+    if (bullet.bulletCoolDown2 > 0) {
+        bullet.bulletCoolDown2--;
+    }
     if (bullet.bulletCoolDown > 0) {
         bullet.bulletCoolDown--;
     }
 
     //bullet moving
-    for (int i = 0; i < 40; i++) {
+    for (int i = 0; i < bullet.numberofbullets; i++) {
         Bullets[i].move(0, -bullet.bulletSpeed);
     }
 }
@@ -1026,14 +1106,26 @@ void PlayerShooting() {
 void rocketshooting()
 {
     //shooting
-    if (Mouse::isButtonPressed(Mouse::Right) && activemissile == false && rockets > 0)
+    if (Keyboard::isKeyPressed(Keyboard::LShift) && activemissile == false && rockets > 0)
+    {
+        activemissile = true;
+        if (soundeffectON)
+        {
+            rocketshoot.play();
+        }
+        missile.setPosition(Player.getPosition().x + 29, Player.getPosition().y - 45);
+        rockets--;
+        rocket.setString(to_string(rockets));
+    }
+
+    if (Mouse::isButtonPressed(Mouse::Right) && activemissile == false && rockets > 0 && coopon)
     {
         activemissile = true;
         if (soundeffectON) 
         {
             rocketshoot.play();
         }
-        missile.setPosition(Player.getPosition().x + 29, Player.getPosition().y - 45);
+        missile.setPosition(Player2ship.getPosition().x + 29, Player2ship.getPosition().y - 45);
         rockets--;
         rocket.setString(to_string(rockets));
     }
@@ -1097,7 +1189,6 @@ void ChickenMove()
     {
         for (int i = 0; i < 8; i++)
         {
-
             Chicken[i][j].setTexture(ChickenSkin);
             Chicken[i][j].setScale(2.75, 2.75);
             if (chickeninitialpos == 0) 
@@ -1110,7 +1201,7 @@ void ChickenMove()
     chickeninitialpos = 1;
 
      for (int j = 0; j < 5; j++)
-    {
+     {
         for (int i = 0; i < 8; i++)
         {
             Chicken[i][j].setTextureRect(IntRect(ChickenMovement * 46.9, 0, 46.9, 38));
@@ -1131,7 +1222,7 @@ void ChickenMove()
         }
 
 
-    }
+     }
 
     if (rectdir == 0)
         rectangle3.move(-chicken.speed, 0);
@@ -1390,7 +1481,7 @@ void meteormove()
         if (meteortimer[i] == 0) {
             meteor[i].move(meteors.meteorspeed, meteors.meteorspeed);
         }
-        for (int i = 0; i < 40; i++)
+        for (int i = 0; i < bullet.numberofbullets; i++)
         {
             for (int a = 0; a <= 39; a++)
             {
@@ -1512,7 +1603,7 @@ void meteorfast()
         if (meteortimer[i] == 0) {
             meteor[i].move(0, meteors.meteorspeed * 4);
         }
-        for (int i = 0; i < 40; i++)
+        for (int i = 0; i < bullet.numberofbullets; i++)
         {
             for (int a = 0; a <= 20; a++)
             {
@@ -1601,7 +1692,7 @@ void meteorfast()
 
 //increasing score
 void scorecalc() {
-    for (int i = 0; i < 40; i++) {
+    for (int i = 0; i < bullet.numberofbullets; i++) {
         for (int j = 0; j < 8; j++) {
             for (int z = 0; z < 5; z++) {
 
@@ -1615,7 +1706,7 @@ void scorecalc() {
                     chicken_legs[j][z].setPosition(Chicken[j][z].getPosition().x, Chicken[j][z].getPosition().y);
                     Chicken[j][z].setPosition(10000, 10000);
                     missileScoreCount += 1000;
-                    if (missileScoreCount == 70000)
+                    if (missileScoreCount == 60000)
                     {
                         missileScoreCount = 0;
                         rockets += 1;
@@ -1948,7 +2039,7 @@ void bossmove() {
         animation++;
 
     //Boss getting killed after collision with bullets
-    for (int i = 0; i < 40; i++)
+    for (int i = 0; i < bullet.numberofbullets; i++)
     {
         if (Bullets[i].getGlobalBounds().intersects(bosssprite.getGlobalBounds()))
         {
@@ -2401,6 +2492,7 @@ beginning: {};
         //pause menu
         if (page == 5)
         {
+            coopon = false;
             modeselectdelay = 0;
             backdelay = 0;
             checkdelay = 0;
@@ -2531,7 +2623,7 @@ beginning: {};
                     window.draw(rocket);
                     window.draw(powerlvl);
                     window.draw(explosion);
-                    for (int i = 0; i < 40; i++)
+                    for (int i = 0; i < bullet.numberofbullets; i++)
                     {
                         window.draw(Bullets[i]);
                         if (Bullets[i].getGlobalBounds().intersects(Gamebar.getGlobalBounds()))
@@ -2554,10 +2646,13 @@ beginning: {};
                         Wave2 = true;
                         clock4.restart();
                         clock3.restart();
-                        for (int i = 0; i < 40; i++)
+                        for (int i = 0; i < bullet.numberofbullets; i++)
                         {
                             Bullets[i].setPosition(9000, 9000);
-                            spark[i].setPosition(9000, 9000);
+                            if (i < 40)
+                            {
+                                spark[i].setPosition(9000, 9000);
+                            }
                         }
                     }
                     shield_move();
@@ -2573,6 +2668,7 @@ beginning: {};
                     {
                         page = 5;
                         MainMusicPlaying = true;
+                        
                     }
                 }
                 else
@@ -2657,10 +2753,13 @@ beginning: {};
 
                         clock4.restart();
                         clock3.restart();
-                        for (int i = 0; i < 40; i++)
+                        for (int i = 0; i < bullet.numberofbullets; i++)
                         {
                             Bullets[i].setPosition(9000, 9000);
-                            spark[i].setPosition(9000, 9000);
+                            if (i < 40)
+                            {
+                                spark[i].setPosition(9000, 9000);
+                            }
                         }
 
                     }
@@ -2673,7 +2772,7 @@ beginning: {};
                     window.draw(rocket);
                     window.draw(powerlvl);
                     window.draw(explosion);
-                    for (int i = 0; i < 40; i++)
+                    for (int i = 0; i < bullet.numberofbullets; i++)
                     {
                         window.draw(Bullets[i]);
                         if (Bullets[i].getGlobalBounds().intersects(Gamebar.getGlobalBounds()))
@@ -2779,7 +2878,7 @@ beginning: {};
                     window.draw(rocket);
                     window.draw(powerlvl);
                     window.draw(explosion);
-                    for (int i = 0; i < 40; i++)
+                    for (int i = 0; i < bullet.numberofbullets; i++)
                     {
                         window.draw(Bullets[i]);
                         if (Bullets[i].getGlobalBounds().intersects(Gamebar.getGlobalBounds()))
@@ -2803,10 +2902,13 @@ beginning: {};
                         Wave4 = true;
                         clock4.restart();
                         clock3.restart();
-                        for (int i = 0; i < 40; i++)
+                        for (int i = 0; i < bullet.numberofbullets; i++)
                         {
                             Bullets[i].setPosition(9000, 9000);
-                        spark[i].setPosition(9000, 9000);
+                            if (i < 40)
+                            {
+                                spark[i].setPosition(9000, 9000);
+                            }
                         }
                         for (int i = 0; i < 8; i++)
                         {
@@ -2913,10 +3015,13 @@ beginning: {};
 
                         clock4.restart();
                         clock3.restart();
-                        for (int i = 0; i < 40; i++)
+                        for (int i = 0; i < bullet.numberofbullets; i++)
                         {
                             Bullets[i].setPosition(9000, 9000);
-                            spark[i].setPosition(9000, 9000);
+                            if (i < 40)
+                            {
+                                spark[i].setPosition(9000, 9000);
+                            }
                         }
 
                     }
@@ -2929,7 +3034,7 @@ beginning: {};
                     window.draw(rocket);
                     window.draw(powerlvl);
                     window.draw(explosion);
-                    for (int i = 0; i < 40; i++)
+                    for (int i = 0; i < bullet.numberofbullets; i++)
                     {
                         window.draw(Bullets[i]);
                         if (Bullets[i].getGlobalBounds().intersects(Gamebar.getGlobalBounds()))
@@ -2944,7 +3049,7 @@ beginning: {};
                     window.draw(missile);
                     for (int i = 0; i < 40; i++) {
                         window.draw(spark[i]);
-                    window.draw(fog[i]);
+                        window.draw(fog[i]);
                     }
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
@@ -3029,7 +3134,7 @@ beginning: {};
                     window.draw(rocket);
                     window.draw(powerlvl);
                     window.draw(explosion);
-                    for (int i = 0; i < 40; i++)
+                    for (int i = 0; i < bullet.numberofbullets; i++)
                     {
                         window.draw(Bullets[i]);
                         if (Bullets[i].getGlobalBounds().intersects(Gamebar.getGlobalBounds()))
@@ -3049,10 +3154,12 @@ beginning: {};
                         Wave5 = false;
                         clock4.restart();
                         clock3.restart();
-                        for (int i = 0; i < 40; i++)
+                        for (int i = 0; i < bullet.numberofbullets; i++)
                         {
                             Bullets[i].setPosition(9000, 9000);
-                        spark[i].setPosition(9000, 9000);
+                            {
+                                spark[i].setPosition(9000, 9000);
+                            }
                         }
                         for (int i = 0; i < 8; i++)
                         {
@@ -3138,6 +3245,14 @@ beginning: {};
             playerdamage();
             PlayerMove();
             window.draw(Player);
+            if (coopon)
+            {
+                window.draw(Player2ship);
+            }
+            else
+            {
+                Player2ship.setPosition(10000, 0);
+            }
         }
 
         // control
@@ -3306,12 +3421,14 @@ beginning: {};
             //coop
             if (mousepos.x >= 985 && mousepos.x <= 1335 && mousepos.y >= 480 && mousepos.y <= 550 && Mouse::isButtonPressed(Mouse::Left) && modeselectdelay >= 5)
             {
-             
-                if (soundeffectON && coopclick >= 5)
-                {
-                    MenuClick.play();
-                    coopclick = 0;
-                }
+                coopon = true;
+                temptest2 = 1;
+                MainMusicPlaying = false;
+                IngameMusicPlaying = true;
+                page = 6;
+                pausecooldown = 0;
+                modeselectdelay = 0;
+                goto beginning;
             }
             //back
             if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left) )
