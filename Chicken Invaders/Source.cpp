@@ -60,9 +60,11 @@ sf::View view1(sf::Vector2f(960.f, 540.f), sf::Vector2f(1920.f, 1080.f));
 
 // Intialized Variables
 int exp_x=0,exp_y=0 ;
+int exp_x2 = 0, exp_y2 = 0;
 int sparkx = 0,fogx=0,fogy=0;
 long long cnt = 0;  //counter for
  int health = 3;
+ int health3 = 3;
 int rockets = 0;
 int powerlvls = 0;
 double PlayerMovement = 9, PlayerSpeed = 12, Player2Movement = 9, Player2Speed = 12;
@@ -100,8 +102,10 @@ int yolkanime = 0;
 int yolkvar = 100;
 int eggvar = 501;
 int expbool = 0;
+int expbool2 = 0;
 int sparkbool = 0;
 int health2 = health;
+int health4 = health3;
 bool musicON = true;
 bool soundeffectON = true;
 bool ldbcheck[5] = {};
@@ -115,6 +119,7 @@ int missileScoreCount = 0, camerashakelength = 6;
 bool activemissile = false, explosioncamerashake = false;
 bool yolk[8][5] = { };
 int Timer=2;
+int Timer2 = 2;
 int timer2 = 1;
 bool gameover=false;
 //sound variables
@@ -122,6 +127,7 @@ int currentshootsfx = 0, currentchickensfx = 0, currenteggshootsfx = 0, numberof
 //shield variables
 bool bullet_shot = 0;
 bool shield_on = 0;
+bool shield_on2 = 0;
 Clock clock4;
 Clock clock3;
 bool Wave1 = 1, Wave2 =0, Wave3 = 0, Wave4 = 0, Wave5 = 0;
@@ -132,6 +138,9 @@ int meteoralive = 0;
 int aliveboss = 1;
 int shield_timervar = 60;
 int shield_timer = 0;
+int shield_timervar2 = 60;
+int shield_timer2 = 0;
+bool player_2 = 1;
 bool coopon = false;
 // Creating Game Window
 RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders",Style::Fullscreen);
@@ -157,7 +166,9 @@ Texture checkmark;
 Texture earth;
 Texture GameBarSkin;
 Texture BottomBarSkin;
+Texture BottomBarSkin2;
 Texture explosionimage;
+Texture explosionimage2;
 Texture missileTexture;
 Texture sparkimage;
 Texture fogimage;
@@ -200,14 +211,20 @@ RectangleShape rectangleldbs[5];
 RectangleShape rectangleselectmode[2];
 //shield
 CircleShape Shield(60);
+CircleShape Shield2(60);
 
 
 //adding texts
 Text hp;
+Text hp2;
 Text rocket;
+Text rocket2;
 Text score;
+Text score2;
 Text powerlvl;
+Text powerlvl2;
 Text foodscore;
+Text foodscore2;
 Text play;
 Text Options;
 Text Leaderboard;
@@ -257,6 +274,7 @@ Sprite Player2ship;
 Sprite Chicken[8][6];
 Sprite Chicken2[8][6];
 Sprite explosion;
+Sprite explosion2;
 Sprite Bullets[50];
 Sprite health_bar;
 Sprite Eggs[8][5];
@@ -277,6 +295,7 @@ Sprite checkbox[2];
 Sprite Earth;
 Sprite Gamebar;
 Sprite Bottombar;
+Sprite Bottombar2;
 Sprite missile;
 Sprite spark[40];
 Sprite fog[40];
@@ -330,6 +349,12 @@ void IngameImages()
     Bottombar.setTexture(BottomBarSkin);
     Bottombar.setPosition(0, 975);
     Bottombar.setScale(1.5, 1.5);
+
+    BottomBarSkin2.loadFromFile("BottomBar2.png");
+    BottomBarSkin2.setSmooth(true);
+    Bottombar2.setTexture(BottomBarSkin2);
+    Bottombar2.setPosition(1475, 975);
+    Bottombar2.setScale(1.5, 1.5);
     Gamebar.setTexture(GameBarSkin);
     Gamebar.setPosition(0, 0);
     Gamebar.setScale(1.5, 1.5);
@@ -338,6 +363,12 @@ void IngameImages()
     explosion.setTexture(explosionimage);
     explosion.setPosition(7000, 7000);
     sparkimage.loadFromFile("sparkspink.png");
+
+    explosionimage2.loadFromFile("PlayerDeath.png");
+    explosion2.setTexture(explosionimage2);
+    explosion2.setPosition(8000, 8000);
+    sparkimage.loadFromFile("sparkspink.png");
+
     for (int i = 0; i < 40; i++) {
         spark[i].setTexture(sparkimage);
         spark[i].setPosition(8000, 8000);
@@ -350,6 +381,9 @@ void IngameImages()
     //Shield
     Shield.setFillColor(Color(0, 102, 204, 140));
     Shield.setPosition(10000, 10000);
+
+    Shield2.setFillColor(Color(0, 102, 204, 140));
+    Shield2.setPosition(10500, 10500);
 
     //Buttons in main menu
     for (int i = 0; i < 5; i++)
@@ -785,6 +819,12 @@ void IngameImages()
     hp.setPosition(70, window.getSize().y - 58);
     hp.setString(to_string(health));
 
+    hp2.setFont(font1);
+    hp2.setCharacterSize(35);
+    hp2.setOrigin(0, 0);
+    hp2.setPosition(1835, window.getSize().y - 58);
+    hp2.setString(to_string(health3));
+
     // rockets
     rocket.setFont(font1);
     rocket.setCharacterSize(35);
@@ -792,12 +832,25 @@ void IngameImages()
     rocket.setPosition(160, window.getSize().y - 58);
     rocket.setString(to_string(rockets));
 
+    rocket2.setFont(font1);
+    rocket2.setCharacterSize(35);
+    rocket2.setOrigin(0, 0);
+    rocket2.setPosition(1745, window.getSize().y - 58);
+    rocket2.setString(to_string(rockets));
+
+
     // powerlvl
     powerlvl.setFont(font1);
     powerlvl.setCharacterSize(35);
     powerlvl.setOrigin(0, 0);
     powerlvl.setPosition(260, window.getSize().y - 58);
     powerlvl.setString(to_string(powerlvls));
+
+    powerlvl2.setFont(font1);
+    powerlvl2.setCharacterSize(35);
+    powerlvl2.setOrigin(0, 0);
+    powerlvl2.setPosition(1645, window.getSize().y - 58);
+    powerlvl2.setString(to_string(powerlvls));
 
     //score
     score.setFont(font2);
@@ -812,6 +865,12 @@ void IngameImages()
     foodscore.setOrigin(0, 0);
     foodscore.setPosition(350, window.getSize().y - 58);
     foodscore.setString( to_string(foodcnt));
+
+    foodscore2.setFont(font1);
+    foodscore2.setCharacterSize(35);
+    foodscore2.setOrigin(0, 0);
+    foodscore2.setPosition(1555, window.getSize().y - 58);
+    foodscore2.setString(to_string(foodcnt));
 
     //meteor
     meteortex.loadFromFile("Stones.png");
@@ -1024,9 +1083,6 @@ void spark_fog() {
     
 }
     
-
-
-
 //shooting function
 void PlayerShooting() {
 
@@ -1256,6 +1312,17 @@ void playerdamage() {
                     hp.setString(to_string(health));
                     Eggs[i][j].setPosition(4000, 5000);
                 }
+                if (Eggs[i][j].getGlobalBounds().intersects(Player2ship.getGlobalBounds()) && coopon)
+                {
+                    health3 -= 1;
+                    if (soundeffectON)
+                    {
+                        exploding.play();
+                    }
+                    hp2.setString(to_string(health3));
+                    Eggs[i][j].setPosition(4000, 5000);
+
+                }
 
             }
         }
@@ -1264,6 +1331,12 @@ void playerdamage() {
             playeralive = false;
 
         }
+
+        if (health3 < health4)
+        {
+            player2alive = false;
+        }
+
         if (playeralive == false) {
 
             if (expbool == 0) {
@@ -1288,8 +1361,12 @@ void playerdamage() {
 
                     Timer = 2;
 
+                    if (health == 0)
+                    {
+                        Player.setPosition(12121, 12121);
+                    }
 
-                    if (health == 0) {
+                    if (health == 0 && player_2==0) {
                         gameover = true;
                         MainMusicPlaying = true;
                         IngameMusicPlaying = false;
@@ -1301,7 +1378,6 @@ void playerdamage() {
                         shield_on = 1;
                         shield_timer = shield_timervar;
 
-
                     }
 
                 }
@@ -1310,6 +1386,49 @@ void playerdamage() {
 
             }
 
+        }
+        if (player2alive == false)
+        {
+            if (expbool2 == 0) {
+                expbool2 = 1;
+                explosion2.setPosition(Player2ship.getPosition());
+            }
+            Player2ship.setPosition(9000, 9000);
+            explosion2.setTextureRect(IntRect(96.6 * exp_x2, 5 + (90.6 * exp_y2), 96.6, 90.6));
+            exp_x2++;
+            if (exp_x2 == 7 && exp_y2 < 3) {
+                exp_y2++;
+                exp_x2 = 0;
+            }
+            if (exp_y2 == 2 && exp_x2 == 5) {
+                exp_y2 = 0;
+                exp_x2 = 0;
+                health4 = health3;
+                expbool2 = 0;
+
+                if (Timer2 <= 0) {
+                    player2alive = true;
+
+                    Timer2 = 2;
+
+
+                    if (health3 == 0 ) {
+                        Player2ship.setPosition(11111, 11111);
+                        player_2 = 0;
+                    }
+                    else
+                    {
+                        Player2ship.setPosition(1000, 850);
+                        Shield2.setPosition(Player2ship.getPosition().x - 18, Player2ship.getPosition().y - 25);
+                        shield_on2 = 1;
+                        shield_timer2 = shield_timervar2;
+                    }
+
+                }
+                else
+                    Timer2--;
+
+            }
         }
     }
 }
@@ -1328,6 +1447,18 @@ void shield_move()
         Shield.setPosition(10000, 10000);
         shield_on = 0;
     }
+    if (shield_on2 == 1 && shield_timer2 > 0)
+    {
+
+        Shield2.setPosition(Player2ship.getPosition().x - 18, Player2ship.getPosition().y - 25);
+        shield_timer2--;
+    }
+    else
+    {
+        Shield2.setPosition(10000, 10000);
+        shield_on2 = 0;
+    }
+
 }
 
 // egg movement function
@@ -1405,6 +1536,11 @@ void eggmovement()
             {
                 Eggs[i][j].setPosition(10000, 10000);
             }
+            if (Eggs[i][j].getGlobalBounds().intersects(Shield2.getGlobalBounds()))
+            {
+                Eggs[i][j].setPosition(10000, 10000);
+            }
+
 
             //collision egg
             /*if (Eggs[i][j].getGlobalBounds().intersects(Player.getGlobalBounds()))
@@ -1461,6 +1597,7 @@ void meteormove()
     }
     xmeteor++;
     meteorx++;
+
     // meteor animation loop
     for (int i = 0; i <= 39; i++)
     {
@@ -1473,6 +1610,7 @@ void meteormove()
                 ymeteor= 0;
         }
     }
+
     // meteor movement loop
     for (int i = 0; i <= 39; i++) {
         if (meteortimer[i] > 0) {
@@ -1502,63 +1640,124 @@ void meteormove()
             }
         }
     }
+
     for (int i = 0; i < 40; i++) {
-          if (Player.getGlobalBounds().intersects(meteor[i].getGlobalBounds()) && shield_on==false) {
-              health -= 1;
-              if (soundeffectON)
-              {
-                  exploding.play();
-              }
-              hp.setString(to_string(health));
-              if (health < health2) {
+        if (Player.getGlobalBounds().intersects(meteor[i].getGlobalBounds()) && shield_on == false) {
+            health -= 1;
+            if (soundeffectON)
+            {
+                exploding.play();
+            }
+            hp.setString(to_string(health));
+            if (health < health2) {
 
-                  playeralive = false;
+                playeralive = false;
 
-              }
-              if (playeralive == false) {
+            }
+            if (playeralive == false) {
 
-                  if (expbool == 0) {
-                      expbool = 1;
-                      explosion.setPosition(Player.getPosition());
-                  }
-                  Player.setPosition(6000, 6000);
-                  explosion.setTextureRect(IntRect(96.6 * exp_x, 5 + (90.6 * exp_y), 96.6, 90.6));
-                  exp_x++;
-                  if (exp_x == 7 && exp_y < 3) {
-                      exp_y++;
-                      exp_x = 0;
-                  }
-                  if (exp_y == 2 && exp_x == 5) {
-                      exp_y = 0;
-                      exp_x = 0;
-                      health2 = health;
-                      expbool = 0;
+                if (expbool == 0) {
+                    expbool = 1;
+                    explosion.setPosition(Player.getPosition());
+                }
+                Player.setPosition(6000, 6000);
+                explosion.setTextureRect(IntRect(96.6 * exp_x, 5 + (90.6 * exp_y), 96.6, 90.6));
+                exp_x++;
+                if (exp_x == 7 && exp_y < 3) {
+                    exp_y++;
+                    exp_x = 0;
+                }
+                if (exp_y == 2 && exp_x == 5) {
+                    exp_y = 0;
+                    exp_x = 0;
+                    health2 = health;
+                    expbool = 0;
 
-                      if (Timer <= 0) {
-                          playeralive = true;
+                    if (Timer <= 0) {
+                        playeralive = true;
 
-                          Timer = 2;
+                        Timer = 2;
+                        if (health == 0)
+                        {
+                            Player.setPosition(12121,12121);
+                        }
+
+                        if (health == 0 && player_2==0) {
+                            gameover = true;
+                        }
+                        else
+                        {
+                            Player.setPosition(960, 850);
+                            Shield.setPosition(Player.getPosition().x - 18, Player.getPosition().y - 25);
+                            shield_on = 1;
+                        }
+
+                    }
+                    else
+                        Timer--;
+
+                }
+
+            }
+        }
+
+        if (Player2ship.getGlobalBounds().intersects(meteor[i].getGlobalBounds()) && shield_on2 == false) {
+            health3 -= 1;
+            if (soundeffectON)
+            {
+                exploding.play();
+            }
+            hp2.setString(to_string(health3));
+            if (health3 < health4) {
+
+                player2alive = false;
+
+            }
+            if (player2alive == false) {
+
+                if (expbool2 == 0) {
+                    expbool2 = 1;
+                    explosion2.setPosition(Player2ship.getPosition());
+                }
+                Player2ship.setPosition(6000, 6000);
+                explosion2.setTextureRect(IntRect(96.6 * exp_x2, 5 + (90.6 * exp_y2), 96.6, 90.6));
+                exp_x2++;
+                if (exp_x2 == 7 && exp_y2 < 3) {
+                    exp_y2++;
+                    exp_x2 = 0;
+                }
+                if (exp_y2 == 2 && exp_x2 == 5) {
+                    exp_y2 = 0;
+                    exp_x2 = 0;
+                    health4 = health3;
+                    expbool2 = 0;
+
+                    if (Timer2 <= 0) {
+                        player2alive = true;
+
+                        Timer2 = 2;
 
 
-                          if (health == 0) {
-                              gameover = true;
-                          }
-                          else
-                          {
-                              Player.setPosition(960, 850);
-                              Shield.setPosition(Player.getPosition().x - 18, Player.getPosition().y - 25);
-                              shield_on = 1;
+                        if (health3 == 0) {
+                            player_2 = 0;
+                        }
+                        else
+                        {
+                            Player2ship.setPosition(960, 850);
+                            Shield2.setPosition(Player2ship.getPosition().x - 18, Player2ship.getPosition().y - 25);
+                            shield_on2 = 1;
+                        }
 
-                          }
+                    }
+                    else
+                        Timer2--;
 
-                      }
-                      else
-                          Timer--;
+                }
 
-                  }
+            }
+        }
+             
 
-              }
-          }
     }
 
 }
@@ -1631,7 +1830,6 @@ void meteorfast()
             {
                 exploding.play();
             }
-            hp.setString(to_string(health));
             if (health < health2) {
 
                 playeralive = false;
@@ -1661,8 +1859,12 @@ void meteorfast()
 
                         Timer = 2;
 
+                        if (health == 0)
+                        {
+                            Player.setPosition(12121, 12121);
+                        }
 
-                        if (health == 0) {
+                        if (health == 0 && player_2 == 0) {
                             gameover = true;
                         }
                         else
@@ -1680,15 +1882,70 @@ void meteorfast()
                 }
 
             }
-        }
-    }
-  /*  for (int i = 0; i <= 20; i++) {
-        if (Player.getGlobalBounds().intersects(meteor[i].getGlobalBounds())) {
-            Player.setPosition(10000, 10000);
-        }
-    }*/
 
+        }
+
+        if (Player2ship.getGlobalBounds().intersects(meteor[i].getGlobalBounds()) && shield_on2 == false) {
+            health3 -= 1;
+            if (soundeffectON)
+            {
+                exploding.play();
+            }
+            hp2.setString(to_string(health3));
+            if (health3 < health4) {
+
+                player2alive = false;
+
+            }
+            if (player2alive == false) {
+
+                if (expbool2 == 0) {
+                    expbool2 = 1;
+                    explosion2.setPosition(Player2ship.getPosition());
+                }
+                Player2ship.setPosition(6000, 6000);
+                explosion2.setTextureRect(IntRect(96.6 * exp_x2, 5 + (90.6 * exp_y2), 96.6, 90.6));
+                exp_x2++;
+                if (exp_x2 == 7 && exp_y2 < 3) {
+                    exp_y2++;
+                    exp_x2 = 0;
+                }
+                if (exp_y2 == 2 && exp_x2 == 5) {
+                    exp_y2 = 0;
+                    exp_x2 = 0;
+                    health4 = health3;
+                    expbool2 = 0;
+
+                    if (Timer2 <= 0) {
+                        player2alive = true;
+
+                        Timer2 = 2;
+
+
+                        if (health3 == 0) {
+                            player_2 = 0;
+                        }
+                        else
+                        {
+                            Player2ship.setPosition(960, 850);
+                            Shield2.setPosition(Player2ship.getPosition().x - 18, Player2ship.getPosition().y - 25);
+                            shield_on2 = 1;
+                        }
+
+                    }
+                    else
+                        Timer2--;
+
+                }
+
+            }
+        }
+
+
+    }
 }
+
+
 
 //increasing score
 void scorecalc() {
@@ -2128,10 +2385,13 @@ void reset()
     foodcnt = 0;
     health = 3;
     health2 = 3;
+    health3 = 3;
+    health4 = 3;
     powerlvls = 0;
-    rockets = 0;
+    rockets = 3;
     missileScoreCount = 0;
     Timer = 2;
+    Timer2 = 2;
     cnt = 0;
     boss.bosshp = 50;
     boss.eggcooldownvar = 301;
@@ -2139,6 +2399,7 @@ void reset()
     meteorx = 0;
     meteoralive = 0;
     aliveboss = 1;
+    player_2 = 1;
     rectangle3.setPosition(770, 400);
     for (int i = 0; i <= 20; i++)
     {
@@ -2618,11 +2879,17 @@ beginning: {};
                     window.draw(Gamebar);
                     window.draw(score);
                     window.draw(Bottombar);
+                    window.draw(Bottombar2);
                     window.draw(foodscore);
                     window.draw(hp);
+                    window.draw(hp2);
                     window.draw(rocket);
                     window.draw(powerlvl);
+                    window.draw(foodscore2);
+                    window.draw(rocket2);
+                    window.draw(powerlvl2);
                     window.draw(explosion);
+                    window.draw(explosion2);
                     for (int i = 0; i < bullet.numberofbullets; i++)
                     {
                         window.draw(Bullets[i]);
@@ -2657,6 +2924,8 @@ beginning: {};
                     }
                     shield_move();
                     window.draw(Shield);
+                    window.draw(Shield2);
+
 
                     //drawing missile
                     window.draw(missile);
@@ -2678,8 +2947,13 @@ beginning: {};
                     window.draw(Gamebar);
                     window.draw(score);
                     window.draw(Bottombar);
+                    window.draw(Bottombar2);
                     window.draw(foodscore);
+                    window.draw(foodscore2);
+                    window.draw(rocket2);
+                    window.draw(powerlvl2);
                     window.draw(hp);
+                    window.draw(hp2);
                     window.draw(rocket);
                     window.draw(powerlvl);
                     if (clock3.getElapsedTime().asSeconds() <= 8)
@@ -2767,11 +3041,17 @@ beginning: {};
                     window.draw(Gamebar);
                     window.draw(score);
                     window.draw(Bottombar);
+                    window.draw(Bottombar2);
                     window.draw(foodscore);
                     window.draw(hp);
+                    window.draw(hp2);
                     window.draw(rocket);
                     window.draw(powerlvl);
+                    window.draw(foodscore2);
+                    window.draw(rocket2);
+                    window.draw(powerlvl2);
                     window.draw(explosion);
+                    window.draw(explosion2);
                     for (int i = 0; i < bullet.numberofbullets; i++)
                     {
                         window.draw(Bullets[i]);
@@ -2782,7 +3062,7 @@ beginning: {};
                     }
                     shield_move();
                     window.draw(Shield);
-
+                    window.draw(Shield2);
                     //drawing missile
                     window.draw(missile);
                     for (int i = 0; i < 40; i++) {
@@ -2802,10 +3082,16 @@ beginning: {};
                     window.draw(Gamebar);
                     window.draw(score);
                     window.draw(Bottombar);
+                    window.draw(Bottombar2);
                     window.draw(foodscore);
                     window.draw(hp);
+                    window.draw(hp2);
                     window.draw(rocket);
                     window.draw(powerlvl);
+                    window.draw(foodscore2);
+                    window.draw(rocket2);
+                    window.draw(powerlvl2);
+
                     if (clock3.getElapsedTime().asSeconds() <= 8)
                     {
                         if (clock3.getElapsedTime().asSeconds() <= 5)
@@ -2873,11 +3159,17 @@ beginning: {};
                     window.draw(Gamebar);
                     window.draw(score);
                     window.draw(Bottombar);
+                    window.draw(Bottombar2);
                     window.draw(foodscore);
                     window.draw(hp);
+                    window.draw(hp2);
                     window.draw(rocket);
                     window.draw(powerlvl);
+                    window.draw(foodscore2);
+                    window.draw(rocket2);
+                    window.draw(powerlvl2);
                     window.draw(explosion);
+                    window.draw(explosion2);
                     for (int i = 0; i < bullet.numberofbullets; i++)
                     {
                         window.draw(Bullets[i]);
@@ -2920,7 +3212,7 @@ beginning: {};
                     }
                     shield_move();
                     window.draw(Shield);
-
+                    window.draw(Shield2);
                     //drawing missile
                     window.draw(missile);
                     for (int i = 0; i < 40; i++) {
@@ -2940,11 +3232,15 @@ beginning: {};
                     window.draw(Gamebar);
                     window.draw(score);
                     window.draw(Bottombar);
+                    window.draw(Bottombar2);
                     window.draw(foodscore);
                     window.draw(hp);
+                    window.draw(hp2);
                     window.draw(rocket);
                     window.draw(powerlvl);
-
+                    window.draw(foodscore2);
+                    window.draw(rocket2);
+                    window.draw(powerlvl2);
                     if (clock3.getElapsedTime().asSeconds() <= 8)
                     {
                         if (clock3.getElapsedTime().asSeconds() <= 5)
@@ -3029,11 +3325,17 @@ beginning: {};
                     window.draw(Gamebar);
                     window.draw(score);
                     window.draw(Bottombar);
+                    window.draw(Bottombar2);
                     window.draw(foodscore);
                     window.draw(hp);
+                    window.draw(hp2);
                     window.draw(rocket);
                     window.draw(powerlvl);
+                    window.draw(foodscore2);
+                    window.draw(rocket2);
+                    window.draw(powerlvl2);
                     window.draw(explosion);
+                    window.draw(explosion2);
                     for (int i = 0; i < bullet.numberofbullets; i++)
                     {
                         window.draw(Bullets[i]);
@@ -3044,6 +3346,7 @@ beginning: {};
                     }
                     shield_move();
                     window.draw(Shield);
+                    window.draw(Shield2);
 
                     //drawing missile
                     window.draw(missile);
@@ -3064,9 +3367,14 @@ beginning: {};
                     window.draw(Gamebar);
                     window.draw(score);
                     window.draw(Bottombar);
+                    window.draw(Bottombar2);
                     window.draw(foodscore);
                     window.draw(hp);
+                    window.draw(hp2);
                     window.draw(rocket);
+                    window.draw(foodscore2);
+                    window.draw(rocket2);
+                    window.draw(powerlvl2);
                     window.draw(powerlvl);
                     if (clock3.getElapsedTime().asSeconds() <= 8)
                     {
@@ -3129,11 +3437,17 @@ beginning: {};
                     window.draw(Gamebar);
                     window.draw(score);
                     window.draw(Bottombar);
+                    window.draw(Bottombar2);
                     window.draw(foodscore);
                     window.draw(hp);
+                    window.draw(hp2);
                     window.draw(rocket);
                     window.draw(powerlvl);
+                    window.draw(foodscore2);
+                    window.draw(rocket2);
+                    window.draw(powerlvl2);
                     window.draw(explosion);
+                    window.draw(explosion2);
                     for (int i = 0; i < bullet.numberofbullets; i++)
                     {
                         window.draw(Bullets[i]);
@@ -3171,6 +3485,8 @@ beginning: {};
                     }
                     shield_move();
                     window.draw(Shield);
+                    window.draw(Shield2);
+
 
                     //drawing missile
                     window.draw(missile);
@@ -3191,11 +3507,15 @@ beginning: {};
                     window.draw(Gamebar);
                     window.draw(score);
                     window.draw(Bottombar);
+                    window.draw(Bottombar2);
                     window.draw(foodscore);
                     window.draw(hp);
+                    window.draw(hp2);
                     window.draw(rocket);
                     window.draw(powerlvl);
-
+                    window.draw(foodscore2);
+                    window.draw(rocket2);
+                    window.draw(powerlvl2);
                     if (clock3.getElapsedTime().asSeconds() <= 8)
                     {
                         if (clock3.getElapsedTime().asSeconds() <= 5)
@@ -3214,10 +3534,15 @@ beginning: {};
                 window.draw(Gamebar);
                 window.draw(score);
                 window.draw(Bottombar);
+                window.draw(Bottombar2);
                 window.draw(foodscore);
                 window.draw(hp);
+                window.draw(hp2);
                 window.draw(rocket);
                 window.draw(powerlvl);
+                window.draw(foodscore2);
+                window.draw(rocket2);
+                window.draw(powerlvl2);
                 if (prevwave == '4')
                 {
                     clock3.restart();
