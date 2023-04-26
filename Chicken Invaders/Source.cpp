@@ -297,8 +297,8 @@ Sprite Gamebar;
 Sprite Bottombar;
 Sprite Bottombar2;
 Sprite missile;
-Sprite spark[40];
-Sprite fog[40];
+Sprite spark[50];
+Sprite fog[50];
 // Loading Ingame Files
 void IngameImages()
 {
@@ -369,7 +369,7 @@ void IngameImages()
     explosion2.setPosition(8000, 8000);
     sparkimage.loadFromFile("sparkspink.png");
 
-    for (int i = 0; i < 40; i++) {
+    for (int i = 0; i < 50; i++) {
         spark[i].setTexture(sparkimage);
         spark[i].setPosition(8000, 8000);
     fogimage.loadFromFile("fogwhite.png"); 
@@ -1028,23 +1028,21 @@ void PlayerMove()
 void spark_fog() {
 
 
-    for (int i = 0; i < 40; i++) {
+    for (int i = 0; i < 50; i++) {
         for (int j = 0; j < 8; j++) {
             for (int z = 0; z < 5; z++) {
                 if (Bullets[i].getGlobalBounds().intersects(Chicken[j][z].getGlobalBounds())) {
                     Fog.fogcooldown = Fog.fogcooldownvar;
                     Spark.sparkcooldown = Spark.sparkcooldownvar;
                     chickenalive = false;
-                    if (i < 40) {
-                        spark[i].setPosition(Chicken[j][z].getPosition() - Vector2f(50, 50));
-                        fog[i].setPosition(Chicken[j][z].getPosition() - Vector2f(-50, -20));
-                    }
+                    spark[i].setPosition(Chicken[j][z].getPosition() - Vector2f(50, 50));
+                    fog[i].setPosition(Chicken[j][z].getPosition() - Vector2f(-50, -20));
                 }
             }
         }
     }
     if (chickenalive == false) {
-        for (int i = 0; i < 40; i++) {
+        for (int i = 0; i < 50; i++) {
             spark[i].setTextureRect(IntRect(277 * sparkx, 0, 277, 269));
             fog[i].setTextureRect(IntRect(64 * fogx, 0, 64, 62));
         }
@@ -1059,21 +1057,21 @@ void spark_fog() {
 
             chickenalive = true;
             if (chickenalive == true)
-                for (int i = 0; i < 40; i++) {
+                for (int i = 0; i < 50; i++) {
                     spark[i].setPosition(4000, 5000);
                     fog[i].setPosition(6000, 5000);
                 }
         }
 
     }
-    if (Spark.currentspark == 39) {
+    if (Spark.currentspark == 49) {
         Spark.currentspark = 0;
     }
     Spark.currentspark++;
     if (Spark.sparkcooldown > 0) {
         Spark.sparkcooldown--;
     }
-    if (Fog.currentfog == 39) {
+    if (Fog.currentfog == 49) {
         Fog.currentfog = 0;
     }
     Fog.currentfog++;
@@ -1155,6 +1153,10 @@ void PlayerShooting() {
     //bullet moving
     for (int i = 0; i < bullet.numberofbullets; i++) {
         Bullets[i].move(0, -bullet.bulletSpeed);
+        if (Bullets[i].getPosition().y < 0)
+        {
+            Bullets[i].setPosition(20000, 20000);
+        }
     }
 }
 
@@ -1361,24 +1363,43 @@ void playerdamage() {
 
                     Timer = 2;
 
-                    if (health == 0)
+                    if (coopon == false)
                     {
-                        Player.setPosition(12121, 12121);
-                    }
+                        if (health == 0)
+                        {
+                            Player.setPosition(12121, 12121);
+                            gameover = true;
+                            MainMusicPlaying = true;
+                            IngameMusicPlaying = false;
+                        }
+                        else
+                        {
+                            Player.setPosition(960, 850);
+                            Shield.setPosition(Player.getPosition().x - 18, Player.getPosition().y - 25);
+                            shield_on = 1;
+                            shield_timer = shield_timervar;
 
-                    if (health == 0 && health3==0) {
-                        gameover = true;
-                        MainMusicPlaying = true;
-                        IngameMusicPlaying = false;
+                        }
                     }
-                    else
+                   
+                    if (coopon)
                     {
-                        Player.setPosition(960, 850);
-                        Shield.setPosition(Player.getPosition().x - 18, Player.getPosition().y - 25);
-                        shield_on = 1;
-                        shield_timer = shield_timervar;
+                        if (health == 0 && health3 == 0) {
+                            gameover = true;
+                            MainMusicPlaying = true;
+                            IngameMusicPlaying = false;
+                        }
+                        else
+                        {
+                            Player.setPosition(960, 850);
+                            Shield.setPosition(Player.getPosition().x - 18, Player.getPosition().y - 25);
+                            shield_on = 1;
+                            shield_timer = shield_timervar;
 
+                        }
                     }
+                    
+                    
 
                 }
                 else
@@ -2388,7 +2409,7 @@ void reset()
     health3 = 3;
     health4 = 3;
     powerlvls = 0;
-    rockets = 3;
+    rockets = 0;
     missileScoreCount = 0;
     Timer = 2;
     Timer2 = 2;
@@ -2753,7 +2774,7 @@ beginning: {};
         //pause menu
         if (page == 5)
         {
-            coopon = false;
+            
             modeselectdelay = 0;
             backdelay = 0;
             checkdelay = 0;
@@ -2796,6 +2817,7 @@ beginning: {};
               page = 1;
               IngameMusicPlaying = false;
               MainMusicPlaying = true;
+              coopon = false;
               reset();
               goto beginning;
 
@@ -2879,17 +2901,20 @@ beginning: {};
                     window.draw(Gamebar);
                     window.draw(score);
                     window.draw(Bottombar);
-                    window.draw(Bottombar2);
+                    if (coopon)
+                    {
+                        window.draw(Bottombar2);
+                        window.draw(foodscore2);
+                        window.draw(hp2);
+                        window.draw(rocket2);
+                        window.draw(powerlvl2);
+                        window.draw(explosion2);
+                    }
                     window.draw(foodscore);
                     window.draw(hp);
-                    window.draw(hp2);
                     window.draw(rocket);
                     window.draw(powerlvl);
-                    window.draw(foodscore2);
-                    window.draw(rocket2);
-                    window.draw(powerlvl2);
                     window.draw(explosion);
-                    window.draw(explosion2);
                     for (int i = 0; i < bullet.numberofbullets; i++)
                     {
                         window.draw(Bullets[i]);
@@ -2916,10 +2941,8 @@ beginning: {};
                         for (int i = 0; i < bullet.numberofbullets; i++)
                         {
                             Bullets[i].setPosition(9000, 9000);
-                            if (i < 40)
-                            {
                                 spark[i].setPosition(9000, 9000);
-                            }
+                                fog[i].setPosition(9000, 9000);
                         }
                     }
                     shield_move();
@@ -2929,7 +2952,7 @@ beginning: {};
 
                     //drawing missile
                     window.draw(missile);
-                    for (int i = 0; i < 40; i++) {
+                    for (int i = 0; i < 50; i++) {
                         window.draw(spark[i]);
                         window.draw(fog[i]);
                     }
@@ -2947,13 +2970,18 @@ beginning: {};
                     window.draw(Gamebar);
                     window.draw(score);
                     window.draw(Bottombar);
-                    window.draw(Bottombar2);
+                    if (coopon)
+                    {
+                        window.draw(Bottombar2);
+                        window.draw(foodscore2);
+                        window.draw(hp2);
+                        window.draw(rocket2);
+                        window.draw(powerlvl2);
+                        window.draw(explosion2);
+                    }
+                    
                     window.draw(foodscore);
-                    window.draw(foodscore2);
-                    window.draw(rocket2);
-                    window.draw(powerlvl2);
                     window.draw(hp);
-                    window.draw(hp2);
                     window.draw(rocket);
                     window.draw(powerlvl);
                     if (clock3.getElapsedTime().asSeconds() <= 8)
@@ -3030,10 +3058,10 @@ beginning: {};
                         for (int i = 0; i < bullet.numberofbullets; i++)
                         {
                             Bullets[i].setPosition(9000, 9000);
-                            if (i < 40)
-                            {
+
                                 spark[i].setPosition(9000, 9000);
-                            }
+                                fog[i].setPosition(9000, 9000);
+
                         }
 
                     }
@@ -3041,17 +3069,21 @@ beginning: {};
                     window.draw(Gamebar);
                     window.draw(score);
                     window.draw(Bottombar);
-                    window.draw(Bottombar2);
+                    if (coopon)
+                    {
+                        window.draw(Bottombar2);
+                        window.draw(foodscore2);
+                        window.draw(hp2);
+                        window.draw(rocket2);
+                        window.draw(powerlvl2);
+                        window.draw(explosion2);
+                    }
                     window.draw(foodscore);
                     window.draw(hp);
-                    window.draw(hp2);
                     window.draw(rocket);
-                    window.draw(powerlvl);
-                    window.draw(foodscore2);
-                    window.draw(rocket2);
-                    window.draw(powerlvl2);
+                    window.draw(powerlvl);                  
                     window.draw(explosion);
-                    window.draw(explosion2);
+                    
                     for (int i = 0; i < bullet.numberofbullets; i++)
                     {
                         window.draw(Bullets[i]);
@@ -3065,7 +3097,7 @@ beginning: {};
                     window.draw(Shield2);
                     //drawing missile
                     window.draw(missile);
-                    for (int i = 0; i < 40; i++) {
+                    for (int i = 0; i < 50; i++) {
                         window.draw(spark[i]);
                     window.draw(fog[i]);
                     }
@@ -3082,15 +3114,19 @@ beginning: {};
                     window.draw(Gamebar);
                     window.draw(score);
                     window.draw(Bottombar);
-                    window.draw(Bottombar2);
+                    if (coopon)
+                    {
+                        window.draw(Bottombar2);
+                        window.draw(foodscore2);
+                        window.draw(hp2);
+                        window.draw(rocket2);
+                        window.draw(powerlvl2);
+                        window.draw(explosion2);
+                    }
                     window.draw(foodscore);
                     window.draw(hp);
-                    window.draw(hp2);
                     window.draw(rocket);
                     window.draw(powerlvl);
-                    window.draw(foodscore2);
-                    window.draw(rocket2);
-                    window.draw(powerlvl2);
 
                     if (clock3.getElapsedTime().asSeconds() <= 8)
                     {
@@ -3159,17 +3195,20 @@ beginning: {};
                     window.draw(Gamebar);
                     window.draw(score);
                     window.draw(Bottombar);
-                    window.draw(Bottombar2);
+                    if (coopon)
+                    {
+                        window.draw(Bottombar2);
+                        window.draw(foodscore2);
+                        window.draw(hp2);
+                        window.draw(rocket2);
+                        window.draw(powerlvl2);
+                        window.draw(explosion2);
+                    }
                     window.draw(foodscore);
                     window.draw(hp);
-                    window.draw(hp2);
                     window.draw(rocket);
                     window.draw(powerlvl);
-                    window.draw(foodscore2);
-                    window.draw(rocket2);
-                    window.draw(powerlvl2);
                     window.draw(explosion);
-                    window.draw(explosion2);
                     for (int i = 0; i < bullet.numberofbullets; i++)
                     {
                         window.draw(Bullets[i]);
@@ -3197,10 +3236,10 @@ beginning: {};
                         for (int i = 0; i < bullet.numberofbullets; i++)
                         {
                             Bullets[i].setPosition(9000, 9000);
-                            if (i < 40)
-                            {
+
                                 spark[i].setPosition(9000, 9000);
-                            }
+                                fog[i].setPosition(9000, 9000);
+
                         }
                         for (int i = 0; i < 8; i++)
                         {
@@ -3215,7 +3254,7 @@ beginning: {};
                     window.draw(Shield2);
                     //drawing missile
                     window.draw(missile);
-                    for (int i = 0; i < 40; i++) {
+                    for (int i = 0; i < 50; i++) {
                         window.draw(spark[i]);
                     window.draw(fog[i]);
                     }
@@ -3232,15 +3271,19 @@ beginning: {};
                     window.draw(Gamebar);
                     window.draw(score);
                     window.draw(Bottombar);
-                    window.draw(Bottombar2);
+                    if (coopon)
+                    {
+                        window.draw(Bottombar2);
+                        window.draw(foodscore2);
+                        window.draw(hp2);
+                        window.draw(rocket2);
+                        window.draw(powerlvl2);
+                        window.draw(explosion2);
+                    }
                     window.draw(foodscore);
                     window.draw(hp);
-                    window.draw(hp2);
                     window.draw(rocket);
                     window.draw(powerlvl);
-                    window.draw(foodscore2);
-                    window.draw(rocket2);
-                    window.draw(powerlvl2);
                     if (clock3.getElapsedTime().asSeconds() <= 8)
                     {
                         if (clock3.getElapsedTime().asSeconds() <= 5)
@@ -3314,10 +3357,10 @@ beginning: {};
                         for (int i = 0; i < bullet.numberofbullets; i++)
                         {
                             Bullets[i].setPosition(9000, 9000);
-                            if (i < 40)
-                            {
+                            
                                 spark[i].setPosition(9000, 9000);
-                            }
+                                fog[i].setPosition(9000, 9000);
+                            
                         }
 
                     }
@@ -3325,17 +3368,20 @@ beginning: {};
                     window.draw(Gamebar);
                     window.draw(score);
                     window.draw(Bottombar);
-                    window.draw(Bottombar2);
+                    if (coopon)
+                    {
+                        window.draw(Bottombar2);
+                        window.draw(foodscore2);
+                        window.draw(hp2);
+                        window.draw(rocket2);
+                        window.draw(powerlvl2);
+                        window.draw(explosion2);
+                    }
                     window.draw(foodscore);
                     window.draw(hp);
-                    window.draw(hp2);
                     window.draw(rocket);
                     window.draw(powerlvl);
-                    window.draw(foodscore2);
-                    window.draw(rocket2);
-                    window.draw(powerlvl2);
                     window.draw(explosion);
-                    window.draw(explosion2);
                     for (int i = 0; i < bullet.numberofbullets; i++)
                     {
                         window.draw(Bullets[i]);
@@ -3350,7 +3396,7 @@ beginning: {};
 
                     //drawing missile
                     window.draw(missile);
-                    for (int i = 0; i < 40; i++) {
+                    for (int i = 0; i < 50; i++) {
                         window.draw(spark[i]);
                         window.draw(fog[i]);
                     }
@@ -3367,14 +3413,18 @@ beginning: {};
                     window.draw(Gamebar);
                     window.draw(score);
                     window.draw(Bottombar);
-                    window.draw(Bottombar2);
+                    if (coopon)
+                    {
+                        window.draw(Bottombar2);
+                        window.draw(foodscore2);
+                        window.draw(hp2);
+                        window.draw(rocket2);
+                        window.draw(powerlvl2);
+                        window.draw(explosion2);
+                    }
                     window.draw(foodscore);
                     window.draw(hp);
-                    window.draw(hp2);
                     window.draw(rocket);
-                    window.draw(foodscore2);
-                    window.draw(rocket2);
-                    window.draw(powerlvl2);
                     window.draw(powerlvl);
                     if (clock3.getElapsedTime().asSeconds() <= 8)
                     {
@@ -3437,17 +3487,20 @@ beginning: {};
                     window.draw(Gamebar);
                     window.draw(score);
                     window.draw(Bottombar);
-                    window.draw(Bottombar2);
+                    if (coopon)
+                    {
+                        window.draw(Bottombar2);
+                        window.draw(foodscore2);
+                        window.draw(hp2);
+                        window.draw(rocket2);
+                        window.draw(powerlvl2);
+                        window.draw(explosion2);
+                    }
                     window.draw(foodscore);
                     window.draw(hp);
-                    window.draw(hp2);
                     window.draw(rocket);
                     window.draw(powerlvl);
-                    window.draw(foodscore2);
-                    window.draw(rocket2);
-                    window.draw(powerlvl2);
                     window.draw(explosion);
-                    window.draw(explosion2);
                     for (int i = 0; i < bullet.numberofbullets; i++)
                     {
                         window.draw(Bullets[i]);
@@ -3490,7 +3543,7 @@ beginning: {};
 
                     //drawing missile
                     window.draw(missile);
-                    for (int i = 0; i < 40; i++) {
+                    for (int i = 0; i < 50; i++) {
                         window.draw(spark[i]);
                     window.draw(fog[i]);
                     }
@@ -3507,15 +3560,19 @@ beginning: {};
                     window.draw(Gamebar);
                     window.draw(score);
                     window.draw(Bottombar);
-                    window.draw(Bottombar2);
+                    if (coopon)
+                    {
+                        window.draw(Bottombar2);
+                        window.draw(foodscore2);
+                        window.draw(hp2);
+                        window.draw(rocket2);
+                        window.draw(powerlvl2);
+                        window.draw(explosion2);
+                    }
                     window.draw(foodscore);
                     window.draw(hp);
-                    window.draw(hp2);
                     window.draw(rocket);
                     window.draw(powerlvl);
-                    window.draw(foodscore2);
-                    window.draw(rocket2);
-                    window.draw(powerlvl2);
                     if (clock3.getElapsedTime().asSeconds() <= 8)
                     {
                         if (clock3.getElapsedTime().asSeconds() <= 5)
@@ -3534,15 +3591,19 @@ beginning: {};
                 window.draw(Gamebar);
                 window.draw(score);
                 window.draw(Bottombar);
-                window.draw(Bottombar2);
+                if (coopon)
+                {
+                    window.draw(Bottombar2);
+                    window.draw(foodscore2);
+                    window.draw(hp2);
+                    window.draw(rocket2);
+                    window.draw(powerlvl2);
+                    window.draw(explosion2);
+                }
                 window.draw(foodscore);
                 window.draw(hp);
-                window.draw(hp2);
                 window.draw(rocket);
                 window.draw(powerlvl);
-                window.draw(foodscore2);
-                window.draw(rocket2);
-                window.draw(powerlvl2);
                 if (prevwave == '4')
                 {
                     clock3.restart();
