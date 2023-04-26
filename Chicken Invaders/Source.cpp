@@ -1366,7 +1366,7 @@ void playerdamage() {
                         Player.setPosition(12121, 12121);
                     }
 
-                    if (health == 0 && player_2==0) {
+                    if (health == 0 && health3==0) {
                         gameover = true;
                         MainMusicPlaying = true;
                         IngameMusicPlaying = false;
