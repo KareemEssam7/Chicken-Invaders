@@ -142,6 +142,8 @@ int shield_timervar2 = 60;
 int shield_timer2 = 0;
 bool player_2 = 1;
 bool coopon = false;
+char lvl = '1';
+double grav = 9.8;
 // Creating Game Window
 RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders",Style::Fullscreen);
 
@@ -2421,6 +2423,7 @@ void reset()
     meteoralive = 0;
     aliveboss = 1;
     player_2 = 1;
+    powerlvls = 0;
     rectangle3.setPosition(770, 400);
     for (int i = 0; i <= 20; i++)
     {
@@ -2454,7 +2457,37 @@ void reset()
         }
     }
 }
-
+void lvldiff()
+{
+    if (lvl == '2')
+    {
+        chicken.speed = 4;
+        boss.bosshp = 60;
+        boss.bossspeed = 6;
+        meteors.meteorspeed = 10;
+    }
+    if (lvl == '3')
+    {
+        chicken.speed = 3.5;
+        boss.bosshp = 90;
+        boss.bossspeed = 7;
+        meteors.meteorspeed = 11;
+    }
+    if (lvl == '4')
+    {
+        chicken.speed = 3.2;
+        boss.bosshp = 120;
+        boss.bossspeed = 9;
+        meteors.meteorspeed = 12;
+    }
+    if (lvl == '5')
+    {
+        chicken.speed = 3;
+        boss.bosshp = 200;
+        boss.bossspeed = 10;
+        meteors.meteorspeed = 13.5;
+    }
+}
 int main()
 {
 
@@ -2469,12 +2502,11 @@ int main()
     Sprite sprite(fork);   
     sprite.setScale(1.4, 1); 
     // add functions
-beginning: {};
     cnt = 0;
     boss.bosshp = 50;
     boss.eggcooldownvar = 301;
     IngameImages();
-
+beginning: {};
     // main game loop
     if (MainMusicPlaying && musicON && IngameMusicPlaying == false)
     {
@@ -2512,6 +2544,7 @@ beginning: {};
         // main menu
         if (page == 0)
         {
+            reset();
             modeselectdelay = 0;
             delay = 0;
             frommenu = true;
@@ -2565,6 +2598,7 @@ beginning: {};
         // select level page ==1;
         if (page == 1)
         {
+            reset();
             if (temptest == 1)
             {
                 if (soundeffectON)
@@ -2598,9 +2632,42 @@ beginning: {};
             {
                 if (soundeffectON)
                     MenuClick.play();
+                lvl = '1';
                 page = 9;
  
-            } 
+            }
+            if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 301 && mousepos.y <= 367 && Mouse::isButtonPressed(Mouse::Left))
+            {
+                if (soundeffectON)
+                    MenuClick.play();
+                lvl = '2';
+                page = 9;
+
+            }
+            if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 421 && mousepos.y <= 482 && Mouse::isButtonPressed(Mouse::Left))
+            {
+                if (soundeffectON)
+                    MenuClick.play();
+                lvl = '3';
+                page = 9;
+
+            }
+            if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 541 && mousepos.y <= 606 && Mouse::isButtonPressed(Mouse::Left))
+            {
+                if (soundeffectON)
+                    MenuClick.play();
+                lvl = '4';
+                page = 9;
+
+            }
+            if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 662 && mousepos.y <= 727 && Mouse::isButtonPressed(Mouse::Left))
+            {
+                if (soundeffectON)
+                    MenuClick.play();
+                lvl = '5';
+                page = 9;
+
+            }
             window.draw(sprite);
         }
         // options page ==2
@@ -2768,7 +2835,24 @@ beginning: {};
             window.draw(sprite);  
             if (Cred[6].getScale().x <= 0.15)
             {
-                page = 0;
+                if (frommenu)
+                {
+                    page = 0;
+                    for (int i = 0; i < 7; i++)
+                    {
+                        Cred[i].setPosition(900, 1400 + i * 150);
+                        curscale[i] = 1;
+                    }
+                }
+                else
+                {
+                    page = 5;
+                    for (int i = 0; i < 7; i++)
+                    {
+                        Cred[i].setPosition(900, 1400 + i * 150);
+                        curscale[i] = 1;
+                    }
+                }
             }
         }
         //pause menu
@@ -2996,7 +3080,10 @@ beginning: {};
             }
             else if (Wave2 == true)
             {
+                powerlvls = 1;
                 meteoralive = 0;
+                powerlvl2.setString(to_string(powerlvls));
+                powerlvl.setString(to_string(powerlvls));
                 wave1second.setString("Wave " + to_string(prevwave - 48));
                 if (prevwave == '1')
                 {
@@ -3141,6 +3228,9 @@ beginning: {};
             }
             else if (Wave3 == true)
             {
+                powerlvls = 2;
+                powerlvl2.setString(to_string(powerlvls));
+                powerlvl.setString(to_string(powerlvls));
                 alivechicken = 0;
                 wave1second.setString("Wave " + to_string(prevwave - 48));
                 if (prevwave == '2')
@@ -3296,6 +3386,9 @@ beginning: {};
             }
             else if (Wave4 == true)
             {
+                powerlvls = 3;
+                powerlvl2.setString(to_string(powerlvls));
+                powerlvl.setString(to_string(powerlvls));
                 meteoralive = 0;
                 wave1second.setString("Wave " + to_string(prevwave - 48));
                 if (prevwave == '3')
@@ -3439,6 +3532,9 @@ beginning: {};
             }
             else if (Wave5 == true)
             {
+                powerlvls = 4;
+                powerlvl2.setString(to_string(powerlvls));
+                powerlvl.setString(to_string(powerlvls));
                 aliveboss = 1;
                 wave1second.setString("Wave " + to_string(prevwave - 48));
                 if (prevwave == '4')
@@ -3781,6 +3877,7 @@ beginning: {};
         // coop or single menu
         if (page == 9)
         {
+            lvldiff();
             clock3.restart();
             clock4.restart();
             mainmenu();
