@@ -11,11 +11,13 @@ using namespace sf;
 struct ChickenStruct
 {
     double HP[8][5], speed = 4;
+    double chicken_healthvar = 1, chicken_health = 1;
 };
 
 //Bullet Struct
 struct bulletstruct
 {
+    double bulletdamage = 1;
     int heldWeapon = 1;
     float bulletSpeed = 10;
     int currentBullet = 0;
@@ -121,6 +123,7 @@ bool yolk[8][5] = { };
 int Timer=2;
 int Timer2 = 2;
 int timer2 = 1;
+int chick = 0;
 bool gameover=false;
 //sound variables
 int currentshootsfx = 0, currentchickensfx = 0, currenteggshootsfx = 0, numberofshootsfx = 3;
@@ -273,8 +276,8 @@ Font font2;
 Sprite _GameBackground;
 Sprite Player;
 Sprite Player2ship;
-Sprite Chicken[8][6];
-Sprite Chicken2[8][6];
+Sprite Chicken[8][5];
+Sprite Chicken2[8][5];
 Sprite explosion;
 Sprite explosion2;
 Sprite Bullets[50];
@@ -284,7 +287,7 @@ Sprite eggyolk[8][5];
 Sprite bossegg[5];
 Sprite bossegg1[5];
 Sprite bossegg2[5];
-Sprite chicken_legs[8][6];
+Sprite chicken_legs[8][5];
 Sprite meteor[40];
 Sprite bosssprite;
 Sprite Logo;
@@ -936,10 +939,14 @@ void IngameImages()
 
     //setting chicken legs
     for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 6; j++) {
+        for (int j = 0; j < 5; j++) {
             chicken_legs[i][j].setTexture(Chickenlegs);
             chicken_legs[i][j].setScale(0.05, 0.05);
             chicken_legs[i][j].setPosition(-100, -100);
+
+           
+
+
         }
     }
 
@@ -1256,9 +1263,26 @@ void ChickenMove()
                 Chicken[i][j].setPosition(120 + (i * 170), 70 + (j * 100));
             }
             Chicken[i][j].setTextureRect(IntRect(ChickenMovement * 46.9, 0, 46.9, 38));
+
+
+            
         }
     }
     chickeninitialpos = 1;
+
+    if (chick==0)
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 5; j++)
+            {
+                chicken.HP[i][j] = chicken.chicken_health + (chicken.chicken_healthvar * 0.5 + 0.5);
+            }
+        }
+      
+        chick++;
+    }
+    
 
      for (int j = 0; j < 5; j++)
      {
@@ -1277,6 +1301,7 @@ void ChickenMove()
             }
             if (ChickenDir == 0)
                 Chicken[i][j].move(-chicken.speed, 0);
+
             else if (ChickenDir == 1)
                 Chicken[i][j].move(chicken.speed, 0);
         }
@@ -1978,15 +2003,24 @@ void scorecalc() {
 
                 if (Bullets[i].getGlobalBounds().intersects(Chicken[j][z].getGlobalBounds())) 
                 {
-                    chickendead[j][z] = 1;
-                    eggvar -= 5;
-                    cnt += 1000;
-                    score.setString(to_string(cnt));
-                    Bullets[i].setPosition(-10000, -10000);
-                    chicken_legs[j][z].setPosition(Chicken[j][z].getPosition().x, Chicken[j][z].getPosition().y);
-                    Chicken[j][z].setPosition(10000, 10000);
-                    missileScoreCount += 1000;
-                    if (missileScoreCount == 60000)
+                    if (chicken.HP[j][z] > 0)
+                    {
+                        Bullets[i].setPosition(-10000, -10000);
+                        chicken.HP[j][z] = chicken.HP[j][z] - (powerlvls * 0.5) - bullet.bulletdamage;
+                    }
+                    if (chicken.HP[j][z] <= 0)
+                    {
+                        Chicken[j][z].setPosition(10000, 10000);
+                        Bullets[i].setPosition(-10000, -10000);
+                        cnt += 1000;
+                        chicken_legs[j][z].setPosition(Chicken[j][z].getPosition().x, Chicken[j][z].getPosition().y);
+                        chickendead[j][z] = 1;
+                        eggvar -= 5;
+                        score.setString(to_string(cnt));                       
+                        missileScoreCount += 1000;
+                    }
+                    
+                    if (missileScoreCount == 1000)
                     {
                         missileScoreCount = 0;
                         rockets += 1;
@@ -2015,6 +2049,7 @@ void scorecalc() {
         }
     }
 }
+
 
 //Main menu 
 void mainmenu()
@@ -2461,6 +2496,7 @@ void lvldiff()
 {
     if (lvl == '2')
     {
+        chicken.chicken_health = 2;
         chicken.speed = 4;
         boss.bosshp = 60;
         boss.bossspeed = 6;
@@ -2468,6 +2504,7 @@ void lvldiff()
     }
     if (lvl == '3')
     {
+        chicken.chicken_health = 3;
         chicken.speed = 3.5;
         boss.bosshp = 90;
         boss.bossspeed = 7;
@@ -2475,6 +2512,7 @@ void lvldiff()
     }
     if (lvl == '4')
     {
+        chicken.chicken_health = 4;
         chicken.speed = 3.2;
         boss.bosshp = 120;
         boss.bossspeed = 9;
@@ -2482,6 +2520,7 @@ void lvldiff()
     }
     if (lvl == '5')
     {
+        chicken.chicken_health = 5;
         chicken.speed = 3;
         boss.bosshp = 200;
         boss.bossspeed = 10;
@@ -2944,6 +2983,7 @@ beginning: {};
             }
             if (Wave1 == true)
             {
+                chicken.chicken_healthvar = 1;
                 prevwave = '1';
                 alivechicken = 0;
                 if (clock4.getElapsedTime().asSeconds() >= 9)
@@ -3228,6 +3268,7 @@ beginning: {};
             }
             else if (Wave3 == true)
             {
+                chicken.chicken_healthvar = 3;
                 powerlvls = 2;
                 powerlvl2.setString(to_string(powerlvls));
                 powerlvl.setString(to_string(powerlvls));
@@ -3235,6 +3276,7 @@ beginning: {};
                 wave1second.setString("Wave " + to_string(prevwave - 48));
                 if (prevwave == '2')
                 {
+                    chick = 0;
                     clock3.restart();
                     clock4.restart();
                     meteorx = 0;
