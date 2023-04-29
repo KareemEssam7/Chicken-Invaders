@@ -1455,8 +1455,12 @@ void playerdamage() {
                             gameover = true;
                             MainMusicPlaying = true;
                             IngameMusicPlaying = false;
-                            MenuMusic.play();
-                            ingamemusic.stop();
+                            if (musicON)
+                            {
+                                MenuMusic.play();
+                                ingamemusic.stop();
+                            }
+                            
                         }
                         else
                         {
@@ -1474,6 +1478,11 @@ void playerdamage() {
                             gameover = true;
                             MainMusicPlaying = true;
                             IngameMusicPlaying = false;
+                            if (musicON)
+                            {
+                                MenuMusic.play();
+                                ingamemusic.stop();
+                            }
                         }
                         else
                         {
@@ -3013,9 +3022,12 @@ beginning: {};
               IngameMusicPlaying = false;
               MainMusicPlaying = true;
               
-
-              ingamemusic.stop();
-              MenuMusic.play();
+              if (musicON)
+              {
+                  ingamemusic.stop();
+                  MenuMusic.play();
+              }
+              
 
               coopon = false;
               reset();
@@ -3052,13 +3064,7 @@ beginning: {};
             delay = 0;
             checkdelay = 0;
             frommenu = false;
-            /*if (IngameMusicPlay)
-            {
-                ingamemusic.play();
-                IngameMusicPlay = false;
-                IngameMusicPlaying = true;
-
-            }*/
+            
             if (Wave1 == true)
             {
                 chicken.chicken_healthvar = 1;
@@ -4012,8 +4018,12 @@ beginning: {};
                 page = 10;
                 MainMusicPlaying = false;
                 IngameMusicPlaying = true;
-                ingamemusic.play();
-                MenuMusic.stop();
+                if (musicON)
+                {
+                    ingamemusic.play();
+                    MenuMusic.stop();
+                }
+                
             }
             //coop
             if (mousepos.x >= 985 && mousepos.x <= 1335 && mousepos.y >= 480 && mousepos.y <= 550 && Mouse::isButtonPressed(Mouse::Left) && modeselectdelay >= 5)
@@ -4023,8 +4033,12 @@ beginning: {};
                 temptest2 = 1;
                 MainMusicPlaying = false;
                 IngameMusicPlaying = true;
-                ingamemusic.play();
-                MenuMusic.stop();
+                if (musicON)
+                {
+                    ingamemusic.play();
+                    MenuMusic.stop();
+                }
+                
                 page = 6;
                 pausecooldown = 0;
                 modeselectdelay = 0;
@@ -4058,8 +4072,12 @@ beginning: {};
                     temptest2 = 1;
                     MainMusicPlaying = false;
                     IngameMusicPlaying = true;
-                    ingamemusic.play();
-                    MenuMusic.stop();
+                    if (musicON)
+                    {
+                        ingamemusic.play();
+                        MenuMusic.stop();
+                    }
+                    
                     page = 6;
                     pausecooldown = 0;
                     modeselectdelay = 0;
