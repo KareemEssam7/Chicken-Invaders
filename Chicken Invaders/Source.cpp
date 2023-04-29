@@ -147,6 +147,7 @@ bool player_2 = 1;
 bool coopon = false;
 char lvl = '1';
 double grav = 9.8;
+vector<pair<int, string>>l;
 // Creating Game Window
 RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders",Style::Fullscreen);
 
@@ -267,6 +268,17 @@ Text wave1second;
 Text endofwave1;
 Text congratulation;
 Text endoflevel1;
+//for adding name
+Text t1;
+Text t2;
+Text t3;
+Text t4;
+Text leader[100];
+vector<string>lines;
+string line;
+
+string Name;
+string name2;
 
 //adding font
 Font font1;
@@ -307,6 +319,27 @@ Sprite fog[50];
 // Loading Ingame Files
 void IngameImages()
 {
+    //leaderboard
+    
+    sort(l.begin(), l.end());
+    ofstream offile;
+    offile.open("history.txt",ios::app);
+    
+    ifstream infile;
+    infile.open("history.txt", ios::in);
+    while (getline(infile, line,'*')) {
+        lines.push_back(line);
+    }
+    for (int i = 0; i < lines.size(); i++) {
+        leader[i].setFont(font1);
+        leader[i].setCharacterSize(40);
+        leader[i].setFillColor(Color::White);
+        leader[i].setString(lines[i]);
+        leader[i].setPosition(50, 100 * i);
+    }
+    
+
+
     //fonts
     font1.loadFromFile("RobotoCondensed-Bold.ttf");
     font3.loadFromFile("Wedgie_Regular.ttf");
@@ -470,6 +503,30 @@ void IngameImages()
     rectanglecont.setFillColor(Color(0, 0, 255, 40));
     rectanglecont.setOutlineColor(Color(51, 153, 255, 60));
     rectanglecont.setOutlineThickness(2.8f);
+
+    //leaderboard
+    t1.setFont(font1);
+    t2.setFont(font1);
+    t3.setFont(font1);
+    t1.setString("Enter your name");
+    t3.setString("Enter your names");
+    t1.setCharacterSize(70);
+    t2.setCharacterSize(70);
+    t3.setCharacterSize(70);
+    t4.setCharacterSize(70);
+    t1.setPosition(10, 10);
+    t2.setPosition(10, 100);
+    t3.setPosition(10, 10);
+    t4.setPosition(10, 100);
+    t1.setFillColor(Color::White);
+    t2.setFillColor(Color::White);
+    t1.setOutlineColor(Color::Blue);
+    t2.setOutlineColor(Color::Blue);
+    t3.setFillColor(Color::White);
+    t3.setOutlineColor(Color::Blue);
+    t4.setFillColor(Color::White);
+    t4.setOutlineColor(Color::Blue);
+
 
     //back to main menu Button
     rectanglereturn.setPosition(785, 880);
@@ -2555,7 +2612,7 @@ beginning: {};
     {
         ingamemusic.play();
     }
-
+    
 
     MainMusicPlaying = false;
     while (window.isOpen())
@@ -2575,6 +2632,7 @@ beginning: {};
                 window.close();
             }
         }
+        
         //clear window
         window.clear();
 
@@ -2771,7 +2829,20 @@ beginning: {};
                     page = 5;
             }
             mainmenu();
-           
+            if (Keyboard::isKeyPressed(Keyboard::Up)) {
+                if (leader[0].getPosition().y <= 5) {
+                    for (int i = 0; i < lines.size() + 10; i++) {
+                        leader[i].move(0, 20);
+                    }
+                }
+            }
+            if (Keyboard::isKeyPressed(Keyboard::Down)) {
+                if (leader[lines.size()-1].getPosition().y >= window.getPosition().y+1000) {
+                    for (int i = 0; i < lines.size() + 10; i++) {
+                        leader[i].move(0, -20);
+                    }
+                }
+            }
             window.draw(menubg);
             for (int i = 0; i < 5; i++)
             {
@@ -2809,6 +2880,9 @@ beginning: {};
             window.draw(rectangleback);
             window.draw(back);
             window.draw(sprite);  
+            for (int i = 0; i < lines.size(); i++) {
+                window.draw(leader[i]);
+            }
         }
         // credits page ==4
         if (page == 4)
@@ -3001,7 +3075,9 @@ beginning: {};
 
                     if (gameover == true) {
                         gameover = false;
-
+                        ofstream offile;
+                        offile.open("history.txt", ios::app);
+                        offile << Name << "        " << cnt << "*" << "\n";
                         temptest = 1;
                         page = 1;
                         reset();
@@ -3156,6 +3232,9 @@ beginning: {};
 
                     if (gameover == true) {
                         gameover = false;
+                        ofstream offile;
+                        offile.open("history.txt", ios::app);
+                        offile << Name << "        " << cnt << "*" << "\n";
 
                         temptest = 1;
                         page = 1;
@@ -3302,6 +3381,9 @@ beginning: {};
 
                     if (gameover == true) {
                         gameover = false;
+                        ofstream offile;
+                        offile.open("history.txt", ios::app);
+                        offile << Name << "        " << cnt << "*" << "\n";
 
                         temptest = 1;
                         page = 1;
@@ -3463,6 +3545,9 @@ beginning: {};
 
                     if (gameover == true) {
                         gameover = false;
+                        ofstream offile;
+                        offile.open("history.txt", ios::app);
+                        offile << Name << "        " << cnt << "*" << "\n";
 
                         temptest = 1;
                         page = 1;
@@ -3605,6 +3690,9 @@ beginning: {};
 
                     if (gameover == true) {
                         gameover = false;
+                        ofstream offile;
+                        offile.open("history.txt", ios::app);
+                        offile << Name << "        " << cnt << "*" << "\n";
 
                         temptest = 1;
                         page = 1;
@@ -3935,17 +4023,12 @@ beginning: {};
             //single
             if (mousepos.x >= 585 && mousepos.x <= 935 && mousepos.y >= 480 && mousepos.y <= 550 && Mouse::isButtonPressed(Mouse::Left) && modeselectdelay >= 5)
             {
-                temptest2 = 1;
-                MainMusicPlaying = false;
-                IngameMusicPlaying = true;
-                page = 6;
-                pausecooldown = 0;
-                modeselectdelay = 0;
-                    goto beginning;
+                page = 10;
             }
             //coop
             if (mousepos.x >= 985 && mousepos.x <= 1335 && mousepos.y >= 480 && mousepos.y <= 550 && Mouse::isButtonPressed(Mouse::Left) && modeselectdelay >= 5)
             {
+                
                 coopon = true;
                 temptest2 = 1;
                 MainMusicPlaying = false;
@@ -3969,6 +4052,33 @@ beginning: {};
             window.draw(sprite);
          
         }
+            if (page == 10) {
+                if (event.type == Event::TextEntered) {
+                    Name += static_cast<char>(event.text.unicode);
+                }
+                if (Keyboard::isKeyPressed(Keyboard::BackSpace)&&Name.size()>0) {
+                    Name.resize(Name.size() - 1);
+                }
+                if (Keyboard::isKeyPressed(Keyboard::Enter) && Name.size() > 1) {
+                    temptest2 = 1;
+                    MainMusicPlaying = false;
+                    IngameMusicPlaying = true;
+                    page = 6;
+                    pausecooldown = 0;
+                    modeselectdelay = 0;
+                    goto beginning;
+
+
+                }
+                if (Keyboard::isKeyPressed(Keyboard::Escape)) {
+                    page = 9;
+                }
+                t2.setString(Name);
+                window.draw(_GameBackground);
+                window.draw(t1);
+                window.draw(t2);
+            }
+             
         sprite.setPosition(static_cast<Vector2f>(Mouse::getPosition(window))); // Set position 
         
         // window display
