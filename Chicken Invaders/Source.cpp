@@ -1455,6 +1455,8 @@ void playerdamage() {
                             gameover = true;
                             MainMusicPlaying = true;
                             IngameMusicPlaying = false;
+                            MenuMusic.play();
+                            ingamemusic.stop();
                         }
                         else
                         {
@@ -2584,6 +2586,7 @@ void lvldiff()
         meteors.meteorspeed = 13.5;
     }
 }
+
 int main()
 {
 
@@ -2602,19 +2605,12 @@ int main()
     boss.bosshp = 50;
     boss.eggcooldownvar = 301;
     IngameImages();
+    MenuMusic.play();
 beginning: {};
+    
     // main game loop
-    if (MainMusicPlaying && musicON && IngameMusicPlaying == false)
-    {
-        MenuMusic.play();
-    }
-    if (musicON && IngameMusicPlaying && MainMusicPlaying == false)
-    {
-        ingamemusic.play();
-    }
     
 
-    MainMusicPlaying = false;
     while (window.isOpen())
     {
         
@@ -2637,11 +2633,13 @@ beginning: {};
         window.clear();
 
         Vector2i mousepos = Mouse::getPosition(window);
+        
         //draw window
         // main menu
         if (page == 0)
         {
             reset();
+            
             modeselectdelay = 0;
             delay = 0;
             frommenu = true;
@@ -3009,11 +3007,16 @@ beginning: {};
           else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 880 && mousepos.y <= 950)
           {
               gameover = false;
-
+              
               temptest = 1;
               page = 1;
               IngameMusicPlaying = false;
               MainMusicPlaying = true;
+              
+
+              ingamemusic.stop();
+              MenuMusic.play();
+
               coopon = false;
               reset();
               goto beginning;
@@ -3037,7 +3040,7 @@ beginning: {};
         // ingame
         if (page == 6)
         {
-
+            
             if (temptest2 == 1)
             {
                 if (soundeffectON)
@@ -3049,12 +3052,13 @@ beginning: {};
             delay = 0;
             checkdelay = 0;
             frommenu = false;
-            if (IngameMusicPlay)
+            /*if (IngameMusicPlay)
             {
                 ingamemusic.play();
                 IngameMusicPlay = false;
                 IngameMusicPlaying = true;
-            }
+
+            }*/
             if (Wave1 == true)
             {
                 chicken.chicken_healthvar = 1;
@@ -3159,7 +3163,7 @@ beginning: {};
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
                         page = 5;
-                        MainMusicPlaying = true;
+                        
                         
                     }
                 }
@@ -3310,7 +3314,7 @@ beginning: {};
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
                         page = 5;
-                        MainMusicPlaying = true;
+                       
                     }
                 }
                 else
@@ -3475,7 +3479,7 @@ beginning: {};
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
                         page = 5;
-                        MainMusicPlaying = true;
+                        
                     }
                 }
                 else
@@ -3623,7 +3627,7 @@ beginning: {};
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
                         page = 5;
-                        MainMusicPlaying = true;
+                        
                     }
                 }
                 else
@@ -3776,7 +3780,7 @@ beginning: {};
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
                         page = 5;
-                        MainMusicPlaying = true;
+                       
                     }
                 }
                 else
@@ -3944,46 +3948,28 @@ beginning: {};
 
             if (mousepos.x >= 985 && mousepos.x <= 1055 && mousepos.y >= 480  && mousepos.y <= 550 && Mouse::isButtonPressed(Mouse::Left) && checkdelay>=5)
             {
-                if (!IngameMusicPlaying)
-                {
-                    if (soundeffectON)
-                    {
-                        MenuClick.play();
-                        MenuMusic.play();
-                        MenuMusic.play();
-                    }
-                    musicON = !musicON;
-                    if (musicON)
-                    {
-                        MainMusicPlaying = true;
-                        goto beginning;
-                    }
-                    else
-                    {
-                        MainMusicPlaying = false;
-                        goto beginning;
-                    }
-                    checkdelay = 0;
-                }
-                else
-                {
+                
                     if (soundeffectON)
                     {
                         MenuClick.play();
                     }
                     musicON = !musicON;
-                    if (musicON)
+                    if (musicON == false)
                     {
-                        IngameMusicPlay = true;
-                        goto beginning;
+                        MenuMusic.stop();
+                        ingamemusic.stop();
                     }
-                    else
+                    if (musicON && IngameMusicPlaying && MainMusicPlaying == false)
                     {
-                        IngameMusicPlay = false;
-                        goto beginning;
+                        ingamemusic.play();
+                    }
+                    if (musicON && MainMusicPlaying && IngameMusicPlaying == false)
+                    {
+                        MenuMusic.play();
                     }
                     checkdelay = 0;
-                }
+
+                    
                 
             }
             if (mousepos.x >= 985 && mousepos.x <= 1055 && mousepos.y >= 580 && mousepos.y <= 650 && Mouse::isButtonPressed(Mouse::Left) && checkdelay >= 5)
@@ -4024,6 +4010,10 @@ beginning: {};
             if (mousepos.x >= 585 && mousepos.x <= 935 && mousepos.y >= 480 && mousepos.y <= 550 && Mouse::isButtonPressed(Mouse::Left) && modeselectdelay >= 5)
             {
                 page = 10;
+                MainMusicPlaying = false;
+                IngameMusicPlaying = true;
+                ingamemusic.play();
+                MenuMusic.stop();
             }
             //coop
             if (mousepos.x >= 985 && mousepos.x <= 1335 && mousepos.y >= 480 && mousepos.y <= 550 && Mouse::isButtonPressed(Mouse::Left) && modeselectdelay >= 5)
@@ -4033,9 +4023,12 @@ beginning: {};
                 temptest2 = 1;
                 MainMusicPlaying = false;
                 IngameMusicPlaying = true;
+                ingamemusic.play();
+                MenuMusic.stop();
                 page = 6;
                 pausecooldown = 0;
                 modeselectdelay = 0;
+               
                 goto beginning;
             }
             //back
@@ -4044,6 +4037,7 @@ beginning: {};
                 if (soundeffectON)
                     MenuClick.play();
                 page = 1;
+               
             }
             window.draw(rectangleback);
             window.draw(back);
@@ -4060,9 +4054,12 @@ beginning: {};
                     Name.resize(Name.size() - 1);
                 }
                 if (Keyboard::isKeyPressed(Keyboard::Enter) && Name.size() > 1) {
+                    
                     temptest2 = 1;
                     MainMusicPlaying = false;
                     IngameMusicPlaying = true;
+                    ingamemusic.play();
+                    MenuMusic.stop();
                     page = 6;
                     pausecooldown = 0;
                     modeselectdelay = 0;
@@ -4078,7 +4075,7 @@ beginning: {};
                 window.draw(t1);
                 window.draw(t2);
             }
-             
+            
         sprite.setPosition(static_cast<Vector2f>(Mouse::getPosition(window))); // Set position 
         
         // window display
