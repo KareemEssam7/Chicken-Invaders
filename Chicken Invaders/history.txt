@@ -7,3 +7,5 @@ hhhhhhhhhhhhh        5000*
 suuiiiiiiiiiiiiiiiiiii        42100*
         6000*
         6000*
+mm        42400*
+k        80000*

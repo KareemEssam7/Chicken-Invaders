@@ -1801,8 +1801,8 @@ void eggmovement()
 void FoodMovment() {
 
     for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 6; j++) {
-            if (Chicken[i][j].getPosition().x > 3000 && Chicken[i][j].getPosition().y > 3000)
+        for (int j = 0; j < 5; j++) {
+            if (Chicken[i][j].getPosition().x>3000 && Chicken[i][j].getPosition().y>3000)
                 chicken_legs[i][j].move(0, 10);
 
         }
@@ -2242,10 +2242,10 @@ void scorecalc() {
                     }
                     if (chicken.HP[j][z] <= 0)
                     {
+                        chicken_legs[j][z].setPosition(Chicken[j][z].getPosition().x, Chicken[j][z].getPosition().y);
                         Chicken[j][z].setPosition(10000, 10000);
                         Bullets[i].setPosition(-10000, -10000);
                         cnt += 1000;
-                        chicken_legs[j][z].setPosition(Chicken[j][z].getPosition().x, Chicken[j][z].getPosition().y);
                         chickendead[j][z] = 1;
                         eggvar -= 5;
                         score.setString(to_string(cnt));                       
@@ -3277,6 +3277,7 @@ beginning: {};
                     eggmovement();
                     spark_fog();
                     scorecalc();
+                    FoodMovment();
                     window.draw(_GameBackground);
                     window.draw(rectangle1);
                     window.draw(rectangle2);
@@ -3302,8 +3303,13 @@ beginning: {};
                             window.draw(eggyolk[i][j]);
                             window.draw(Chicken[i][j]);
                             window.draw(Eggs[i][j]);
+                            window.draw(chicken_legs[i][j]);
+
                         }
                     }
+                  
+
+                    
 
                     window.draw(health_bar);
                     window.draw(Gamebar);
@@ -3364,6 +3370,7 @@ beginning: {};
                         window.draw(spark[i]);
                         window.draw(fog[i]);
                     }
+               
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
                         page = 5;
@@ -3434,6 +3441,7 @@ beginning: {};
                     rocketshooting();
                     spark_fog();
                     scorecalc();
+                    FoodMovment();
                     window.draw(_GameBackground);
                     window.draw(rectangle1);
                     window.draw(rectangle2);
@@ -3583,6 +3591,7 @@ beginning: {};
                     eggmovement();
                     spark_fog();
                     scorecalc();
+                    FoodMovment();
                     window.draw(_GameBackground);
                     window.draw(rectangle1);
                     window.draw(rectangle2);
@@ -3610,6 +3619,7 @@ beginning: {};
                             window.draw(eggyolk[i][j]);
                             window.draw(Chicken[i][j]);
                             window.draw(Eggs[i][j]);
+                            window.draw(chicken_legs[i][j]);
                         }
                     }
 
@@ -3747,6 +3757,7 @@ beginning: {};
                     rocketshooting();
                     spark_fog();
                     scorecalc();
+                    FoodMovment();
                     window.draw(_GameBackground);
                     window.draw(rectangle1);
                     window.draw(rectangle2);
@@ -3895,6 +3906,7 @@ beginning: {};
                     bossmove();
                     spark_fog();
                     scorecalc();
+
                     window.draw(_GameBackground);
                     window.draw(rectangle1);
                     window.draw(rectangle2);
