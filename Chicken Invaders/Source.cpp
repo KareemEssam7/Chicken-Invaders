@@ -135,6 +135,7 @@ Clock clock4;
 Clock clock3;
 bool Wave1 = 1, Wave2 =0, Wave3 = 0, Wave4 = 0, Wave5 = 0;
 char prevwave = '1';
+bool bossalive = 0;
 bool chickendead[8][5];
 int alivechicken = 0;
 int meteoralive = 0;
@@ -143,6 +144,8 @@ int shield_timervar = 60;
 int shield_timer = 0;
 int shield_timervar2 = 60;
 int shield_timer2 = 0;
+int bosschick = 0;
+int bosslvl=1;
 bool player_2 = 1;
 bool coopon = false;
 char lvl = '1';
@@ -1265,7 +1268,7 @@ void rocketshooting()
     if (missile.getPosition().y <= 400)
     {
         activemissile = false;
-        missile.setPosition(10000, 100000);
+        missile.setPosition(10000, 10000);
         explosioncamerashake = true;
         if (soundeffectON)
         {
@@ -1277,6 +1280,10 @@ void rocketshooting()
             {
                 Chicken[i][j].setPosition(10000, 10000);
             }
+        }
+        if (aliveboss == 1)
+        {
+            boss.bosshp -= 15;
         }
     }
 
@@ -1298,7 +1305,7 @@ void camerashake()
     if (camerashakelength == 0)
     {
         view1.setSize(sf::Vector2f(1920.f, 1080.f));
-        aliveboss = 0;
+        //aliveboss = 0;
         alivechicken = 0;
         meteoralive = 0;
         explosioncamerashake = false;
@@ -1336,7 +1343,8 @@ void ChickenMove()
                 chicken.HP[i][j] = chicken.chicken_health + (chicken.chicken_healthvar * 0.5 + 0.5);
             }
         }
-      
+        
+
         chick++;
     }
     
@@ -2428,9 +2436,9 @@ void bossmove() {
         {
             if (boss.bosshp > 0)
             {
-                boss.bosshp -= 2;
+                boss.bosshp = boss.bosshp - (powerlvls * 0.5) - bullet.bulletdamage;
             }
-            else if (boss.bosshp == 0)
+            if (boss.bosshp <= 0)
             {
                 bosssprite.setPosition(10000, 10000);
                 cnt += 5000;
@@ -2449,6 +2457,13 @@ void bossmove() {
         }
         z++;
     }
+
+    /*if (bosschick == 0)
+    {
+        boss.bosshp = 50 + (bosslvl * 10);
+
+        bosschick++;
+    }*/
 
     for (int i = 0; i < 5; i++)
     {
@@ -2493,33 +2508,47 @@ void bossmove() {
             Player.setPosition(10000, 10000);
         }*/
 
-
-  
+        //missile explosion
     
+    /*if (missile.getPosition().y <= 400)
+    {
+        if (boss.bosshp > 0)
+        {
+            boss.bosshp -= 15;
+        }
+        if (boss.bosshp <= 0)
+        {
+            bosssprite.setPosition(10000, 10000);
+        }
 
-
-
-
-
-
+    }*/
+  
 
 }
 void reset()
 {
+    bosschick = 0;
+    chick = 0;
     chickeninitialpos = 0;
     cnt = 0;
     foodcnt = 0;
     health = 3;
+    hp.setString(to_string(health));
     health2 = 3;
     health3 = 3;
+    hp2.setString(to_string(health3));
     health4 = 3;
     powerlvls = 0;
+    powerlvl2.setString(to_string(powerlvls));
+    powerlvl.setString(to_string(powerlvls));
     rockets = 0;
+    rocket.setString(to_string(rockets));
     missileScoreCount = 0;
     Timer = 2;
     Timer2 = 2;
     cnt = 0;
-    boss.bosshp = 50;
+    score.setString(to_string(cnt));
+    boss.bosshp = 50 + (bosslvl * 10);
     boss.eggcooldownvar = 301;
     tmp = 100;
     meteorx = 0;
@@ -2557,6 +2586,7 @@ void reset()
         {
             eggyolk[i][j].setPosition(10000, 10000);
             chickendead[i][j] = 0;
+            Eggs[i][j].setPosition(11112, 11112);
         }
     }
 }
@@ -2564,6 +2594,7 @@ void lvldiff()
 {
     if (lvl == '2')
     {
+        bosslvl = 2;
         chicken.chicken_health = 2;
         chicken.speed = 4;
         boss.bosshp = 60;
@@ -2572,6 +2603,7 @@ void lvldiff()
     }
     if (lvl == '3')
     {
+        bosslvl = 3;
         chicken.chicken_health = 3;
         chicken.speed = 3.5;
         boss.bosshp = 90;
@@ -2580,6 +2612,7 @@ void lvldiff()
     }
     if (lvl == '4')
     {
+        bosslvl = 4;
         chicken.chicken_health = 4;
         chicken.speed = 3.2;
         boss.bosshp = 120;
@@ -2588,6 +2621,7 @@ void lvldiff()
     }
     if (lvl == '5')
     {
+        bosslvl = 5;
         chicken.chicken_health = 5;
         chicken.speed = 3;
         boss.bosshp = 200;
@@ -2611,7 +2645,6 @@ int main()
     sprite.setScale(1.4, 1); 
     // add functions
     cnt = 0;
-    boss.bosshp = 50;
     boss.eggcooldownvar = 301;
     IngameImages();
     MenuMusic.play();
@@ -3676,6 +3709,9 @@ beginning: {};
                 wave1second.setString("Wave " + to_string(prevwave - 48));
                 if (prevwave == '4')
                 {
+                    boss.bosshp = 50 + (bosslvl * 10);
+                    //bosschick = 0;
+                    bossalive = 1;
                     clock3.restart();
                     clock4.restart();
                     meteorx = 0;
@@ -3749,11 +3785,13 @@ beginning: {};
                     {
                         window.draw(meteor[i]);
                     }
-                    if (boss.bosshp == 0)
+                    if (boss.bosshp <= 0)
                         aliveboss = 0;
+                    
                     camerashake();
-                    if (aliveboss == 0)
+                    if (aliveboss <= 0)
                     {
+                        bosssprite.setPosition(11112, 11112);
                         Wave5 = false;
                         clock4.restart();
                         clock3.restart();
