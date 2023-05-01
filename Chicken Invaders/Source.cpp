@@ -65,8 +65,8 @@ int exp_x=0,exp_y=0 ;
 int exp_x2 = 0, exp_y2 = 0;
 int sparkx = 0,fogx=0,fogy=0;
 long long cnt = 0;  //counter for
- int health = 3;
- int health3 = 3;
+int health = 3;
+int health3 = 3;
 int rockets = 0;
 int powerlvls = 0;
 double PlayerMovement = 9, PlayerSpeed = 12, Player2Movement = 9, Player2Speed = 12;
@@ -150,6 +150,9 @@ bool player_2 = 1;
 bool coopon = false;
 char lvl = '1';
 double grav = 9.8;
+//menu chicken
+int menuchickenanimation = 0, menuchickenx = 5, menuchickeny = 5;
+
 vector<pair<int, string>>l;
 // Creating Game Window
 RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders",Style::Fullscreen);
@@ -218,6 +221,13 @@ RectangleShape rectanglecontrols[6][2];
 RectangleShape rectanglecheck[2];
 RectangleShape rectangleldbs[5];
 RectangleShape rectangleselectmode[2];
+
+//borders for interactive background
+RectangleShape topborder(Vector2f(1920, 100));
+RectangleShape bottomborder(Vector2f(1920, 100));
+RectangleShape leftborder(Vector2f(100, 1080));
+RectangleShape rightborder(Vector2f(100, 1080));
+
 //shield
 CircleShape Shield(60);
 CircleShape Shield2(60);
@@ -319,9 +329,20 @@ Sprite Bottombar2;
 Sprite missile;
 Sprite spark[50];
 Sprite fog[50];
+Sprite menuchicken;
+
 // Loading Ingame Files
 void IngameImages()
 {
+    //borders for chicken bounce
+    topborder.setPosition(0, 0);
+    bottomborder.setPosition(0, 980);
+    leftborder.setPosition(0, 0);
+    rightborder.setPosition(1820, 0);
+
+    
+
+
     //leaderboard
     
     sort(l.begin(), l.end());
@@ -862,6 +883,10 @@ void IngameImages()
     // chicken image
     ChickenSkin.loadFromFile("RedChicken.png");
 
+    //background chicken
+    menuchicken.setTexture(ChickenSkin);
+    menuchicken.setPosition(200, 200);
+    menuchicken.setScale(1.5,1.5);
     //Egg image
     eggTex.loadFromFile("egg.png");
     eggbreak.loadFromFile("eggBreak.png");
@@ -1003,7 +1028,7 @@ void IngameImages()
             chicken_legs[i][j].setTexture(Chickenlegs);
             chicken_legs[i][j].setScale(0.05, 0.05);
             chicken_legs[i][j].setPosition(-100, -100);
-
+            
            
 
 
@@ -1420,6 +1445,101 @@ void playerdamage() {
 
             }
         }
+        //boss egg damage
+        for (int i = 0; i < 5; i++)
+        {
+            if (bossegg[i].getGlobalBounds().intersects(Shield.getGlobalBounds()))
+            {
+                bossegg[i].setPosition(10000, 10000);
+            }
+            if (bossegg[i].getGlobalBounds().intersects(Shield2.getGlobalBounds()))
+            {
+                bossegg[i].setPosition(10000, 10000);
+            }
+
+            if (bossegg1[i].getGlobalBounds().intersects(Shield.getGlobalBounds()))
+            {
+                bossegg1[i].setPosition(10000, 10000);
+            }
+            if (bossegg1[i].getGlobalBounds().intersects(Shield2.getGlobalBounds()))
+            {
+                bossegg1[i].setPosition(10000, 10000);
+            }
+
+            if (bossegg2[i].getGlobalBounds().intersects(Shield.getGlobalBounds()))
+            {
+                bossegg2[i].setPosition(10000, 10000);
+            }
+            if (bossegg2[i].getGlobalBounds().intersects(Shield2.getGlobalBounds()))
+            {
+                bossegg2[i].setPosition(10000, 10000);
+            }
+
+
+            if (bossegg[i].getGlobalBounds().intersects(Player.getGlobalBounds())) {
+                health -= 1;
+                if (soundeffectON)
+                {
+                    exploding.play();
+                }
+                hp.setString(to_string(health));
+                bossegg[i].setPosition(4000, 5000);
+            }
+            if (bossegg[i].getGlobalBounds().intersects(Player2ship.getGlobalBounds()) && coopon)
+            {
+                health3 -= 1;
+                if (soundeffectON)
+                {
+                    exploding.play();
+                }
+                hp2.setString(to_string(health3));
+                bossegg[i].setPosition(4000, 5000);
+
+            }
+
+            if (bossegg1[i].getGlobalBounds().intersects(Player.getGlobalBounds())) {
+                health -= 1;
+                if (soundeffectON)
+                {
+                    exploding.play();
+                }
+                hp.setString(to_string(health));
+                bossegg1[i].setPosition(4000, 5000);
+            }
+            if (bossegg1[i].getGlobalBounds().intersects(Player2ship.getGlobalBounds()) && coopon)
+            {
+                health3 -= 1;
+                if (soundeffectON)
+                {
+                    exploding.play();
+                }
+                hp2.setString(to_string(health3));
+                bossegg1[i].setPosition(4000, 5000);
+
+            }
+
+            if (bossegg2[i].getGlobalBounds().intersects(Player.getGlobalBounds())) {
+                health -= 1;
+                if (soundeffectON)
+                {
+                    exploding.play();
+                }
+                hp.setString(to_string(health));
+                bossegg2[i].setPosition(4000, 5000);
+            }
+            if (bossegg2[i].getGlobalBounds().intersects(Player2ship.getGlobalBounds()) && coopon)
+            {
+                health3 -= 1;
+                if (soundeffectON)
+                {
+                    exploding.play();
+                }
+                hp2.setString(to_string(health3));
+                bossegg2[i].setPosition(4000, 5000);
+
+            }
+        }
+        
         if (health < health2) {
 
             playeralive = false;
@@ -1688,6 +1808,42 @@ void FoodMovment() {
         }
     }
 }
+
+void interactivebackground() 
+{
+    menuchicken.setTextureRect(IntRect(menuchickenanimation * 46.9, 0, 46.9, 38));
+    menuchickenanimation++;
+    if (menuchickenanimation == 10)
+    {
+        menuchickenanimation = 0;
+    }
+    menuchicken.setOrigin(23,19);
+    menuchicken.rotate(7);
+    
+
+    if (menuchicken.getGlobalBounds().intersects(rightborder.getGlobalBounds()))
+    {
+        menuchickenx *= -1;
+    }
+    else if (menuchicken.getGlobalBounds().intersects(bottomborder.getGlobalBounds()))
+    {
+        menuchickeny *= -1;
+    }
+    else if (menuchicken.getGlobalBounds().intersects(topborder.getGlobalBounds()))
+    {
+        menuchickeny *= -1;
+    }
+    else if (menuchicken.getGlobalBounds().intersects(leftborder.getGlobalBounds()))
+    {
+        menuchickenx *= -1;
+    }
+    
+    
+
+    menuchicken.move(menuchickenx, menuchickeny);
+}
+
+
 
 //meteor behavior
 void meteormove() 
@@ -2101,6 +2257,7 @@ void scorecalc() {
                         missileScoreCount = 0;
                         rockets += 1;
                         rocket.setString(to_string(rockets));
+                        rocket2.setString(to_string(rockets));
                     }
                     if (soundeffectON)
                     {
@@ -2400,7 +2557,7 @@ void bossmove() {
         bosssprite.move(boss.bossspeed, boss.bossspeed);
     else if (bossdir == 1)
         bosssprite.move(boss.bossspeed, -boss.bossspeed);
-   if (bosssprite.getGlobalBounds().intersects(rectangle2.getGlobalBounds())) {
+    if (bosssprite.getGlobalBounds().intersects(rectangle2.getGlobalBounds())) {
         bossdir = 3;
     }
     else if (bosssprite.getGlobalBounds().intersects(rectangle1.getGlobalBounds())) {
@@ -2543,6 +2700,7 @@ void reset()
     powerlvl.setString(to_string(powerlvls));
     rockets = 0;
     rocket.setString(to_string(rockets));
+    rocket2.setString(to_string(rockets));
     missileScoreCount = 0;
     Timer = 2;
     Timer2 = 2;
@@ -2694,6 +2852,13 @@ beginning: {};
             window.draw(Credits);
             window.draw(Quit);
             window.draw(sprite);
+            window.draw(topborder);
+            window.draw(bottomborder);
+            window.draw(leftborder);
+            window.draw(rightborder);
+            interactivebackground();
+            window.draw(menuchicken);
+            
             for (int i = 0; i < 5; i++)
             {
                 window.draw(rectanglemainmenu[i]);
