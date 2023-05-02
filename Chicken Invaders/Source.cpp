@@ -316,7 +316,7 @@ Sprite chicken_legs[8][5];
 Sprite meteor[40];
 Sprite bosssprite;
 Sprite Logo;
-Sprite menubg;
+Sprite menubg[2];
 Sprite arrow_l[2];
 Sprite arrow_r[2];
 Sprite arrow_up[2];
@@ -395,10 +395,21 @@ void IngameImages()
     ingamemusic.openFromFile("ingame.wav");
     // background
     Background.loadFromFile("IngameBackground.jpg");
-    _GameBackground.setTexture(Background);
-    _GameBackground.setScale(1.875f, 1.05f);
-    gamemenubg.loadFromFile("gamemenubg.jpg");
-    menubg.setTexture(gamemenubg);
+    
+    /*for (int i = 0; i < 2; i++)
+    {
+        _GameBackground[i].setTexture(Background);
+    }
+    menubg[1].setPosition(0, -1080);*/
+    
+    gamemenubg.loadFromFile("gamemenubg.png");
+    for (int i = 0; i < 2; i++)
+    {
+        menubg[i].setTexture(gamemenubg);
+    }
+
+    menubg[1].setPosition(0, -1080);
+    
     gamelogo.loadFromFile("logo.png");
     Logo.setTexture(gamelogo);
     Logo.setPosition(423.5, -25);
@@ -1809,7 +1820,7 @@ void FoodMovment() {
     }
 }
 
-void interactivebackground() 
+void bouncingchicken() 
 {
     menuchicken.setTextureRect(IntRect(menuchickenanimation * 46.9, 0, 46.9, 38));
     menuchickenanimation++;
@@ -1841,6 +1852,20 @@ void interactivebackground()
     
 
     menuchicken.move(menuchickenx, menuchickeny);
+}
+
+void movingbackround()
+{
+    for (int i = 0; i < 2; i++)
+    {
+        menubg[i].move(0, 2);
+        if (menubg[i].getPosition().y >= 1080)
+        {
+            menubg[i].setPosition(0, -1080);
+        }
+        window.draw(menubg[i]);
+    }
+    
 }
 
 
@@ -2788,12 +2813,15 @@ void lvldiff()
     }
 }
 
+
+
 int main()
 {
 
     window.setMouseCursorVisible(false); // Hide cursor  
     View fixed = window.getView(); // Create a fixed view  
 
+    
     
 
     // Load image and create sprite
@@ -2805,6 +2833,7 @@ int main()
     cnt = 0;
     boss.eggcooldownvar = 301;
     IngameImages();
+    
     MenuMusic.play();
 beginning: {};
     
@@ -2822,6 +2851,7 @@ beginning: {};
         Event event;
         while (window.pollEvent(event))
         {
+
             // close window
             if (event.type == Event::Closed)
             {
@@ -2833,7 +2863,12 @@ beginning: {};
         window.clear();
 
         Vector2i mousepos = Mouse::getPosition(window);
+
+        //background
+        movingbackround();
+
         
+
         //draw window
         // main menu
         if (page == 0)
@@ -2843,7 +2878,7 @@ beginning: {};
             modeselectdelay = 0;
             delay = 0;
             frommenu = true;
-            window.draw(menubg);
+            window.draw(menuchicken);
             window.draw(Logo);
             mainmenu();
             window.draw(play);
@@ -2852,12 +2887,13 @@ beginning: {};
             window.draw(Credits);
             window.draw(Quit);
             window.draw(sprite);
-            window.draw(topborder);
+            /*window.draw(topborder);
             window.draw(bottomborder);
             window.draw(leftborder);
-            window.draw(rightborder);
-            interactivebackground();
-            window.draw(menuchicken);
+            window.draw(rightborder);*/
+            bouncingchicken();
+            
+            
             
             for (int i = 0; i < 5; i++)
             {
@@ -2920,7 +2956,7 @@ beginning: {};
                 backdelay = 0;
                     page = 0;
             }
-            window.draw(menubg);
+            
             window.draw(rectangleback);
             window.draw(back);
            
@@ -2991,7 +3027,7 @@ beginning: {};
                         page = 5;
                 }
                 mainmenu();
-                window.draw(menubg);
+                
                 window.draw(Logo);
                 window.draw(Option);
                 window.draw(rectangleback);
@@ -3048,7 +3084,7 @@ beginning: {};
                     }
                 }
             }
-            window.draw(menubg);
+            
             for (int i = 0; i < 5; i++)
             {
                 if (mousepos.x >= 50 + i * 370 && mousepos.x <= 400 + i * 370 && mousepos.y >= 25 && mousepos.y <= 95 && Mouse::isButtonPressed(Mouse::Left))
@@ -3127,7 +3163,7 @@ beginning: {};
                }
             }
             mainmenu();
-            window.draw(menubg);
+            
             window.draw(rectangleback);
             window.draw(back);
 
@@ -3232,7 +3268,7 @@ beginning: {};
               goto beginning;
 
           }
-            window.draw(menubg);
+            
             window.draw(Logo);
             for (int i = 1; i < 4; i++)
             {
@@ -4100,7 +4136,7 @@ beginning: {};
             checkdelay = 0;
             backdelay++;
             mainmenu();
-            window.draw(menubg);
+            
             window.draw(Logo);
             for (int j = 0; j < 2; j++)
             {
@@ -4150,7 +4186,7 @@ beginning: {};
             backdelay = 0;
             checkdelay++;
             mainmenu();
-            window.draw(menubg);
+            
             window.draw(Logo);
             window.draw(rectangleback);
             window.draw(back);
@@ -4221,7 +4257,7 @@ beginning: {};
             modeselectdelay++;
             coopclick++;
             backdelay=0;
-            window.draw(menubg);
+            
             window.draw(Logo);
             for (int i = 0; i < 2; i++)
             {
@@ -4231,13 +4267,7 @@ beginning: {};
             if (mousepos.x >= 585 && mousepos.x <= 935 && mousepos.y >= 480 && mousepos.y <= 550 && Mouse::isButtonPressed(Mouse::Left) && modeselectdelay >= 5)
             {
                 page = 10;
-                MainMusicPlaying = false;
-                IngameMusicPlaying = true;
-                if (musicON)
-                {
-                    ingamemusic.play();
-                    MenuMusic.stop();
-                }
+                
                 
             }
             //coop
@@ -4296,6 +4326,13 @@ beginning: {};
                     page = 6;
                     pausecooldown = 0;
                     modeselectdelay = 0;
+                    MainMusicPlaying = false;
+                    IngameMusicPlaying = true;
+                    if (musicON)
+                    {
+                        ingamemusic.play();
+                        MenuMusic.stop();
+                    }
                     goto beginning;
 
 
