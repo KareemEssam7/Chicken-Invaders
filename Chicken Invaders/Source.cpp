@@ -152,6 +152,8 @@ char lvl = '1';
 double grav = 9.8;
 //menu chicken
 int menuchickenanimation = 0, menuchickenx = 5, menuchickeny = 5;
+//ship fire
+int shipfirescale = 0;
 
 vector<pair<int, string>>l;
 // Creating Game Window
@@ -184,6 +186,7 @@ Texture explosionimage2;
 Texture missileTexture;
 Texture sparkimage;
 Texture fogimage;
+Texture shipfiretx;
 
 // adding border
 RectangleShape rectangle1(Vector2f(60, 1080));
@@ -330,6 +333,7 @@ Sprite missile;
 Sprite spark[50];
 Sprite fog[50];
 Sprite menuchicken;
+Sprite shipfire;
 
 // Loading Ingame Files
 void IngameImages()
@@ -422,6 +426,12 @@ void IngameImages()
     Bottombar.setTexture(BottomBarSkin);
     Bottombar.setPosition(0, 975);
     Bottombar.setScale(1.5, 1.5);
+
+    //ship fire
+    shipfiretx.loadFromFile("shipfire.png");
+    shipfire.setTexture(shipfiretx);
+    shipfire.setOrigin(15, 0);
+    shipfire.setColor(Color(255, 165, 6, 240));
 
     BottomBarSkin2.loadFromFile("BottomBar2.png");
     BottomBarSkin2.setSmooth(true);
@@ -1063,8 +1073,9 @@ void PlayerMove()
         {
             PlayerMovement++;
         }
-
+        
     }
+    
     //Creating Movement For Left Direction
     else if (Keyboard::isKeyPressed(Keyboard::A) && Player.getPosition().x >= 15)
     {
@@ -1128,6 +1139,53 @@ void PlayerMove()
             Player2ship.setTextureRect(IntRect(Player2Movement * 60, 0, 60, 42));
         }
     }
+    //shipe fire
+    shipfire.setPosition(Player.getPosition().x + 45, Player.getPosition().y + 45);
+    if (shipfirescale == 0)
+    {
+        shipfire.setScale(1, 1.2);
+        shipfirescale++;
+    }
+    else
+    {
+        shipfire.setScale(1, 1);
+        shipfirescale--;
+    }
+    if (Keyboard::isKeyPressed(Keyboard::D) && Player.getPosition().x <= 1800)
+    {
+        if (shipfire.getRotation() <= 40)
+        {
+            shipfire.rotate(4);
+            
+        }
+
+    }
+    else
+    {
+        if (shipfire.getRotation() > 0)
+        {
+            shipfire.rotate(-4);
+            
+        }
+    }
+
+    /*if (Keyboard::isKeyPressed(Keyboard::A) && Player.getPosition().x <= 1800)
+    {
+        if (shipfire.getRotation() <= 320 || shipfire.getRotation() == 0)
+        {
+            shipfire.rotate(-4);
+        }
+        cout << shipfire.getRotation() << endl;
+
+    }
+    else
+    {
+        if (shipfire.getRotation() < 0)
+        {
+            shipfire.rotate(4);
+
+        }
+    }*/
 }
 //spark and fog
 void spark_fog() {
@@ -1867,7 +1925,7 @@ void movingbackround()
         window.draw(menubg[i]);
 
         //ingame bg
-        _GameBackground[i].move(0, 2);
+        _GameBackground[i].move(0, 3);
         if (_GameBackground[i].getPosition().y >= 1080)
         {
             _GameBackground[i].setPosition(0, -1080);
@@ -4131,7 +4189,10 @@ beginning: {};
 
             playerdamage();
             PlayerMove();
+            
             window.draw(Player);
+            window.draw(shipfire);
+
             if (coopon)
             {
                 window.draw(Player2ship);
