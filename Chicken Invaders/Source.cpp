@@ -298,7 +298,7 @@ Font font1;
 Font font3;
 Font font2;
 // Ingame Sprites
-Sprite _GameBackground;
+Sprite _GameBackground[2];
 Sprite Player;
 Sprite Player2ship;
 Sprite Chicken[8][5];
@@ -394,13 +394,13 @@ void IngameImages()
     MenuMusic.openFromFile("IntroMenu.wav");
     ingamemusic.openFromFile("ingame.wav");
     // background
-    Background.loadFromFile("IngameBackground.jpg");
+    Background.loadFromFile("IngameBackground.png");
     
-    /*for (int i = 0; i < 2; i++)
+    for (int i = 0; i < 2; i++)
     {
         _GameBackground[i].setTexture(Background);
     }
-    menubg[1].setPosition(0, -1080);*/
+    _GameBackground[1].setPosition(0, -1080);
     
     gamemenubg.loadFromFile("gamemenubg.png");
     for (int i = 0; i < 2; i++)
@@ -1858,12 +1858,21 @@ void movingbackround()
 {
     for (int i = 0; i < 2; i++)
     {
+        //menu bg
         menubg[i].move(0, 2);
         if (menubg[i].getPosition().y >= 1080)
         {
             menubg[i].setPosition(0, -1080);
         }
         window.draw(menubg[i]);
+
+        //ingame bg
+        _GameBackground[i].move(0, 2);
+        if (_GameBackground[i].getPosition().y >= 1080)
+        {
+            _GameBackground[i].setPosition(0, -1080);
+        }
+        
     }
     
 }
@@ -3283,10 +3292,15 @@ beginning: {};
             window.draw(ret); 
             window.draw(sprite); 
         } 
+        
         // ingame
         if (page == 6)
         {
-            
+            //drawing ingame bg
+            for (int i = 0; i < 2; i++)
+            {
+                window.draw(_GameBackground[i]);
+            }
             if (temptest2 == 1)
             {
                 if (soundeffectON)
@@ -3314,7 +3328,7 @@ beginning: {};
                     spark_fog();
                     scorecalc();
                     FoodMovment();
-                    window.draw(_GameBackground);
+                    
                     window.draw(rectangle1);
                     window.draw(rectangle2);
 
@@ -3416,7 +3430,7 @@ beginning: {};
                 }
                 else
                 {
-                    window.draw(_GameBackground);
+                    
                     window.draw(health_bar);
                     window.draw(Gamebar);
                     window.draw(score);
@@ -3478,7 +3492,7 @@ beginning: {};
                     spark_fog();
                     scorecalc();
                     FoodMovment();
-                    window.draw(_GameBackground);
+                    
                     window.draw(rectangle1);
                     window.draw(rectangle2);
 
@@ -3567,7 +3581,7 @@ beginning: {};
                 }
                 else
                 {
-                    window.draw(_GameBackground);
+                    
                     window.draw(health_bar);
                     window.draw(Gamebar);
                     window.draw(score);
@@ -3628,7 +3642,7 @@ beginning: {};
                     spark_fog();
                     scorecalc();
                     FoodMovment();
-                    window.draw(_GameBackground);
+                    
                     window.draw(rectangle1);
                     window.draw(rectangle2);
 
@@ -3734,7 +3748,7 @@ beginning: {};
                 }
                 else
                 {
-                    window.draw(_GameBackground);
+                    
                     window.draw(health_bar);
                     window.draw(Gamebar);
                     window.draw(score);
@@ -3794,7 +3808,7 @@ beginning: {};
                     spark_fog();
                     scorecalc();
                     FoodMovment();
-                    window.draw(_GameBackground);
+                    
                     window.draw(rectangle1);
                     window.draw(rectangle2);
 
@@ -3883,7 +3897,7 @@ beginning: {};
                 }
                 else
                 {
-                    window.draw(_GameBackground);
+                    
                     window.draw(health_bar);
                     window.draw(Gamebar);
                     window.draw(score);
@@ -3943,7 +3957,7 @@ beginning: {};
                     spark_fog();
                     scorecalc();
 
-                    window.draw(_GameBackground);
+                    
                     window.draw(rectangle1);
                     window.draw(rectangle2);
 
@@ -4042,7 +4056,7 @@ beginning: {};
                 }
                 else
                 {
-                    window.draw(_GameBackground);
+                    
                     window.draw(health_bar);
                     window.draw(Gamebar);
                     window.draw(score);
@@ -4073,7 +4087,7 @@ beginning: {};
 
             else
             {
-                window.draw(_GameBackground);
+                
                 window.draw(health_bar);
                 window.draw(Gamebar);
                 window.draw(score);
@@ -4341,7 +4355,7 @@ beginning: {};
                     page = 9;
                 }
                 t2.setString(Name);
-                window.draw(_GameBackground);
+                
                 window.draw(t1);
                 window.draw(t2);
             }
