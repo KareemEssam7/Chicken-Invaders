@@ -150,8 +150,10 @@ bool player_2 = 1;
 bool coopon = false;
 char lvl = '1';
 double grav = 9.8;
+int randomizer = 0;
+int doublebullets = 0;
 //menu chicken
-int menuchickenanimation = 0, menuchickenx = 5, menuchickeny = 5;
+int menuchickenx = 5, menuchickeny = 5;
 //ship fire
 int shipfirescale = 0;
 
@@ -187,6 +189,8 @@ Texture missileTexture;
 Texture sparkimage;
 Texture fogimage;
 Texture shipfiretx;
+Texture GiftIon;
+Texture GiftCrystal;
 
 // adding border
 RectangleShape rectangle1(Vector2f(60, 1080));
@@ -334,6 +338,8 @@ Sprite spark[50];
 Sprite fog[50];
 Sprite menuchicken;
 Sprite shipfire;
+Sprite iongift;
+Sprite crystalgift;
 
 // Loading Ingame Files
 void IngameImages()
@@ -1056,7 +1062,18 @@ void IngameImages()
         }
     }
 
+    //ion gift image
+    GiftIon.loadFromFile("GIFTIonBlaster.png");
+    iongift.setTexture(GiftIon);
+    iongift.setPosition(-100, -100);
+
+
+    //crystal gift image
+    GiftCrystal.loadFromFile("GIFTHypergun.png");
+    crystalgift.setTexture(GiftCrystal);
+    crystalgift.setPosition(-100, -100);
 }
+
 
 // function for player movement
 void PlayerMove()
@@ -1875,17 +1892,22 @@ void FoodMovment() {
                 chicken_legs[i][j].move(0, 10);
 
         }
+        iongift.move(0, 1);
+        crystalgift.move(0, 1);
     }
 }
 
 void bouncingchicken() 
 {
-    menuchicken.setTextureRect(IntRect(menuchickenanimation * 46.9, 0, 46.9, 38));
-    menuchickenanimation++;
-    if (menuchickenanimation == 10)
-    {
-        menuchickenanimation = 0;
-    }
+    menuchicken.setTextureRect(IntRect(ChickenMovement * 46.9, 0, 46.9, 38));
+    if (ChickenMovement == 9)
+        checkchickenanimation = false;
+    else if (ChickenMovement == 0)
+        checkchickenanimation = true;
+    if (checkchickenanimation == false)
+        ChickenMovement--;
+    else
+        ChickenMovement++;
     menuchicken.setOrigin(23,19);
     menuchicken.rotate(7);
     
@@ -1934,7 +1956,6 @@ void movingbackround()
     }
     
 }
-
 
 
 //meteor behavior
@@ -2005,7 +2026,7 @@ void meteormove()
                     {
                         meteor[a].setPosition(10000, 10000);
                         cnt += 700;
-                        score.setString("score : " + to_string(cnt));
+                        score.setString(to_string(cnt));
                     }
                     Bullets[i].setPosition(-2000, -2000);
                 }
@@ -2317,8 +2338,6 @@ void meteorfast()
     }
 }
 
-
-
 //increasing score
 void scorecalc() {
     for (int i = 0; i < bullet.numberofbullets; i++) {
@@ -2334,6 +2353,19 @@ void scorecalc() {
                     }
                     if (chicken.HP[j][z] <= 0)
                     {
+                        randomizer = 1 + rand() % 40;
+                        if (randomizer == 1)
+                        {
+                            iongift.setPosition(Chicken[j][z].getPosition().x, Chicken[j][z].getPosition().y);
+                          
+                        }
+                        if (randomizer==2)
+                        {
+   
+                            crystalgift.setPosition(Chicken[j][z].getPosition().x, Chicken[j][z].getPosition().y);
+                          
+                        }
+                       
                         chicken_legs[j][z].setPosition(Chicken[j][z].getPosition().x, Chicken[j][z].getPosition().y);
                         Chicken[j][z].setPosition(10000, 10000);
                         Bullets[i].setPosition(-10000, -10000);
@@ -2364,6 +2396,17 @@ void scorecalc() {
 
                 }
 
+                if (iongift.getGlobalBounds().intersects(Player.getGlobalBounds()))
+                {
+                    iongift.setPosition(4000, -100);
+                    doublebullets = 1;
+                }
+                if (crystalgift.getGlobalBounds().intersects(Player.getGlobalBounds()))
+                {
+                    crystalgift.setPosition(4000, -100);
+                    doublebullets = 1;
+                }
+
                 if (chicken_legs[j][z].getGlobalBounds().intersects(Player.getGlobalBounds())) 
                 {
                     chicken_legs[j][z].setPosition(4000, -100);
@@ -2374,7 +2417,6 @@ void scorecalc() {
         }
     }
 }
-
 
 //Main menu 
 void mainmenu()
@@ -2774,8 +2816,11 @@ void bossmove() {
   
 
 }
+
 void reset()
 {
+    prevwave = '1';
+    randomizer = 0;
     bosschick = 0;
     chick = 0;
     chickeninitialpos = 0;
@@ -2840,6 +2885,7 @@ void reset()
         }
     }
 }
+
 void lvldiff()
 {
     if (lvl == '2')
@@ -3417,8 +3463,8 @@ beginning: {};
                     }
                   
 
-                    
-
+                    window.draw(crystalgift); 
+                    window.draw(iongift);
                     window.draw(health_bar);
                     window.draw(Gamebar);
                     window.draw(score);
@@ -3730,7 +3776,8 @@ beginning: {};
                             window.draw(chicken_legs[i][j]);
                         }
                     }
-
+                    window.draw(iongift);
+                    window.draw(crystalgift);
                     window.draw(health_bar);
                     window.draw(Gamebar);
                     window.draw(score);
