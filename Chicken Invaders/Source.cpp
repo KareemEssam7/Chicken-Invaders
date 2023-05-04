@@ -135,6 +135,7 @@ Clock clock4;
 Clock clock3;
 bool Wave1 = 1, Wave2 =0, Wave3 = 0, Wave4 = 0, Wave5 = 0;
 char prevwave = '1';
+char checkbullet = 'r';
 bool bossalive = 0;
 bool chickendead[8][5];
 int alivechicken = 0;
@@ -191,6 +192,7 @@ Texture fogimage;
 Texture shipfiretx;
 Texture GiftIon;
 Texture GiftCrystal;
+Texture crystaltear;
 
 // adding border
 RectangleShape rectangle1(Vector2f(60, 1080));
@@ -928,6 +930,7 @@ void IngameImages()
   
     //bullet image
     bulletImage.loadFromFile("Bullet1Image.png");
+    crystaltear.loadFromFile("crystaltear.png");
 
     //health
     hp.setFont(font1);
@@ -1280,7 +1283,34 @@ void PlayerShooting() {
     {
         bullet.bulletCoolDown = bullet.bulletCoolDownvar;
         bullet_shot = 0;
-        Bullets[bullet.currentBullet].setPosition(Player.getPosition().x + 29, Player.getPosition().y - 45);
+        if (doublebullets==0)
+        Bullets[bullet.currentBullet].setPosition(Player.getPosition().x + 35, Player.getPosition().y - 45);
+        else if (doublebullets == 1)
+        {
+            Bullets[bullet.currentBullet].setPosition(Player.getPosition().x + 20, Player.getPosition().y - 45);
+            Bullets[bullet.currentBullet+1].setPosition(Player.getPosition().x + 50, Player.getPosition().y - 45);
+            bullet.currentBullet++;
+            if (bullet.currentBullet == bullet.numberofbullets - 1) {
+                bullet.currentBullet = 0;
+            }
+        }
+        else if (doublebullets == 2)
+        {
+            Bullets[bullet.currentBullet].setPosition(Player.getPosition().x + 20, Player.getPosition().y - 45);
+            if (bullet.currentBullet+1 == bullet.numberofbullets - 1) {
+                bullet.currentBullet = 0;
+            }
+            Bullets[bullet.currentBullet + 1].setPosition(Player.getPosition().x + 50, Player.getPosition().y - 45);
+            if (bullet.currentBullet+2 == bullet.numberofbullets - 1) {
+                bullet.currentBullet = 0;
+            }
+            Bullets[bullet.currentBullet + 2].setPosition(Player.getPosition().x + 35, Player.getPosition().y -70);
+            bullet.currentBullet += 2;
+            if (bullet.currentBullet == bullet.numberofbullets - 1) {
+                bullet.currentBullet = 0;
+            }
+        }
+       
 
         //sfx
         if (soundeffectON && playeralive)
@@ -2353,13 +2383,13 @@ void scorecalc() {
                     }
                     if (chicken.HP[j][z] <= 0)
                     {
-                        randomizer = 1 + rand() % 40;
-                        if (randomizer == 1)
+                        randomizer = 1 + rand() % 80;
+                        if (randomizer == 1|| randomizer==2)
                         {
                             iongift.setPosition(Chicken[j][z].getPosition().x, Chicken[j][z].getPosition().y);
                           
                         }
-                        if (randomizer==2)
+                        if (randomizer==3)
                         {
    
                             crystalgift.setPosition(Chicken[j][z].getPosition().x, Chicken[j][z].getPosition().y);
@@ -2395,16 +2425,45 @@ void scorecalc() {
                     
 
                 }
+                if (checkbullet == 'b')
+                {
+                    bullet.bulletdamage = 2;
+                }
+                else if(checkbullet == 'r')
+                {
+                    bullet.bulletdamage = 1;
+                }
 
                 if (iongift.getGlobalBounds().intersects(Player.getGlobalBounds()))
                 {
                     iongift.setPosition(4000, -100);
-                    doublebullets = 1;
+                    for (int i = 0; i < 50; i++)
+                    {
+                        Bullets[i].setTexture(bulletImage);
+                    }
+                    if (checkbullet == 'b')
+                    {
+                        doublebullets = 0;
+                        checkbullet = 'r';
+                    }
+                    else if(doublebullets < 2)
+                    doublebullets ++;
+
                 }
                 if (crystalgift.getGlobalBounds().intersects(Player.getGlobalBounds()))
                 {
                     crystalgift.setPosition(4000, -100);
-                    doublebullets = 1;
+                    for (int i = 0; i < 50; i++)
+                    {
+                        Bullets[i].setTexture(crystaltear);
+                    }
+                    if (checkbullet == 'r')
+                    {
+                        doublebullets = 0;
+                        checkbullet = 'b';
+                    }
+                    else if(doublebullets<2)
+                        doublebullets ++;
                 }
 
                 if (chicken_legs[j][z].getGlobalBounds().intersects(Player.getGlobalBounds())) 
@@ -2819,6 +2878,8 @@ void bossmove() {
 
 void reset()
 {
+    doublebullets = 0;
+    checkbullet = 'r';
     prevwave = '1';
     randomizer = 0;
     bosschick = 0;
