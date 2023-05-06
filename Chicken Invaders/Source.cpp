@@ -372,7 +372,7 @@ void IngameImages()
         leader[i].setCharacterSize(40);
         leader[i].setFillColor(Color::White);
         leader[i].setString(lines[i]);
-        leader[i].setPosition(50, 100 * i);
+        leader[i].setPosition(850, 150 + (50 * i));
     }
     
 
