@@ -1,12 +1,16 @@
-#include<iostream>
+#include <iostream>
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <string>
 #include <fstream>
 #include <algorithm>
-#include<ctime>
+#include <ctime>
+#include <vector>
+#include <utility>
+
 using namespace std;
 using namespace sf;
+
 // Chicken Struct
 struct ChickenStruct
 {
@@ -26,6 +30,7 @@ struct bulletstruct
     float bulletCoolDown2 = 0;
     const int numberofbullets = 50;
 };
+
 //spark struct
 struct spark_struct {
     int currentspark = 0;
@@ -33,6 +38,8 @@ struct spark_struct {
     float sparkcooldown = 0;
 
 };
+
+//fog struct
 struct fogstruct {
     int currentfog = 0;
     float fogcooldownvar = 8;
@@ -64,7 +71,7 @@ sf::View view1(sf::Vector2f(960.f, 540.f), sf::Vector2f(1920.f, 1080.f));
 int exp_x=0,exp_y=0 ;
 int exp_x2 = 0, exp_y2 = 0;
 int sparkx = 0,fogx=0,fogy=0;
-long long cnt = 0;  //counter for
+long long cnt = 0;  
 int health = 3;
 int health3 = 3;
 int rockets = 0;
@@ -160,6 +167,8 @@ int menuchickenx = 5, menuchickeny = 5;
 int shipfirescale = 0;
 
 vector<pair<int, string>>l;
+
+
 // Creating Game Window
 RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders",Style::Fullscreen);
 
@@ -347,17 +356,14 @@ Sprite crystalgift;
 // Loading Ingame Files
 void IngameImages()
 {
+
     //borders for chicken bounce
     topborder.setPosition(0, 0);
     bottomborder.setPosition(0, 980);
     leftborder.setPosition(0, 0);
     rightborder.setPosition(1820, 0);
 
-    
-
-
     //leaderboard
-    
     sort(l.begin(), l.end());
     ofstream offile;
     offile.open("history.txt",ios::app);
@@ -374,8 +380,6 @@ void IngameImages()
         leader[i].setString(lines[i]);
         leader[i].setPosition(850, 150 + (50 * i));
     }
-    
-
 
     //fonts
     font1.loadFromFile("RobotoCondensed-Bold.ttf");
@@ -3249,6 +3253,9 @@ beginning: {};
         // hall of fame page ==3
         if (page == 3)
         {
+
+            
+
             temptest3++;
             modeselectdelay = 0;
             backdelay = 0;
@@ -3432,6 +3439,9 @@ beginning: {};
               if (soundeffectON)
                   MenuClick.play();
              page = 3;
+
+             
+
              goto pagecode;
           }
           else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 780 && mousepos.y <= 850)
@@ -3519,9 +3529,27 @@ beginning: {};
 
                     if (gameover == true) {
                         gameover = false;
+                        //leader board
                         ofstream offile;
                         offile.open("history.txt", ios::app);
                         offile << Name << "        " << cnt << "*" << "\n";
+                        
+                        sort(l.begin(), l.end());
+                        ofstream offile;
+                        offile.open("history.txt", ios::app);
+
+                        ifstream infile;
+                        infile.open("history.txt", ios::in);
+                        while (getline(infile, line, '*'))
+                        {
+                            lines.push_back(line);
+                        }
+                        for (int i = 0; i < lines.size(); i++)
+                        {
+                            leader[i].setString(lines[i]);
+                            leader[i].setPosition(850, 150 + (50 * i));
+                        }
+
                         temptest = 1;
                         page = 1;
                         reset();
