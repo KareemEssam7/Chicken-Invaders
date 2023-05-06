@@ -133,6 +133,7 @@ bool shield_on = 0;
 bool shield_on2 = 0;
 Clock clock4;
 Clock clock3;
+Clock c4;
 bool Wave1 = 1, Wave2 =0, Wave3 = 0, Wave4 = 0, Wave5 = 0;
 char prevwave = '1';
 char checkbullet = 'r';
@@ -567,8 +568,8 @@ void IngameImages()
     t2.setCharacterSize(70);
     t3.setCharacterSize(70);
     t4.setCharacterSize(70);
-    t1.setPosition(10, 10);
-    t2.setPosition(10, 100);
+    t1.setPosition(750, 300);
+    t2.setPosition(750, 400);
     t3.setPosition(10, 10);
     t4.setPosition(10, 100);
     t1.setFillColor(Color::White);
@@ -1275,8 +1276,6 @@ void PlayerShooting() {
         bullet.bulletCoolDown = bullet.bulletCoolDownvar;
         pausecooldown = 1;
         //Shield.setPosition(10000, 10000);
-
-
     }
 
     if ((Keyboard::isKeyPressed(Keyboard::Space)) && bullet.bulletCoolDown == 0 && pausecooldown == 1)
@@ -1290,23 +1289,23 @@ void PlayerShooting() {
             Bullets[bullet.currentBullet].setPosition(Player.getPosition().x + 20, Player.getPosition().y - 45);
             Bullets[bullet.currentBullet+1].setPosition(Player.getPosition().x + 50, Player.getPosition().y - 45);
             bullet.currentBullet++;
-            if (bullet.currentBullet == bullet.numberofbullets - 1) {
+            if (bullet.currentBullet >= 40 ) {
                 bullet.currentBullet = 0;
             }
         }
         else if (doublebullets == 2)
         {
             Bullets[bullet.currentBullet].setPosition(Player.getPosition().x + 20, Player.getPosition().y - 45);
-            if (bullet.currentBullet+1 == bullet.numberofbullets - 1) {
+            if (bullet.currentBullet+1 >= 40) {
                 bullet.currentBullet = 0;
             }
             Bullets[bullet.currentBullet + 1].setPosition(Player.getPosition().x + 50, Player.getPosition().y - 45);
-            if (bullet.currentBullet+2 == bullet.numberofbullets - 1) {
+            if (bullet.currentBullet+2 >= 40) {
                 bullet.currentBullet = 0;
             }
             Bullets[bullet.currentBullet + 2].setPosition(Player.getPosition().x + 35, Player.getPosition().y -70);
             bullet.currentBullet += 2;
-            if (bullet.currentBullet == bullet.numberofbullets - 1) {
+            if (bullet.currentBullet >= 40) {
                 bullet.currentBullet = 0;
             }
         }
@@ -1323,7 +1322,7 @@ void PlayerShooting() {
             }
         }
         //current bullet for shooting
-        if (bullet.currentBullet == bullet.numberofbullets - 1) {
+        if (bullet.currentBullet >= 40) {
             bullet.currentBullet = 0;
         }
         bullet.currentBullet++;
@@ -3031,6 +3030,19 @@ beginning: {};
             {
                 window.close();
             }
+
+            if (page == 10)
+            {
+                
+                if (event.type == Event::TextEntered && !Keyboard::isKeyPressed(Keyboard::Enter)) {
+
+                    Name += static_cast<char>(event.text.unicode);
+
+                }
+                if (Keyboard::isKeyPressed(Keyboard::BackSpace) && Name.size() > 0) {
+                    Name.resize(Name.size() - 1);
+                }
+            }
         }
         
         //clear window
@@ -3073,10 +3085,13 @@ beginning: {};
             {
                 window.draw(rectanglemainmenu[i]);
             }
+
             if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550 )
             {
                 if (soundeffectON)
                     MenuClick.play();
+                
+                c4.restart();
                 page = 1;
                 goto pagecode;
             }
@@ -3139,44 +3154,49 @@ beginning: {};
                 window.draw(rectanglelevels[i]);
                 window.draw(levels[i]);
             }
-            //level1
-            if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 180 && mousepos.y <= 250 && Mouse::isButtonPressed(Mouse::Left))
+            //levels
+            if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 180 && mousepos.y <= 250 && Mouse::isButtonPressed(Mouse::Left) && c4.getElapsedTime().asSeconds() >= 0.2)
             {
                 if (soundeffectON)
                     MenuClick.play();
                 lvl = '1';
+                c4.restart();
                 page = 9;
  
             }
-            if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 301 && mousepos.y <= 367 && Mouse::isButtonPressed(Mouse::Left))
+            if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 301 && mousepos.y <= 367 && Mouse::isButtonPressed(Mouse::Left) && c4.getElapsedTime().asSeconds() >= 0.2)
             {
                 if (soundeffectON)
                     MenuClick.play();
                 lvl = '2';
+                c4.restart();
                 page = 9;
 
             }
-            if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 421 && mousepos.y <= 482 && Mouse::isButtonPressed(Mouse::Left))
+            if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 421 && mousepos.y <= 482 && Mouse::isButtonPressed(Mouse::Left) && c4.getElapsedTime().asSeconds() >= 0.2)
             {
                 if (soundeffectON)
                     MenuClick.play();
                 lvl = '3';
+                c4.restart();
                 page = 9;
 
             }
-            if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 541 && mousepos.y <= 606 && Mouse::isButtonPressed(Mouse::Left))
+            if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 541 && mousepos.y <= 606 && Mouse::isButtonPressed(Mouse::Left) && c4.getElapsedTime().asSeconds() >= 0.2)
             {
                 if (soundeffectON)
                     MenuClick.play();
                 lvl = '4';
+                c4.restart();
                 page = 9;
 
             }
-            if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 662 && mousepos.y <= 727 && Mouse::isButtonPressed(Mouse::Left))
+            if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 662 && mousepos.y <= 727 && Mouse::isButtonPressed(Mouse::Left) && c4.getElapsedTime().asSeconds() >= 0.2)
             {
                 if (soundeffectON)
                     MenuClick.play();
                 lvl = '5';
+                c4.restart();
                 page = 9;
 
             }
@@ -4489,44 +4509,42 @@ beginning: {};
          
         }
             if (page == 10) {
-                if (event.type == Event::TextEntered) {
-                    Name += static_cast<char>(event.text.unicode);
-                }
-                if (Keyboard::isKeyPressed(Keyboard::BackSpace)&&Name.size()>0) {
-                    Name.resize(Name.size() - 1);
-                }
-                if (Keyboard::isKeyPressed(Keyboard::Enter) && Name.size() > 1) {
-                    
-                    temptest2 = 1;
-                    MainMusicPlaying = false;
-                    IngameMusicPlaying = true;
-                    if (musicON)
+    
+                    if (Keyboard::isKeyPressed(Keyboard::Enter) && Name.size() >= 1)
                     {
-                        ingamemusic.play();
-                        MenuMusic.stop();
-                    }
-                    
-                    page = 6;
-                    pausecooldown = 0;
-                    modeselectdelay = 0;
-                    MainMusicPlaying = false;
-                    IngameMusicPlaying = true;
-                    if (musicON)
-                    {
-                        ingamemusic.play();
-                        MenuMusic.stop();
-                    }
-                    goto beginning;
+
+                        temptest2 = 1;
+                        MainMusicPlaying = false;
+                        IngameMusicPlaying = true;
+                        if (musicON)
+                        {
+                            ingamemusic.play();
+                            MenuMusic.stop();
+                        }
+
+                        page = 6;
+                        pausecooldown = 0;
+                        modeselectdelay = 0;
+                        MainMusicPlaying = false;
+                        IngameMusicPlaying = true;
+                        if (musicON)
+                        {
+                            ingamemusic.play();
+                            MenuMusic.stop();
+                        }
+                        goto beginning;
 
 
-                }
-                if (Keyboard::isKeyPressed(Keyboard::Escape)) {
-                    page = 9;
-                }
-                t2.setString(Name);
-                
-                window.draw(t1);
-                window.draw(t2);
+                    }
+                    if (Keyboard::isKeyPressed(Keyboard::Escape)) {
+                        page = 9;
+                        Name = "";
+                    }
+                    t2.setString(Name);
+
+                    window.draw(t1);
+                    window.draw(t2);
+
             }
             
         sprite.setPosition(static_cast<Vector2f>(Mouse::getPosition(window))); // Set position 
