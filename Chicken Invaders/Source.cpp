@@ -439,7 +439,7 @@ void IngameImages()
     BottomBarSkin.loadFromFile("leftbar1.png");
     BottomBarSkin.setSmooth(true);
     Bottombar.setTexture(BottomBarSkin);
-    Bottombar.setPosition(-45, 1004);
+    Bottombar.setPosition(-70 , 1004);
     Bottombar.setScale(1, 1);
 
     //ship fire
@@ -451,7 +451,7 @@ void IngameImages()
     BottomBarSkin2.loadFromFile("rightbar1.png");
     BottomBarSkin2.setSmooth(true);
     Bottombar2.setTexture(BottomBarSkin2);
-    Bottombar2.setPosition(1500, 1004);
+    Bottombar2.setPosition(1430, 1004);
     Bottombar2.setScale(1, 1);
     Gamebar.setTexture(GameBarSkin);
     Gamebar.setPosition(0, 0);
@@ -943,41 +943,41 @@ void IngameImages()
     hp.setFont(font1);
     hp.setCharacterSize(35);
     hp.setOrigin(0, 0);
-    hp.setPosition(85, window.getSize().y - 58);
+    hp.setPosition(60, window.getSize().y - 58);
     hp.setString(to_string(health));
 
-    hp2.setFont(font1);
-    hp2.setCharacterSize(35);
-    hp2.setOrigin(0, 0);
-    hp2.setPosition(1835, window.getSize().y - 58);
-    hp2.setString(to_string(health3));
+    foodscore2.setFont(font1);
+    foodscore2.setCharacterSize(35);
+    foodscore2.setOrigin(0, 0);
+    foodscore2.setPosition(1810, window.getSize().y - 58);
+    foodscore2.setString(to_string(health3));
 
     // rockets
     rocket.setFont(font1);
     rocket.setCharacterSize(35);
     rocket.setOrigin(0, 0);
-    rocket.setPosition(180, window.getSize().y - 58);
+    rocket.setPosition(147, window.getSize().y - 58);
     rocket.setString(to_string(rockets));
 
-    rocket2.setFont(font1);
-    rocket2.setCharacterSize(35);
-    rocket2.setOrigin(0, 0);
-    rocket2.setPosition(1745, window.getSize().y - 58);
-    rocket2.setString(to_string(rockets));
+    powerlvl2.setFont(font1);
+    powerlvl2.setCharacterSize(35);
+    powerlvl2.setOrigin(0, 0);
+    powerlvl2.setPosition(1720, window.getSize().y - 58);
+    powerlvl2.setString(to_string(rockets));
 
 
     // powerlvl
     powerlvl.setFont(font1);
     powerlvl.setCharacterSize(35);
     powerlvl.setOrigin(0, 0);
-    powerlvl.setPosition(275, window.getSize().y - 58);
+    powerlvl.setPosition(240, window.getSize().y - 58);
     powerlvl.setString(to_string(powerlvls));
 
-    powerlvl2.setFont(font1);
-    powerlvl2.setCharacterSize(35);
-    powerlvl2.setOrigin(0, 0);
-    powerlvl2.setPosition(1645, window.getSize().y - 58);
-    powerlvl2.setString(to_string(powerlvls));
+    rocket2.setFont(font1);
+    rocket2.setCharacterSize(35);
+    rocket2.setOrigin(0, 0);
+    rocket2.setPosition(1635, window.getSize().y - 58);
+    rocket2.setString(to_string(powerlvls));
 
     //score
     score.setFont(font2);
@@ -990,14 +990,14 @@ void IngameImages()
     foodscore.setFont(font1);
     foodscore.setCharacterSize(35);
     foodscore.setOrigin(0, 0);
-    foodscore.setPosition(350, window.getSize().y - 58);
+    foodscore.setPosition(325, window.getSize().y - 58);
     foodscore.setString( to_string(foodcnt));
 
-    foodscore2.setFont(font1);
-    foodscore2.setCharacterSize(35);
-    foodscore2.setOrigin(0, 0);
-    foodscore2.setPosition(1555, window.getSize().y - 58);
-    foodscore2.setString(to_string(foodcnt));
+    hp2.setFont(font1);
+    hp2.setCharacterSize(35);
+    hp2.setOrigin(0, 0);
+    hp2.setPosition(1545, window.getSize().y - 58);
+    hp2.setString(to_string(foodcnt));
 
     //meteor
     meteortex.loadFromFile("Stones.png");
