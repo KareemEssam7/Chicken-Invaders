@@ -165,6 +165,8 @@ int doublebullets = 0;
 int menuchickenx = 5, menuchickeny = 5;
 //ship fire
 int shipfirescale = 0;
+//rocket animation
+int rocketx = 0;
 
 vector<pair<int, string>>l;
 
@@ -434,11 +436,11 @@ void IngameImages()
     // ingame images
     GameBarSkin.setSmooth(true);
     GameBarSkin.loadFromFile("TopBar.png");
-    BottomBarSkin.loadFromFile("BottomBar.png");
+    BottomBarSkin.loadFromFile("leftbar1.png");
     BottomBarSkin.setSmooth(true);
     Bottombar.setTexture(BottomBarSkin);
-    Bottombar.setPosition(0, 975);
-    Bottombar.setScale(1.5, 1.5);
+    Bottombar.setPosition(-45, 1004);
+    Bottombar.setScale(1, 1);
 
     //ship fire
     shipfiretx.loadFromFile("shipfire.png");
@@ -446,11 +448,11 @@ void IngameImages()
     shipfire.setOrigin(15, 0);
     shipfire.setColor(Color(255, 165, 6, 240));
 
-    BottomBarSkin2.loadFromFile("BottomBar2.png");
+    BottomBarSkin2.loadFromFile("rightbar1.png");
     BottomBarSkin2.setSmooth(true);
     Bottombar2.setTexture(BottomBarSkin2);
-    Bottombar2.setPosition(1475, 975);
-    Bottombar2.setScale(1.5, 1.5);
+    Bottombar2.setPosition(1500, 1004);
+    Bottombar2.setScale(1, 1);
     Gamebar.setTexture(GameBarSkin);
     Gamebar.setPosition(0, 0);
     Gamebar.setScale(1.5, 1.5);
@@ -941,7 +943,7 @@ void IngameImages()
     hp.setFont(font1);
     hp.setCharacterSize(35);
     hp.setOrigin(0, 0);
-    hp.setPosition(70, window.getSize().y - 58);
+    hp.setPosition(85, window.getSize().y - 58);
     hp.setString(to_string(health));
 
     hp2.setFont(font1);
@@ -954,7 +956,7 @@ void IngameImages()
     rocket.setFont(font1);
     rocket.setCharacterSize(35);
     rocket.setOrigin(0, 0);
-    rocket.setPosition(160, window.getSize().y - 58);
+    rocket.setPosition(180, window.getSize().y - 58);
     rocket.setString(to_string(rockets));
 
     rocket2.setFont(font1);
@@ -968,7 +970,7 @@ void IngameImages()
     powerlvl.setFont(font1);
     powerlvl.setCharacterSize(35);
     powerlvl.setOrigin(0, 0);
-    powerlvl.setPosition(260, window.getSize().y - 58);
+    powerlvl.setPosition(275, window.getSize().y - 58);
     powerlvl.setString(to_string(powerlvls));
 
     powerlvl2.setFont(font1);
@@ -1006,10 +1008,10 @@ void IngameImages()
     }
 
     //missile image
-    missileTexture.loadFromFile("missile.png");
+    missileTexture.loadFromFile("rockets.png");
     missile.setTexture(missileTexture);
     missile.setPosition(10000, 10000);
-    missile.setScale(0.05, 0.05);
+    missile.setScale(0.3, 0.3);
     
 
     //boss texture and position
@@ -1405,6 +1407,12 @@ void rocketshooting()
     if (activemissile == true)
     {
         missile.move(0, -bullet.bulletSpeed * 2);
+        missile.setTextureRect(IntRect(183 * rocketx, 0, 183, 229));
+        rocketx++;
+        if (rocketx == 10)
+        {
+            rocketx = 0;
+        }
     }
 
 
@@ -2881,6 +2889,7 @@ void bossmove() {
 
 void reset()
 {
+    view1.setSize(sf::Vector2f(1920.f, 1080.f));
     doublebullets = 0;
     checkbullet = 'r';
     for (int i = 0; i < 50; i++)
@@ -4271,6 +4280,7 @@ beginning: {};
                     camerashake();
                     if (aliveboss <= 0)
                     {
+                        view1.setSize(sf::Vector2f(1920.f, 1080.f));
                         bosssprite.setPosition(11112, 11112);
                         Wave5 = false;
                         clock4.restart();
