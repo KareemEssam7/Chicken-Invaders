@@ -1015,8 +1015,8 @@ void IngameImages()
     //boss texture and position
     bosssprite.setTexture(bossimage);
     bosssprite.setPosition(Vector2f(200, 200));
-    bosssprite.setScale(4.5 , 4.5);
-    bosssprite.setTextureRect(IntRect(75*animation, 0, 75, 68));
+    bosssprite.setScale(0.3436 , 0.385);
+    bosssprite.setTextureRect(IntRect(982*animation, 0, 982, 794));
     //setting bullet textures
     for (int i = 0; i < bullet.numberofbullets; i++)
     {
@@ -2744,7 +2744,7 @@ void mainmenu()
 void bossmove() {
 
     //Boss movement + animation
-    bosssprite.setTextureRect(IntRect(75 * animation, 0, 75, 68));
+    bosssprite.setTextureRect(IntRect(982 * animation, 0, 982, 794));
     if (bosssprite.getGlobalBounds().intersects(rectangle5.getGlobalBounds()))
         bossdir = 0;
     else if (bosssprite.getGlobalBounds().intersects(rectangle4.getGlobalBounds()))
@@ -2883,13 +2883,18 @@ void reset()
 {
     doublebullets = 0;
     checkbullet = 'r';
-    prevwave = '1';
+    for (int i = 0; i < 50; i++)
+    {
+        Bullets[i].setTexture(bulletImage);
+    }
     randomizer = 0;
     bosschick = 0;
     chick = 0;
     chickeninitialpos = 0;
     cnt = 0;
     foodcnt = 0;
+    foodscore.setString(to_string(foodcnt));
+    foodscore2.setString(to_string(foodcnt));
     health = 3;
     hp.setString(to_string(health));
     health2 = 3;
@@ -2938,6 +2943,7 @@ void reset()
         meteortimer[i] = rand() % 400 + 100;
     }
     prevwave = '1';
+    wave1second.setString("Wave " + to_string(prevwave - 48));
     Wave2 = false, Wave3 = false, Wave4 = false, Wave5 = false, Wave1 = true;
     for (int j = 0; j < 5; j++)
     {
@@ -2948,6 +2954,7 @@ void reset()
             Eggs[i][j].setPosition(11112, 11112);
         }
     }
+    bosssprite.setPosition(Vector2f(200, 200));
 }
 
 void lvldiff()
@@ -3535,7 +3542,7 @@ beginning: {};
                         offile << Name << "        " << cnt << "*" << "\n";
                         
                         sort(l.begin(), l.end());
-                        ofstream offile;
+                        
                         offile.open("history.txt", ios::app);
 
                         ifstream infile;
@@ -3648,6 +3655,7 @@ beginning: {};
                     window.draw(Gamebar);
                     window.draw(score);
                     window.draw(Bottombar);
+                   
                     if (coopon)
                     {
                         window.draw(Bottombar2);
@@ -3794,7 +3802,22 @@ beginning: {};
                 }
                 else
                 {
-                    
+                    for (int j = 0; j < 5; j++)
+                    {
+                        for (int i = 0; i < 8; i++)
+                        {
+
+                            window.draw(eggyolk[i][j]);
+                            window.draw(Eggs[i][j]);
+                            window.draw(chicken_legs[i][j]);
+
+                        }
+                    }
+                    eggmovement();
+                    scorecalc();
+                    FoodMovment();
+                    window.draw(crystalgift);
+                    window.draw(iongift);
                     window.draw(health_bar);
                     window.draw(Gamebar);
                     window.draw(score);
@@ -3967,6 +3990,7 @@ beginning: {};
                     window.draw(Gamebar);
                     window.draw(score);
                     window.draw(Bottombar);
+                   
                     if (coopon)
                     {
                         window.draw(Bottombar2);
@@ -4111,7 +4135,22 @@ beginning: {};
                 }
                 else
                 {
-                    
+                    for (int j = 0; j < 5; j++)
+                    {
+                        for (int i = 0; i < 8; i++)
+                        {
+
+                            window.draw(eggyolk[i][j]);
+                            window.draw(Eggs[i][j]);
+                            window.draw(chicken_legs[i][j]);
+
+                        }
+                    }
+                    window.draw(crystalgift);
+                    window.draw(iongift);
+                    eggmovement();
+                    scorecalc();
+                    FoodMovment();
                     window.draw(health_bar);
                     window.draw(Gamebar);
                     window.draw(score);
@@ -4270,7 +4309,7 @@ beginning: {};
                 }
                 else
                 {
-                    
+                   
                     window.draw(health_bar);
                     window.draw(Gamebar);
                     window.draw(score);
@@ -4301,7 +4340,14 @@ beginning: {};
 
             else
             {
-                
+                bossmove();
+                scorecalc();
+                for (int i = 0; i < 5; i++)
+                {
+                    window.draw(bossegg[i]);
+                    window.draw(bossegg1[i]);
+                    window.draw(bossegg2[i]);
+                }
                 window.draw(health_bar);
                 window.draw(Gamebar);
                 window.draw(score);
@@ -4356,6 +4402,11 @@ beginning: {};
             else
             {
                 Player2ship.setPosition(10000, 0);
+            }
+            if (Keyboard::isKeyPressed(Keyboard::Escape))
+            {
+                page = 5;
+
             }
         }
 
@@ -4482,8 +4533,6 @@ beginning: {};
         if (page == 9)
         {
             lvldiff();
-            clock3.restart();
-            clock4.restart();
             mainmenu();
             modeselectdelay++;
             coopclick++;
@@ -4544,6 +4593,8 @@ beginning: {};
                         temptest2 = 1;
                         MainMusicPlaying = false;
                         IngameMusicPlaying = true;
+                        clock3.restart();
+                        clock4.restart();
                         if (musicON)
                         {
                             ingamemusic.play();
