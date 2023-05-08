@@ -2480,7 +2480,7 @@ void scorecalc() {
                         missileScoreCount += 1000;
                     }
                     
-                    if (missileScoreCount == 1000)
+                    if (missileScoreCount == 70000)
                     {
                         missileScoreCount = 0;
                         rockets += 1;
