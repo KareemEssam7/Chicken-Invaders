@@ -143,6 +143,7 @@ Clock clock3;
 Clock c4;
 bool Wave1 = 1, Wave2 =0, Wave3 = 0, Wave4 = 0, Wave5 = 0;
 char prevwave = '1';
+bool validname = false;
 char checkbullet = 'r';
 bool bossalive = 0;
 bool chickendead[8][5];
@@ -165,6 +166,7 @@ int doublebullets = 0;
 int menuchickenx = 5, menuchickeny = 5;
 //ship fire
 int shipfirescale = 0;
+int shipfirescale2 = 0;
 //rocket animation
 int rocketx = 0;
 
@@ -202,6 +204,7 @@ Texture missileTexture;
 Texture sparkimage;
 Texture fogimage;
 Texture shipfiretx;
+Texture shipfiretx2;
 Texture GiftIon;
 Texture GiftCrystal;
 Texture crystaltear;
@@ -221,6 +224,8 @@ SoundBuffer chickensfx;
 SoundBuffer eggshootsfx;
 SoundBuffer rocketshootsfx;
 SoundBuffer explodingsfx;
+SoundBuffer eatingsfx;
+SoundBuffer upgradesfx;
 // sounds
 Sound MenuClick;
 Sound shoot1[3];
@@ -228,6 +233,8 @@ Sound chickenhurt[2];
 Sound eggshoot[2];
 Sound rocketshoot;
 Sound exploding;
+Sound eating;
+Sound upgradesound;
 //music
 Music MenuMusic;
 Music ingamemusic;
@@ -352,6 +359,7 @@ Sprite spark[50];
 Sprite fog[50];
 Sprite menuchicken;
 Sprite shipfire;
+Sprite shipfire2;
 Sprite iongift;
 Sprite crystalgift;
 
@@ -409,6 +417,10 @@ void IngameImages()
     rocketshoot.setBuffer(rocketshootsfx);
     explodingsfx.loadFromFile("explosion.wav");
     exploding.setBuffer(explodingsfx);
+    eatingsfx.loadFromFile("eating.wav");
+    eating.setBuffer(eatingsfx);
+    upgradesfx.loadFromFile("upgrade.wav");
+    upgradesound.setBuffer(upgradesfx);
     // music
     MenuMusic.openFromFile("IntroMenu.wav");
     ingamemusic.openFromFile("ingame.wav");
@@ -447,6 +459,11 @@ void IngameImages()
     shipfire.setTexture(shipfiretx);
     shipfire.setOrigin(15, 0);
     shipfire.setColor(Color(255, 165, 6, 240));
+
+    shipfiretx2.loadFromFile("shipfire.png");
+    shipfire2.setTexture(shipfiretx2);
+    shipfire2.setOrigin(15, 0);
+    shipfire2.setColor(Color(255, 165, 6, 240));
 
     BottomBarSkin2.loadFromFile("rightbar1.png");
     BottomBarSkin2.setSmooth(true);
@@ -943,7 +960,7 @@ void IngameImages()
     hp.setFont(font1);
     hp.setCharacterSize(35);
     hp.setOrigin(0, 0);
-    hp.setPosition(60, window.getSize().y - 58);
+    hp.setPosition(147, window.getSize().y - 58);
     hp.setString(to_string(health));
 
     foodscore2.setFont(font1);
@@ -956,7 +973,7 @@ void IngameImages()
     rocket.setFont(font1);
     rocket.setCharacterSize(35);
     rocket.setOrigin(0, 0);
-    rocket.setPosition(147, window.getSize().y - 58);
+    rocket.setPosition(240, window.getSize().y - 58);
     rocket.setString(to_string(rockets));
 
     powerlvl2.setFont(font1);
@@ -970,7 +987,7 @@ void IngameImages()
     powerlvl.setFont(font1);
     powerlvl.setCharacterSize(35);
     powerlvl.setOrigin(0, 0);
-    powerlvl.setPosition(240, window.getSize().y - 58);
+    powerlvl.setPosition(420, window.getSize().y - 58);
     powerlvl.setString(to_string(powerlvls));
 
     rocket2.setFont(font1);
@@ -1063,12 +1080,9 @@ void IngameImages()
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 5; j++) {
             chicken_legs[i][j].setTexture(Chickenlegs);
-            chicken_legs[i][j].setScale(0.05, 0.05);
+            chicken_legs[i][j].setScale(0.3, 0.3);
             chicken_legs[i][j].setPosition(-100, -100);
-            
-           
-
-
+            chicken_legs[i][j].setOrigin(57, 70);
         }
     }
 
@@ -1193,6 +1207,35 @@ void PlayerMove()
         {
             shipfire.rotate(-4);
             
+        }
+    }
+
+    shipfire2.setPosition(Player2ship.getPosition().x + 45, Player2ship.getPosition().y + 45);
+    if (shipfirescale2 == 0)
+    {
+        shipfire2.setScale(1, 1.2);
+        shipfirescale2++;
+    }
+    else
+    {
+        shipfire2.setScale(1, 1);
+        shipfirescale2--;
+    }
+    if (Keyboard::isKeyPressed(Keyboard::Right) && Player2ship.getPosition().x <= 1800)
+    {
+        if (shipfire2.getRotation() <= 40)
+        {
+            shipfire2.rotate(4);
+
+        }
+
+    }
+    else
+    {
+        if (shipfire2.getRotation() > 0)
+        {
+            shipfire2.rotate(-4);
+
         }
     }
 
@@ -1389,6 +1432,7 @@ void rocketshooting()
         missile.setPosition(Player.getPosition().x + 29, Player.getPosition().y - 45);
         rockets--;
         rocket.setString(to_string(rockets));
+        rocket2.setString(to_string(rockets));
     }
 
     if (Mouse::isButtonPressed(Mouse::Right) && activemissile == false && rockets > 0 && coopon)
@@ -1401,6 +1445,7 @@ void rocketshooting()
         missile.setPosition(Player2ship.getPosition().x + 29, Player2ship.getPosition().y - 45);
         rockets--;
         rocket.setString(to_string(rockets));
+        rocket2.setString(to_string(rockets));
     }
 
     //missile moving
@@ -1551,6 +1596,8 @@ void playerdamage() {
             {
                 if (Eggs[i][j].getGlobalBounds().intersects(Player.getGlobalBounds())) {
                     health -= 1;
+                    if (doublebullets > 0)
+                        doublebullets -= 1;
                     if (soundeffectON)
                     {
                         exploding.play();
@@ -1739,6 +1786,10 @@ void playerdamage() {
                                 ingamemusic.stop();
                             }
                         }
+                        if (health == 0)
+                        {
+                            Player.setPosition(12121, 12121);
+                        }
                         else
                         {
                             Player.setPosition(960, 850);
@@ -1795,6 +1846,16 @@ void playerdamage() {
                         shield_timer2 = shield_timervar2;
                     }
 
+                    if (health == 0 && health3 == 0) {
+                        gameover = true;
+                        MainMusicPlaying = true;
+                        IngameMusicPlaying = false;
+                        if (musicON)
+                        {
+                            MenuMusic.play();
+                            ingamemusic.stop();
+                        }
+                    }
                 }
                 else
                     Timer2--;
@@ -1929,9 +1990,11 @@ void FoodMovment() {
 
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 5; j++) {
-            if (Chicken[i][j].getPosition().x>3000 && Chicken[i][j].getPosition().y>3000)
-                chicken_legs[i][j].move(0, 10);
-
+            if (Chicken[i][j].getPosition().x > 3000 && Chicken[i][j].getPosition().y > 3000)
+            {
+                chicken_legs[i][j].move(0, 10); 
+                chicken_legs[i][j].rotate(10);
+            }
         }
         iongift.move(0, 1);
         crystalgift.move(0, 1);
@@ -2447,6 +2510,10 @@ void scorecalc() {
 
                 if (iongift.getGlobalBounds().intersects(Player.getGlobalBounds()))
                 {
+                    if (soundeffectON)
+                    {
+                        upgradesound.play();
+                    }
                     iongift.setPosition(4000, -100);
                     for (int i = 0; i < 50; i++)
                     {
@@ -2463,6 +2530,10 @@ void scorecalc() {
                 }
                 if (crystalgift.getGlobalBounds().intersects(Player.getGlobalBounds()))
                 {
+                    if (soundeffectON)
+                    {
+                        upgradesound.play();
+                    }
                     crystalgift.setPosition(4000, -100);
                     for (int i = 0; i < 50; i++)
                     {
@@ -2482,6 +2553,24 @@ void scorecalc() {
                     chicken_legs[j][z].setPosition(4000, -100);
                     foodcnt += 1;
                     foodscore.setString(to_string(foodcnt));
+                    if (soundeffectON)
+                    {
+                        eating.play();
+                    }
+                   
+                }
+                if (coopon)
+                {
+                    if (chicken_legs[j][z].getGlobalBounds().intersects(Player2ship.getGlobalBounds()))
+                    {
+                        chicken_legs[j][z].setPosition(4000, -100);
+                        foodcnt += 1;
+                        foodscore2.setString(to_string(foodcnt));
+                        if (soundeffectON)
+                        {
+                            eating.play();
+                        }
+                    }
                 }
             }
         }
@@ -2889,12 +2978,37 @@ void bossmove() {
 
 void reset()
 {
+    if (soundeffectON)
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            shoot1[i].stop();
+        }
+        for (int i = 0; i < 2; i++)
+        {
+            chickenhurt[i].stop();
+            eggshoot[i].stop();
+        }       
+        rocketshoot.stop();
+        exploding.stop();
+        eating.stop();
+        upgradesound.stop();
+    }
+    crystalgift.setPosition(-10000, -10000);
+    iongift.setPosition(-10000, -10000);
+    Player.setPosition(900,850);
+    Player2ship.setPosition(1000,850);
+    coopon = false;
+    validname = false;
     view1.setSize(sf::Vector2f(1920.f, 1080.f));
     doublebullets = 0;
     checkbullet = 'r';
     for (int i = 0; i < 50; i++)
     {
         Bullets[i].setTexture(bulletImage);
+        Bullets[i].setPosition(-10000, -10000);
+        spark[i].setPosition(100000, 100000);
+        fog[i].setPosition(100000, 100000);
     }
     randomizer = 0;
     bosschick = 0;
@@ -2929,6 +3043,16 @@ void reset()
     aliveboss = 1;
     player_2 = 1;
     powerlvls = 0;
+    playeralive = true;
+    player2alive = true;
+    shield_on = false;
+    shield_on2 = false;
+    explosion.setPosition(10000, 10000);
+    explosion2.setPosition(10000, 10000);
+    exp_y = 0;
+    exp_x = 0;
+    exp_y2 = 0;
+    exp_x2 = 0;
     rectangle3.setPosition(770, 400);
     for (int i = 0; i <= 20; i++)
     {
@@ -2961,9 +3085,11 @@ void reset()
             eggyolk[i][j].setPosition(10000, 10000);
             chickendead[i][j] = 0;
             Eggs[i][j].setPosition(11112, 11112);
+            chicken_legs[i][j].setPosition(-10000,-10000);
         }
     }
     bosssprite.setPosition(Vector2f(200, 200));
+    
 }
 
 void lvldiff()
@@ -3014,9 +3140,6 @@ int main()
     window.setMouseCursorVisible(false); // Hide cursor  
     View fixed = window.getView(); // Create a fixed view  
 
-    
-    
-
     // Load image and create sprite
     
     fork.loadFromFile("Fork.png");  
@@ -3050,11 +3173,11 @@ beginning: {};
             {
                 window.close();
             }
-
+           
             if (page == 10)
             {
                 
-                if (event.type == Event::TextEntered && !Keyboard::isKeyPressed(Keyboard::Enter)) {
+                if (event.type == Event::TextEntered && !Keyboard::isKeyPressed(Keyboard::Enter) && Name.size()<=20) {
 
                     Name += static_cast<char>(event.text.unicode);
 
@@ -3659,7 +3782,7 @@ beginning: {};
                 }
                 else
                 {
-                    
+                   
                     window.draw(health_bar);
                     window.draw(Gamebar);
                     window.draw(score);
@@ -4405,9 +4528,11 @@ beginning: {};
             window.draw(Player);
             window.draw(shipfire);
 
+
             if (coopon)
             {
                 window.draw(Player2ship);
+                window.draw(shipfire2);
             }
             else
             {
@@ -4573,7 +4698,8 @@ beginning: {};
                     ingamemusic.play();
                     MenuMusic.stop();
                 }
-                
+                clock4.restart();
+                clock3.restart();
                 page = 6;
                 pausecooldown = 0;
                 modeselectdelay = 0;
@@ -4596,32 +4722,42 @@ beginning: {};
          
         }
             if (page == 10) {
+                
     
                     if (Keyboard::isKeyPressed(Keyboard::Enter) && Name.size() >= 1)
                     {
-
-                        temptest2 = 1;
-                        MainMusicPlaying = false;
-                        IngameMusicPlaying = true;
-                        clock3.restart();
-                        clock4.restart();
-                        if (musicON)
+                        for (int i = 0; i < Name.size();i++)
                         {
-                            ingamemusic.play();
-                            MenuMusic.stop();
+                            for (char v = 'a'; v <= 'z';v++)
+                            {
+                                if (Name[i] == v || Name[i] == toupper(v))
+                                {
+                                    temptest2 = 1;
+                                    MainMusicPlaying = false;
+                                    IngameMusicPlaying = true;
+                                    clock3.restart();
+                                    clock4.restart();
+                                    if (musicON)
+                                    {
+                                        ingamemusic.play();
+                                        MenuMusic.stop();
+                                    }
+                                    
+                                    page = 6;
+                                    pausecooldown = 0;
+                                    modeselectdelay = 0;
+                                    MainMusicPlaying = false;
+                                    IngameMusicPlaying = true;
+                                    if (musicON)
+                                    {
+                                        ingamemusic.play();
+                                        MenuMusic.stop();
+                                    }
+                                    goto beginning;
+                                }
+                            }
                         }
-
-                        page = 6;
-                        pausecooldown = 0;
-                        modeselectdelay = 0;
-                        MainMusicPlaying = false;
-                        IngameMusicPlaying = true;
-                        if (musicON)
-                        {
-                            ingamemusic.play();
-                            MenuMusic.stop();
-                        }
-                        goto beginning;
+                        
 
 
                     }
