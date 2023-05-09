@@ -1,1 +1,6 @@
 test 12000*
+tet111 13000*
+hello 11000*
+noscore 1*
+noscores  2*
+noscorez  3*

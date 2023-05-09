@@ -170,6 +170,11 @@ int shipfirescale = 0;
 int shipfirescale2 = 0;
 //rocket animation
 int rocketx = 0;
+//leader variables
+int searchl = 0;
+//shipfire variable
+
+
 
 vector<pair<long long, string >>lvl1score;
 vector<pair<long long, string >>lvl2score;
@@ -234,6 +239,7 @@ SoundBuffer rocketshootsfx;
 SoundBuffer explodingsfx;
 SoundBuffer eatingsfx;
 SoundBuffer upgradesfx;
+SoundBuffer shipinsfx;
 // sounds
 Sound MenuClick;
 Sound shoot1[3];
@@ -243,6 +249,7 @@ Sound rocketshoot;
 Sound exploding;
 Sound eating;
 Sound upgradesound;
+Sound shipin;
 //music
 Music MenuMusic;
 Music ingamemusic;
@@ -322,7 +329,7 @@ Text t1;
 Text t2;
 Text t3;
 Text t4;
-Text leader[100];
+Text leader[6];
 vector<string>lines;
 
 string line;
@@ -411,6 +418,8 @@ void IngameImages()
     eating.setBuffer(eatingsfx);
     upgradesfx.loadFromFile("upgrade.wav");
     upgradesound.setBuffer(upgradesfx);
+    shipinsfx.loadFromFile("player-starting.wav");
+    shipin.setBuffer(shipinsfx);
     // music
     MenuMusic.openFromFile("IntroMenu.wav");
     ingamemusic.openFromFile("ingame.wav");
@@ -556,6 +565,11 @@ void IngameImages()
         rectangleldbs[i].setFillColor(Color(0, 0, 255, 40));
         rectangleldbs[i].setOutlineColor(Color(51, 153, 255, 60));
         rectangleldbs[i].setOutlineThickness(2.8f);
+        leader[i].setFont(font1);
+        leader[i].setCharacterSize(50);
+        leader[i].setPosition(960, 200 + (100 * i));
+        leader[i].setFillColor(Color::White);
+        leader[i].setOutlineColor(Color::Blue);
     }
  
     //Back Button
@@ -2035,19 +2049,18 @@ void movingbackround()
         menubg[i].move(0, backgroundspeed);
         if (menubg[i].getPosition().y >= 1080)
         {
-            menubg[i].setPosition(0, -1080);
+            menubg[i].setPosition(0, menubg[i].getPosition().y - (1080 * 2));
         }
+        
         window.draw(menubg[i]);
 
         //ingame bg
         _GameBackground[i].move(0, backgroundspeed);
         if (_GameBackground[i].getPosition().y >= 1080)
         {
-            _GameBackground[i].setPosition(0, -1080);
-        }
-        
-    }
-    
+            _GameBackground[i].setPosition(0, _GameBackground[i].getPosition().y - (1080 * 2));
+        }       
+    }   
 }
 
 
@@ -3184,6 +3197,7 @@ beginning: {};
                     Name.resize(Name.size() - 1);
                 }
             }
+            
         }
         
         //clear window
@@ -3200,171 +3214,201 @@ beginning: {};
         // main menu
         if (page == 0)
         {
-            ifstream infile;
-            infile.open("firstlvl.txt", ios::in);
-            string line;
-            while (getline(infile, line, '*'))
-            {
-                long long indx = 0;
-                long long scr=0;
-                string nm;
-                for (int i = 0; i < line.size(); i++)
+            if (searchl == 0)
+            {       
+                mapfirst.clear();
+                mapsecond.clear();
+                mapthird.clear();
+                mapfourth.clear();
+                mapfifth.clear();
+                ifstream infile;
+                infile.open("firstlvl.txt", ios::in);
+                string line;
+                while (getline(infile, line, '*'))
                 {
-                    if (line[i] == ' ')
+                    long long indx = 0;
+                    long long scr = 0;
+                    string nm;
+                    for (int i = 0; i < line.size(); i++)
                     {
-                        indx = i;
+                        if (line[i] == ' ')
+                        {
+                            indx = i;
+                        }
                     }
-                }
-                for (int i = 0; i < indx; i++)
-                {
-                    nm += line[i];
-                }
-                for (int i = indx + 1; i < line.size(); i++)
-                {
-                    scr *= 10;
-                    scr += int(line[i])-48;
-
-                }
-                mapfirst[nm] = max(mapfirst[nm], scr);
-                for (auto it : mapfirst)
-                {
-                    lvl1score.push_back({ it.second,it.first });
-                }
-                sort(lvl1score.begin(), lvl1score.end());
-            }
-            infile.close();
-            ifstream infile2;
-            infile2.open("secondlvl.txt", ios::in);
-            string line2;
-            while (getline(infile2, line2, '*'))
-            {
-                long long indx = 0;
-                long long scr = 0;
-                string nm;
-                for (int i = 0; i < line2.size(); i++)
-                {
-                    if (line2[i] == ' ')
+                    for (int i = 0; i < indx; i++)
                     {
-                        indx = i;
+                        nm += line[i];
                     }
-                }
-                for (int i = 0; i < indx; i++)
-                {
-                    nm += line2[i];
-                }
-                for (int i = indx + 1; i < line2.size(); i++)
-                {
-                    scr *= 10;
-                    scr += int(line2[i]) - 48;
-
-                }
-                mapsecond[nm] = max(mapsecond[nm], scr);
-                for (auto it : mapsecond)
-                {
-                    lvl2score.push_back({ it.second,it.first });
-                }
-                sort(lvl2score.begin(), lvl2score.end());
-            }
-            infile2.close();
-            ifstream infile3;
-            infile3.open("thirdlvl.txt", ios::in);
-            string line3;
-            while (getline(infile3, line3, '*'))
-            {
-                long long indx = 0;
-                long long scr = 0;
-                string nm;
-                for (int i = 0; i < line3.size(); i++)
-                {
-                    if (line3[i] == ' ')
+                    for (int i = indx + 1; i < line.size(); i++)
                     {
-                        indx = i;
-                    }
-                }
-                for (int i = 0; i < indx; i++)
-                {
-                    nm += line3[i];
-                }
-                for (int i = indx + 1; i < line3.size(); i++)
-                {
-                    scr *= 10;
-                    scr += int(line3[i]) - 48;
+                        scr *= 10;
+                        scr += int(line[i]) - 48;
 
-                }
-                mapthird[nm] = max(mapthird[nm], scr);
-                for (auto it : mapthird)
-                {
-                    lvl3score.push_back({ it.second,it.first });
-                }
-                sort(lvl3score.begin(), lvl3score.end());
-            }
-            infile3.close();
-            ifstream infile4;
-            infile4.open("fourthlvl.txt", ios::in);
-            string line4;
-            while (getline(infile4, line4, '*'))
-            {
-                long long indx = 0;
-                long long scr = 0;
-                string nm;
-                for (int i = 0; i < line4.size(); i++)
-                {
-                    if (line4[i] == ' ')
+                    }
+                    mapfirst[nm] = max(mapfirst[nm], scr);     
+                    lvl1score.resize(mapfirst.size());
+                    lvl1score.clear();
+                    for (auto& it : mapfirst)
                     {
-                        indx = i;
+                        lvl1score.push_back({ it.second,it.first });
+                        cout << "hello" << endl;
                     }
+                    sort(lvl1score.begin(), lvl1score.end());
                 }
-                for (int i = 0; i < indx; i++)
+                infile.close();
+                
+                ifstream infile2;
+                infile2.open("secondlvl.txt", ios::in);
+                string line2;
+                while (getline(infile2, line2, '*'))
                 {
-                    nm += line4[i];
-                }
-                for (int i = indx + 1; i < line4.size(); i++)
-                {
-                    scr *= 10;
-                    scr += int(line4[i]) - 48;
-
-                }
-                mapfourth[nm] = max(mapfourth[nm], scr);
-                for (auto it : mapfourth)
-                {
-                    lvl4score.push_back({ it.second,it.first });
-                }
-                sort(lvl4score.begin(), lvl4score.end());
-            }
-            infile4.close();
-            ifstream infile5;
-            infile5.open("fifthlvl.txt", ios::in);
-            string line5;
-            while (getline(infile5, line5, '*'))
-            {
-                long long indx = 0;
-                long long scr = 0;
-                string nm;
-                for (int i = 0; i < line5.size(); i++)
-                {
-                    if (line5[i] == ' ')
+                    long long indx = 0;
+                    long long scr = 0;
+                    string nm;
+                    for (int i = 0; i < line2.size(); i++)
                     {
-                        indx = i;
+                        if (line2[i] == ' ')
+                        {
+                            indx = i;
+                        }
                     }
-                }
-                for (int i = 0; i < indx; i++)
-                {
-                    nm += line5[i];
-                }
-                for (int i = indx + 1; i < line5.size(); i++)
-                {
-                    scr *= 10;
-                    scr += int(line5[i]) - 48;
+                    for (int i = 0; i < indx; i++)
+                    {
+                        nm += line2[i];
+                    }
+                    for (int i = indx + 1; i < line2.size(); i++)
+                    {
+                        scr *= 10;
+                        scr += int(line2[i]) - 48;
 
+                    }
+                    mapsecond[nm] = max(mapsecond[nm], scr);
+                    lvl2score.resize(mapsecond.size());
+                    lvl2score.clear();
+                    for (auto& it : mapsecond)
+                    {
+                        lvl2score.push_back({ it.second,it.first });
+                    }
+                    
+                    sort(lvl2score.begin(), lvl2score.end());
                 }
-                mapfifth[nm] = max(mapfifth[nm], scr);
-                for (auto it : mapfifth)
+                infile2.close();
+                ifstream infile3;
+                infile3.open("thirdlvl.txt", ios::in);
+                string line3;
+                while (getline(infile3, line3, '*'))
                 {
-                    lvl5score.push_back({ it.second,it.first });
+                    long long indx = 0;
+                    long long scr = 0;
+                    string nm;
+                    for (int i = 0; i < line3.size(); i++)
+                    {
+                        if (line3[i] == ' ')
+                        {
+                            indx = i;
+                        }
+                    }
+                    for (int i = 0; i < indx; i++)
+                    {
+                        nm += line3[i];
+                    }
+                    for (int i = indx + 1; i < line3.size(); i++)
+                    {
+                        scr *= 10;
+                        scr += int(line3[i]) - 48;
+
+                    }
+                    mapthird[nm] = max(mapthird[nm], scr);
+                    lvl3score.clear();
+                    for (auto it : mapthird)
+                    {
+                        lvl3score.push_back({ it.second,it.first });
+                    }
+                    lvl3score.resize(mapthird.size());
+                    sort(lvl3score.begin(), lvl3score.end());
                 }
-                sort(lvl5score.begin(), lvl5score.end());
+                infile3.close();
+                ifstream infile4;
+                infile4.open("fourthlvl.txt", ios::in);
+                string line4;
+                while (getline(infile4, line4, '*'))
+                {
+                    long long indx = 0;
+                    long long scr = 0;
+                    string nm;
+                    for (int i = 0; i < line4.size(); i++)
+                    {
+                        if (line4[i] == ' ')
+                        {
+                            indx = i;
+                        }
+                    }
+                    for (int i = 0; i < indx; i++)
+                    {
+                        nm += line4[i];
+                    }
+                    for (int i = indx + 1; i < line4.size(); i++)
+                    {
+                        scr *= 10;
+                        scr += int(line4[i]) - 48;
+
+                    }
+                    mapfourth[nm] = max(mapfourth[nm], scr);
+                    lvl4score.clear();
+                    for (auto it : mapfourth)
+                    {
+                        lvl4score.push_back({ it.second,it.first });
+                    }
+                    sort(lvl4score.begin(), lvl4score.end());
+                }
+                infile4.close();
+                ifstream infile5;
+                infile5.open("fifthlvl.txt", ios::in);
+                string line5;
+                while (getline(infile5, line5, '*'))
+                {
+                    long long indx = 0;
+                    long long scr = 0;
+                    string nm;
+                    for (int i = 0; i < line5.size(); i++)
+                    {
+                        if (line5[i] == ' ')
+                        {
+                            indx = i;
+                        }
+                    }
+                    for (int i = 0; i < indx; i++)
+                    {
+                        nm += line5[i];
+                    }
+                    for (int i = indx + 1; i < line5.size(); i++)
+                    {
+                        scr *= 10;
+                        scr += int(line5[i]) - 48;
+
+                    }
+                    mapfifth[nm] = max(mapfifth[nm], scr);
+                    lvl5score.clear();
+                    for (auto it : mapfifth)
+                    {
+                        lvl5score.push_back({ it.second,it.first });
+                    }
+                    sort(lvl5score.begin(), lvl5score.end());
+                }
+                infile5.close();
+                searchl++;       
+                for (int i = 0; i < lvl1score.size(); i++)
+                {
+                    cout << lvl1score[i].second << " a " << lvl1score[i].first << endl;
+                }
+                for (auto& it : mapfirst)
+                {
+                    cout << mapfirst[it.second, it.first] << endl;
+                }
+                /*cout << mapfirst.size() << " -- " << lvl1score.size() << endl;*/
             }
-            infile5.close();
+            
             reset();
             backgroundspeed = 2;
             modeselectdelay = 0;
@@ -3518,41 +3562,41 @@ beginning: {};
             backdelay++;
             delay++;
             checkdelay = 0;
-                if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left) && backdelay>=5)
-                {
-                    if (soundeffectON)
-                        MenuClick.play();
-                    backdelay = 0;
-                    if (frommenu)
-                        page = 0;
-                    else
-                        page = 5;
-                }
-                mainmenu();
-                
-                window.draw(Logo);
-                window.draw(Option);
-                window.draw(rectangleback);
-                for (int i = 0; i < 2; i++)
-                    window.draw(rectangleoption[i]);
-                window.draw(controls);
-                window.draw(sound);
-                window.draw(back);
-                window.draw(sprite);
-                if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550 &&delay>=5)
-                {
-                    if (soundeffectON)
-                        MenuClick.play();
-                    delay = 0;
-                    page = 7;
-                }
-                if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 580 && mousepos.y <= 650 && delay>=5)
-                {
-                    if (soundeffectON)
-                        MenuClick.play();
-                    delay = 0;
-                    page = 8;
-                }
+            if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left) && backdelay >= 5)
+            {
+                if (soundeffectON)
+                    MenuClick.play();
+                backdelay = 0;
+                if (frommenu)
+                    page = 0;
+                else
+                    page = 5;
+            }
+            mainmenu();
+
+            window.draw(Logo);
+            window.draw(Option);
+            window.draw(rectangleback);
+            for (int i = 0; i < 2; i++)
+                window.draw(rectangleoption[i]);
+            window.draw(controls);
+            window.draw(sound);
+            window.draw(back);
+            window.draw(sprite);
+            if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550 && delay >= 5)
+            {
+                if (soundeffectON)
+                    MenuClick.play();
+                delay = 0;
+                page = 7;
+            }
+            if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 580 && mousepos.y <= 650 && delay >= 5)
+            {
+                if (soundeffectON)
+                    MenuClick.play();
+                delay = 0;
+                page = 8;
+            }
         }
         // hall of fame page ==3
         if (page == 3)
@@ -3575,7 +3619,7 @@ beginning: {};
                     page = 5;
             }
             mainmenu();
-            if (Keyboard::isKeyPressed(Keyboard::Up)) {
+            /*if (Keyboard::isKeyPressed(Keyboard::Up)) {
                 if (leader[0].getPosition().y <= 5) {
                     for (int i = 0; i < lines.size() + 10; i++) {
                         leader[i].move(0, 20);
@@ -3583,27 +3627,34 @@ beginning: {};
                 }
             }
             if (Keyboard::isKeyPressed(Keyboard::Down)) {
-                if (leader[lines.size()-1].getPosition().y >= window.getPosition().y+1000) {
+                if (leader[lines.size() - 1].getPosition().y >= window.getPosition().y + 1000) {
                     for (int i = 0; i < lines.size() + 10; i++) {
                         leader[i].move(0, -20);
                     }
                 }
-            }
+            }*/
             
+
             for (int i = 0; i < 5; i++)
             {
                 if (i == 0 && ldbcheck[i] == 1)
-                {
-                    for (int a = lvl1score.size() - 1; a >= 0; a--)
+                {             
+                    for (int a = lvl1score.size() - 1, x = 0; x < 5; a--, x++)
                     {
-                        
+                        if (lvl1score[a].second != " ")
+                        {
+                            leader[x].setString(lvl1score[a].second);
+                        }
                     }
                 }
                 if (i == 1 && ldbcheck[i] == 1)
                 {
-                    for (int a = lvl2score.size() - 1; a >= 0; a--)
+                    for (int a = lvl1score.size() - 1, x = 0; x < 5; a--, x++)
                     {
-
+                        if (lvl2score[a].second != " ")
+                        {
+                            leader[x].setString(lvl2score[a].second);
+                        }
                     }
                 }
                 if (i == 2 && ldbcheck[i] == 1)
@@ -3661,7 +3712,7 @@ beginning: {};
             window.draw(rectangleback);
             window.draw(back);
             window.draw(sprite);  
-            for (int i = 0; i < lines.size(); i++) {
+            for (int i = 0; i < 5; i++) {
                 window.draw(leader[i]);
             }
         }
@@ -3868,12 +3919,14 @@ beginning: {};
                     window.draw(rectangle2);
 
                     if (gameover == true) {
+                        searchl = 0;
                         if(lvl=='1')
                         {
                             ofstream offile;
                             offile.open("firstlvl.txt",ios::app);
                             offile << Name <<" "<< cnt << "*" << endl;
                             offile.close();
+                            
                         }
                         if (lvl == '2')
                         {
@@ -3991,13 +4044,12 @@ beginning: {};
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
                         page = 5;
-                        
-                        
+                        shipin.stop();
                     }
                 }
                 else
                 {
-                    
+                   
                     backgroundspeed = 20;
                     window.draw(health_bar);
                     window.draw(Gamebar);
@@ -4142,7 +4194,7 @@ beginning: {};
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
                         page = 5;
-                       
+                        shipin.stop();
                     }
                 }
                 else
@@ -4322,7 +4374,7 @@ beginning: {};
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
                         page = 5;
-                        
+                        shipin.stop();
                     }
                 }
                 else
@@ -4469,7 +4521,7 @@ beginning: {};
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
                         page = 5;
-                        
+                        shipin.stop();
                     }
                 }
                 else
@@ -4641,7 +4693,7 @@ beginning: {};
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
                         page = 5;
-                       
+                        shipin.stop();
                     }
                 }
                 else
@@ -4745,7 +4797,7 @@ beginning: {};
             if (Keyboard::isKeyPressed(Keyboard::Escape))
             {
                 page = 5;
-
+                shipin.stop();
             }
         }
 
@@ -4902,6 +4954,10 @@ beginning: {};
                     ingamemusic.play();
                     MenuMusic.stop();
                 }
+                if (soundeffectON)
+                {
+                    shipin.play();
+                }
                 clock4.restart();
                 clock3.restart();
                 page = 6;
@@ -4946,6 +5002,10 @@ beginning: {};
                                         ingamemusic.play();
                                         MenuMusic.stop();
                                     }
+                                    if (soundeffectON)
+                                    {
+                                        shipin.play();
+                                    }
                                     
                                     page = 6;
                                     pausecooldown = 0;
@@ -4968,6 +5028,7 @@ beginning: {};
                     if (Keyboard::isKeyPressed(Keyboard::Escape)) {
                         page = 9;
                         Name = "";
+                        shipin.stop();
                     }
                     t2.setString(Name);
 
