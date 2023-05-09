@@ -3215,7 +3215,7 @@ beginning: {};
         if (page == 0)
         {
             if (searchl == 0)
-            {       
+            {
                 mapfirst.clear();
                 mapsecond.clear();
                 mapthird.clear();
@@ -3246,169 +3246,26 @@ beginning: {};
                         scr += int(line[i]) - 48;
 
                     }
-                    mapfirst[nm] = max(mapfirst[nm], scr);     
-                    lvl1score.resize(mapfirst.size());
-                    lvl1score.clear();
-                    for (auto& it : mapfirst)
+                    for (int i = 0; i < nm.length(); i++)
                     {
-                        lvl1score.push_back({ it.second,it.first });
-                        cout << "hello" << endl;
+                        if(nm[i]=='\n')
+                            nm.erase(nm.begin() + i);
                     }
-                    sort(lvl1score.begin(), lvl1score.end());
-                }
-                infile.close();
-                
-                ifstream infile2;
-                infile2.open("secondlvl.txt", ios::in);
-                string line2;
-                while (getline(infile2, line2, '*'))
-                {
-                    long long indx = 0;
-                    long long scr = 0;
-                    string nm;
-                    for (int i = 0; i < line2.size(); i++)
-                    {
-                        if (line2[i] == ' ')
-                        {
-                            indx = i;
-                        }
-                    }
-                    for (int i = 0; i < indx; i++)
-                    {
-                        nm += line2[i];
-                    }
-                    for (int i = indx + 1; i < line2.size(); i++)
-                    {
-                        scr *= 10;
-                        scr += int(line2[i]) - 48;
+                    mapfirst[nm] = scr;
 
-                    }
-                    mapsecond[nm] = max(mapsecond[nm], scr);
-                    lvl2score.resize(mapsecond.size());
-                    lvl2score.clear();
-                    for (auto& it : mapsecond)
-                    {
-                        lvl2score.push_back({ it.second,it.first });
-                    }
-                    
-                    sort(lvl2score.begin(), lvl2score.end());
                 }
-                infile2.close();
-                ifstream infile3;
-                infile3.open("thirdlvl.txt", ios::in);
-                string line3;
-                while (getline(infile3, line3, '*'))
+                for (auto it : mapfirst)
                 {
-                    long long indx = 0;
-                    long long scr = 0;
-                    string nm;
-                    for (int i = 0; i < line3.size(); i++)
-                    {
-                        if (line3[i] == ' ')
-                        {
-                            indx = i;
-                        }
-                    }
-                    for (int i = 0; i < indx; i++)
-                    {
-                        nm += line3[i];
-                    }
-                    for (int i = indx + 1; i < line3.size(); i++)
-                    {
-                        scr *= 10;
-                        scr += int(line3[i]) - 48;
-
-                    }
-                    mapthird[nm] = max(mapthird[nm], scr);
-                    lvl3score.clear();
-                    for (auto it : mapthird)
-                    {
-                        lvl3score.push_back({ it.second,it.first });
-                    }
-                    lvl3score.resize(mapthird.size());
-                    sort(lvl3score.begin(), lvl3score.end());
+                    lvl1score.push_back({ it.second,it.first});
                 }
-                infile3.close();
-                ifstream infile4;
-                infile4.open("fourthlvl.txt", ios::in);
-                string line4;
-                while (getline(infile4, line4, '*'))
-                {
-                    long long indx = 0;
-                    long long scr = 0;
-                    string nm;
-                    for (int i = 0; i < line4.size(); i++)
-                    {
-                        if (line4[i] == ' ')
-                        {
-                            indx = i;
-                        }
-                    }
-                    for (int i = 0; i < indx; i++)
-                    {
-                        nm += line4[i];
-                    }
-                    for (int i = indx + 1; i < line4.size(); i++)
-                    {
-                        scr *= 10;
-                        scr += int(line4[i]) - 48;
-
-                    }
-                    mapfourth[nm] = max(mapfourth[nm], scr);
-                    lvl4score.clear();
-                    for (auto it : mapfourth)
-                    {
-                        lvl4score.push_back({ it.second,it.first });
-                    }
-                    sort(lvl4score.begin(), lvl4score.end());
-                }
-                infile4.close();
-                ifstream infile5;
-                infile5.open("fifthlvl.txt", ios::in);
-                string line5;
-                while (getline(infile5, line5, '*'))
-                {
-                    long long indx = 0;
-                    long long scr = 0;
-                    string nm;
-                    for (int i = 0; i < line5.size(); i++)
-                    {
-                        if (line5[i] == ' ')
-                        {
-                            indx = i;
-                        }
-                    }
-                    for (int i = 0; i < indx; i++)
-                    {
-                        nm += line5[i];
-                    }
-                    for (int i = indx + 1; i < line5.size(); i++)
-                    {
-                        scr *= 10;
-                        scr += int(line5[i]) - 48;
-
-                    }
-                    mapfifth[nm] = max(mapfifth[nm], scr);
-                    lvl5score.clear();
-                    for (auto it : mapfifth)
-                    {
-                        lvl5score.push_back({ it.second,it.first });
-                    }
-                    sort(lvl5score.begin(), lvl5score.end());
-                }
-                infile5.close();
-                searchl++;       
+                sort(lvl1score.begin(), lvl1score.end());
                 for (int i = 0; i < lvl1score.size(); i++)
                 {
-                    cout << lvl1score[i].second << " a " << lvl1score[i].first << endl;
+                    cout << lvl1score[i].second << " " << lvl1score[i].first<<endl;
                 }
-                for (auto& it : mapfirst)
-                {
-                    cout << mapfirst[it.second, it.first] << endl;
-                }
-                /*cout << mapfirst.size() << " -- " << lvl1score.size() << endl;*/
+                infile.close();
+                searchl++;
             }
-            
             reset();
             backgroundspeed = 2;
             modeselectdelay = 0;
