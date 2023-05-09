@@ -1226,7 +1226,7 @@ void PlayerMove()
     }
     else
     {
-        if (shipfire.getRotation() > 0)
+        if (shipfire.getRotation() > 0 && shipfire.getRotation() < 50)
         {
             shipfire.rotate(-4);
             
@@ -1255,14 +1255,14 @@ void PlayerMove()
     }
     else
     {
-        if (shipfire2.getRotation() > 0)
+        if (shipfire2.getRotation() > 0 && shipfire2.getRotation() < 50)
         {
             shipfire2.rotate(-4);
 
         }
     }
 
-    /*if (Keyboard::isKeyPressed(Keyboard::A) && Player.getPosition().x <= 1800)
+    if (Keyboard::isKeyPressed(Keyboard::A) && Player.getPosition().x <= 1800)
     {
         if (shipfire.getRotation() >= 320 || shipfire.getRotation() == 0)
         {
@@ -1271,12 +1271,27 @@ void PlayerMove()
     }
     else
     {
-        if (shipfire.getRotation() < 0)
+        if (shipfire.getRotation() < 360 && shipfire.getRotation() >= 300)
         {
             shipfire.rotate(4);
 
         }
-    }*/
+    }
+    if (Keyboard::isKeyPressed(Keyboard::Left) && Player2ship.getPosition().x <= 1800)
+    {
+        if (shipfire2.getRotation() >= 320 || shipfire2.getRotation() == 0)
+        {
+            shipfire2.rotate(-4);
+        }
+    }
+    else
+    {
+        if (shipfire2.getRotation() < 360 && shipfire2.getRotation() >= 300)
+        {
+            shipfire2.rotate(4);
+
+        }
+    }
 }
 //spark and fog
 void spark_fog() {
@@ -3029,6 +3044,8 @@ void reset()
         eating.stop();
         upgradesound.stop();
     }
+    shipfire.setRotation(0);
+    shipfire.setRotation(0);
     crystalgift.setPosition(-10000, -10000);
     iongift.setPosition(-10000, -10000);
     Player.setPosition(900,850);
