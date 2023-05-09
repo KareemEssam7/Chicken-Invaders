@@ -171,9 +171,16 @@ int shipfirescale2 = 0;
 //rocket animation
 int rocketx = 0;
 
-vector<pair<int, string>>l;
-
-
+vector<pair<long long, string >>lvl1score;
+vector<pair<long long, string >>lvl2score;
+vector<pair<long long, string >>lvl3score;
+map<string, long long >mapthird;
+vector<pair<long long, string >>lvl4score;
+map<string, long long >mapfourth;
+vector<pair<long long, string >>lvl5score;
+map<string, long long >mapfifth;
+map<string, long long >mapfirst;
+map<string, long long >mapsecond;
 // Creating Game Window
 RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders",Style::Fullscreen);
 
@@ -317,11 +324,12 @@ Text t3;
 Text t4;
 Text leader[100];
 vector<string>lines;
+
 string line;
 
 string Name;
 string name2;
-// test
+
 //adding font
 Font font1;
 Font font3;
@@ -373,25 +381,6 @@ void IngameImages()
     bottomborder.setPosition(0, 980);
     leftborder.setPosition(0, 0);
     rightborder.setPosition(1820, 0);
-
-    //leaderboard
-    sort(l.begin(), l.end());
-    ofstream offile;
-    offile.open("history.txt",ios::app);
-    
-    ifstream infile;
-    infile.open("history.txt", ios::in);
-    while (getline(infile, line,'*')) {
-        lines.push_back(line);
-    }
-    for (int i = 0; i < lines.size(); i++) {
-        leader[i].setFont(font1);
-        leader[i].setCharacterSize(40);
-        leader[i].setFillColor(Color::White);
-        leader[i].setString(lines[i]);
-        leader[i].setPosition(850, 150 + (50 * i));
-    }
-
     //fonts
     font1.loadFromFile("RobotoCondensed-Bold.ttf");
     font3.loadFromFile("Wedgie_Regular.ttf");
@@ -3211,6 +3200,171 @@ beginning: {};
         // main menu
         if (page == 0)
         {
+            ifstream infile;
+            infile.open("firstlvl.txt", ios::in);
+            string line;
+            while (getline(infile, line, '*'))
+            {
+                long long indx = 0;
+                long long scr=0;
+                string nm;
+                for (int i = 0; i < line.size(); i++)
+                {
+                    if (line[i] == ' ')
+                    {
+                        indx = i;
+                    }
+                }
+                for (int i = 0; i < indx; i++)
+                {
+                    nm += line[i];
+                }
+                for (int i = indx + 1; i < line.size(); i++)
+                {
+                    scr *= 10;
+                    scr += int(line[i])-48;
+
+                }
+                mapfirst[nm] = max(mapfirst[nm], scr);
+                for (auto it : mapfirst)
+                {
+                    lvl1score.push_back({ it.second,it.first });
+                }
+                sort(lvl1score.begin(), lvl1score.end());
+            }
+            infile.close();
+            ifstream infile2;
+            infile2.open("secondlvl.txt", ios::in);
+            string line2;
+            while (getline(infile2, line2, '*'))
+            {
+                long long indx = 0;
+                long long scr = 0;
+                string nm;
+                for (int i = 0; i < line2.size(); i++)
+                {
+                    if (line2[i] == ' ')
+                    {
+                        indx = i;
+                    }
+                }
+                for (int i = 0; i < indx; i++)
+                {
+                    nm += line2[i];
+                }
+                for (int i = indx + 1; i < line2.size(); i++)
+                {
+                    scr *= 10;
+                    scr += int(line2[i]) - 48;
+
+                }
+                mapsecond[nm] = max(mapsecond[nm], scr);
+                for (auto it : mapsecond)
+                {
+                    lvl2score.push_back({ it.second,it.first });
+                }
+                sort(lvl2score.begin(), lvl2score.end());
+            }
+            infile2.close();
+            ifstream infile3;
+            infile3.open("thirdlvl.txt", ios::in);
+            string line3;
+            while (getline(infile3, line3, '*'))
+            {
+                long long indx = 0;
+                long long scr = 0;
+                string nm;
+                for (int i = 0; i < line3.size(); i++)
+                {
+                    if (line3[i] == ' ')
+                    {
+                        indx = i;
+                    }
+                }
+                for (int i = 0; i < indx; i++)
+                {
+                    nm += line3[i];
+                }
+                for (int i = indx + 1; i < line3.size(); i++)
+                {
+                    scr *= 10;
+                    scr += int(line3[i]) - 48;
+
+                }
+                mapthird[nm] = max(mapthird[nm], scr);
+                for (auto it : mapthird)
+                {
+                    lvl3score.push_back({ it.second,it.first });
+                }
+                sort(lvl3score.begin(), lvl3score.end());
+            }
+            infile3.close();
+            ifstream infile4;
+            infile4.open("fourthlvl.txt", ios::in);
+            string line4;
+            while (getline(infile4, line4, '*'))
+            {
+                long long indx = 0;
+                long long scr = 0;
+                string nm;
+                for (int i = 0; i < line4.size(); i++)
+                {
+                    if (line4[i] == ' ')
+                    {
+                        indx = i;
+                    }
+                }
+                for (int i = 0; i < indx; i++)
+                {
+                    nm += line4[i];
+                }
+                for (int i = indx + 1; i < line4.size(); i++)
+                {
+                    scr *= 10;
+                    scr += int(line4[i]) - 48;
+
+                }
+                mapfourth[nm] = max(mapfourth[nm], scr);
+                for (auto it : mapfourth)
+                {
+                    lvl4score.push_back({ it.second,it.first });
+                }
+                sort(lvl4score.begin(), lvl4score.end());
+            }
+            infile4.close();
+            ifstream infile5;
+            infile5.open("fifthlvl.txt", ios::in);
+            string line5;
+            while (getline(infile5, line5, '*'))
+            {
+                long long indx = 0;
+                long long scr = 0;
+                string nm;
+                for (int i = 0; i < line5.size(); i++)
+                {
+                    if (line5[i] == ' ')
+                    {
+                        indx = i;
+                    }
+                }
+                for (int i = 0; i < indx; i++)
+                {
+                    nm += line5[i];
+                }
+                for (int i = indx + 1; i < line5.size(); i++)
+                {
+                    scr *= 10;
+                    scr += int(line5[i]) - 48;
+
+                }
+                mapfifth[nm] = max(mapfifth[nm], scr);
+                for (auto it : mapfifth)
+                {
+                    lvl5score.push_back({ it.second,it.first });
+                }
+                sort(lvl5score.begin(), lvl5score.end());
+            }
+            infile5.close();
             reset();
             backgroundspeed = 2;
             modeselectdelay = 0;
@@ -3438,6 +3592,41 @@ beginning: {};
             
             for (int i = 0; i < 5; i++)
             {
+                if (i == 0 && ldbcheck[i] == 1)
+                {
+                    for (int a = lvl1score.size() - 1; a >= 0; a--)
+                    {
+                        
+                    }
+                }
+                if (i == 1 && ldbcheck[i] == 1)
+                {
+                    for (int a = lvl2score.size() - 1; a >= 0; a--)
+                    {
+
+                    }
+                }
+                if (i == 2 && ldbcheck[i] == 1)
+                {
+                    for (int a = lvl3score.size() - 1; a >= 0; a--)
+                    {
+
+                    }
+                }
+                if (i == 3 && ldbcheck[i] == 1)
+                {
+                    for (int a = lvl4score.size() - 1; a >= 0; a--)
+                    {
+
+                    }
+                }
+                if (i == 4 && ldbcheck[i] == 1)
+                {
+                    for (int a = lvl5score.size() - 1; a >= 0; a--)
+                    {
+
+                    }
+                }
                 if (mousepos.x >= 50 + i * 370 && mousepos.x <= 400 + i * 370 && mousepos.y >= 25 && mousepos.y <= 95 && Mouse::isButtonPressed(Mouse::Left))
                 {
                     ldbcheck[lastlevel - 1] = 0;
@@ -3679,28 +3868,42 @@ beginning: {};
                     window.draw(rectangle2);
 
                     if (gameover == true) {
+                        if(lvl=='1')
+                        {
+                            ofstream offile;
+                            offile.open("firstlvl.txt",ios::app);
+                            offile << Name <<" "<< cnt << "*" << endl;
+                            offile.close();
+                        }
+                        if (lvl == '2')
+                        {
+                            ofstream offile;
+                            offile.open("secondlvl.txt", ios::app);
+                            offile << Name << " " << cnt << "*" << endl;
+                            offile.close();
+                        }
+                        if (lvl == '3')
+                        {
+                            ofstream offile;
+                            offile.open("thirdlvl.txt", ios::app);
+                            offile << Name << " " << cnt << "*" << endl;
+                            offile.close();
+                        }
+                        if (lvl == '4')
+                        {
+                            ofstream offile;
+                            offile.open("fourthlvl.txt", ios::app);
+                            offile << Name << " " << cnt << "*" << endl;
+                            offile.close();
+                        }
+                        if (lvl == '5')
+                        {
+                            ofstream offile;
+                            offile.open("fifthlvl.txt", ios::app);
+                            offile << Name << " " << cnt << "*" << endl;
+                            offile.close();
+                        }
                         gameover = false;
-                        //leader board
-                        ofstream offile;
-                        offile.open("history.txt", ios::app);
-                        offile << Name << "        " << cnt << "*" << "\n";
-                        
-                        sort(l.begin(), l.end());
-                        
-                        offile.open("history.txt", ios::app);
-
-                        ifstream infile;
-                        infile.open("history.txt", ios::in);
-                        while (getline(infile, line, '*'))
-                        {
-                            lines.push_back(line);
-                        }
-                        for (int i = 0; i < lines.size(); i++)
-                        {
-                            leader[i].setString(lines[i]);
-                            leader[i].setPosition(850, 150 + (50 * i));
-                        }
-
                         temptest = 1;
                         page = 1;
                         reset();
@@ -3865,10 +4068,6 @@ beginning: {};
 
                     if (gameover == true) {
                         gameover = false;
-                        ofstream offile;
-                        offile.open("history.txt", ios::app);
-                        offile << Name << "        " << cnt << "*" << "\n";
-
                         temptest = 1;
                         page = 1;
                         reset();
@@ -4031,10 +4230,6 @@ beginning: {};
 
                     if (gameover == true) {
                         gameover = false;
-                        ofstream offile;
-                        offile.open("history.txt", ios::app);
-                        offile << Name << "        " << cnt << "*" << "\n";
-
                         temptest = 1;
                         page = 1;
                         reset();
@@ -4200,10 +4395,6 @@ beginning: {};
 
                     if (gameover == true) {
                         gameover = false;
-                        ofstream offile;
-                        offile.open("history.txt", ios::app);
-                        offile << Name << "        " << cnt << "*" << "\n";
-
                         temptest = 1;
                         page = 1;
                         reset();
@@ -4365,10 +4556,6 @@ beginning: {};
 
                     if (gameover == true) {
                         gameover = false;
-                        ofstream offile;
-                        offile.open("history.txt", ios::app);
-                        offile << Name << "        " << cnt << "*" << "\n";
-
                         temptest = 1;
                         page = 1;
                         reset();
