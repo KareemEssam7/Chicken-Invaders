@@ -76,6 +76,7 @@ int health = 3;
 int health3 = 3;
 int rockets = 0;
 int powerlvls = 0;
+int backgroundspeed = 2;
 double PlayerMovement = 9, PlayerSpeed = 12, Player2Movement = 9, Player2Speed = 12;
 double ChickenDir = 0,rectdir,bossdir=0,chickeninitialpos=0;
 int ChickenMovement = 0 ;
@@ -432,7 +433,6 @@ void IngameImages()
         _GameBackground[i].setTexture(Background);
     }
     _GameBackground[1].setPosition(0, -1080);
-    
     gamemenubg.loadFromFile("gamemenubg.png");
     for (int i = 0; i < 2; i++)
     {
@@ -987,7 +987,7 @@ void IngameImages()
     powerlvl.setFont(font1);
     powerlvl.setCharacterSize(35);
     powerlvl.setOrigin(0, 0);
-    powerlvl.setPosition(420, window.getSize().y - 58);
+    powerlvl.setPosition(325, window.getSize().y - 58);
     powerlvl.setString(to_string(powerlvls));
 
     rocket2.setFont(font1);
@@ -1007,7 +1007,7 @@ void IngameImages()
     foodscore.setFont(font1);
     foodscore.setCharacterSize(35);
     foodscore.setOrigin(0, 0);
-    foodscore.setPosition(325, window.getSize().y - 58);
+    foodscore.setPosition(420, window.getSize().y - 58);
     foodscore.setString( to_string(foodcnt));
 
     hp2.setFont(font1);
@@ -2043,7 +2043,7 @@ void movingbackround()
     for (int i = 0; i < 2; i++)
     {
         //menu bg
-        menubg[i].move(0, 2);
+        menubg[i].move(0, backgroundspeed);
         if (menubg[i].getPosition().y >= 1080)
         {
             menubg[i].setPosition(0, -1080);
@@ -2051,7 +2051,7 @@ void movingbackround()
         window.draw(menubg[i]);
 
         //ingame bg
-        _GameBackground[i].move(0, 3);
+        _GameBackground[i].move(0, backgroundspeed);
         if (_GameBackground[i].getPosition().y >= 1080)
         {
             _GameBackground[i].setPosition(0, -1080);
@@ -2988,7 +2988,7 @@ void reset()
         {
             chickenhurt[i].stop();
             eggshoot[i].stop();
-        }       
+        }
         rocketshoot.stop();
         exploding.stop();
         eating.stop();
@@ -3094,6 +3094,15 @@ void reset()
 
 void lvldiff()
 {
+    if (lvl == '1')
+    {
+        bosslvl = 1;
+        chicken.chicken_health = 1;
+        chicken.speed = 4;
+        boss.bosshp = 50;
+        boss.bossspeed = 5;
+        meteors.meteorspeed = 5;
+    }
     if (lvl == '2')
     {
         bosslvl = 2;
@@ -3203,7 +3212,7 @@ beginning: {};
         if (page == 0)
         {
             reset();
-            
+            backgroundspeed = 2;
             modeselectdelay = 0;
             delay = 0;
             frommenu = true;
@@ -3269,6 +3278,7 @@ beginning: {};
         if (page == 1)
         {
             reset();
+            backgroundspeed = 2;
             if (temptest == 1)
             {
                 if (soundeffectON)
@@ -3348,6 +3358,7 @@ beginning: {};
         // options page ==2
         if (page == 2)
         {
+            backgroundspeed = 2;
             // back
             modeselectdelay = 0;
             backdelay++;
@@ -3393,7 +3404,7 @@ beginning: {};
         if (page == 3)
         {
 
-            
+            backgroundspeed = 2;
 
             temptest3++;
             modeselectdelay = 0;
@@ -3468,6 +3479,7 @@ beginning: {};
         // credits page ==4
         if (page == 4)
         {
+            backgroundspeed = 2;
             modeselectdelay = 0;
             backdelay = 0;
             checkdelay = 0;
@@ -3552,7 +3564,7 @@ beginning: {};
         //pause menu
         if (page == 5)
         {
-            
+            backgroundspeed = 2;
             modeselectdelay = 0;
             backdelay = 0;
             checkdelay = 0;
@@ -3654,7 +3666,7 @@ beginning: {};
                 alivechicken = 0;
                 if (clock4.getElapsedTime().asSeconds() >= 9)
                 {
-
+                    backgroundspeed = 3;
                     PlayerShooting();
                     rocketshooting();
                     ChickenMove();
@@ -3782,7 +3794,8 @@ beginning: {};
                 }
                 else
                 {
-                   
+                    
+                    backgroundspeed = 20;
                     window.draw(health_bar);
                     window.draw(Gamebar);
                     window.draw(score);
@@ -3839,6 +3852,7 @@ beginning: {};
                 prevwave = '2';
                 if (clock4.getElapsedTime().asSeconds() >= 9)
                 {
+                    backgroundspeed = 3;
                     meteormove();
                     PlayerShooting();
                     rocketshooting();
@@ -3934,6 +3948,7 @@ beginning: {};
                 }
                 else
                 {
+                    backgroundspeed = 20;
                     for (int j = 0; j < 5; j++)
                     {
                         for (int i = 0; i < 8; i++)
@@ -4002,7 +4017,7 @@ beginning: {};
 
                 if (clock4.getElapsedTime().asSeconds() >= 9)
                 {
-
+                    backgroundspeed = 3;
                     PlayerShooting();
                     rocketshooting();
                     ChickenMove();
@@ -4117,7 +4132,7 @@ beginning: {};
                 }
                 else
                 {
-                    
+                    backgroundspeed = 20;
                     window.draw(health_bar);
                     window.draw(Gamebar);
                     window.draw(score);
@@ -4172,6 +4187,7 @@ beginning: {};
                 prevwave = '4';
                 if (clock4.getElapsedTime().asSeconds() >= 9)
                 {
+                    backgroundspeed = 3;
                     meteorfast();
                     PlayerShooting();
                     rocketshooting();
@@ -4267,6 +4283,7 @@ beginning: {};
                 }
                 else
                 {
+                    backgroundspeed = 20;
                     for (int j = 0; j < 5; j++)
                     {
                         for (int i = 0; i < 8; i++)
@@ -4335,7 +4352,7 @@ beginning: {};
 
                 if (clock4.getElapsedTime().asSeconds() >= 9)
                 {
-
+                    backgroundspeed = 3;
                     PlayerShooting();
                     rocketshooting();
                     bossmove();
@@ -4442,7 +4459,7 @@ beginning: {};
                 }
                 else
                 {
-                   
+                    backgroundspeed = 20;
                     window.draw(health_bar);
                     window.draw(Gamebar);
                     window.draw(score);
