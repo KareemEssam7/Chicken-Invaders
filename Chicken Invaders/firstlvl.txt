@@ -1,6 +1,7 @@
-test 12000*
-tet111 13000*
-hello 11000*
-noscore 1*
-noscores  2*
-noscorez  3*mo salah 24000*
+noscore5 0*
+noscore4 0*
+noscore3 0*
+noscore2 0*
+noscore1 0*Malek 20000*
+Mohamed Wael 32300*
+Malek 33200*

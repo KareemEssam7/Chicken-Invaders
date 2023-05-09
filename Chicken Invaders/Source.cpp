@@ -118,7 +118,7 @@ int health2 = health;
 int health4 = health3;
 bool musicON = true;
 bool soundeffectON = true;
-bool ldbcheck[5] = {};
+bool ldbcheck[5] = {1,0,0,0,0};
 bool MainMusicPlaying = true, IngameMusicPlay = false, IngameMusicPlaying = false;
 int lastlevel = 1;
 double curscale[7] = {1, 1, 1, 1, 1, 1, 1};
@@ -170,9 +170,11 @@ int shipfirescale = 0;
 int shipfirescale2 = 0;
 //rocket animation
 int rocketx = 0;
-//leader variables
+//leadername variables
 int searchl = 0;
-//shipfire variable
+//food movement
+int foodmovespeed = 10;
+
 
 
 
@@ -289,7 +291,7 @@ Text foodscore;
 Text foodscore2;
 Text play;
 Text Options;
-Text Leaderboard;
+Text leadernameboard;
 Text Credits;
 Text Quit;
 Text controls;
@@ -329,7 +331,7 @@ Text t1;
 Text t2;
 Text t3;
 Text t4;
-Text leader[6];
+Text leadername[6], leaderscore[6], nametext, numbertext;
 vector<string>lines;
 
 string line;
@@ -557,7 +559,7 @@ void IngameImages()
             rectanglecontrols[i][j].setOutlineThickness(2.8f);
         }
     }
-    //Buttons in leaderboard menu
+    //Buttons in leadernameboard menu
     for (int i = 0; i < 5; i++)
     {
         rectangleldbs[i].setSize(Vector2f(350, 70));
@@ -565,12 +567,30 @@ void IngameImages()
         rectangleldbs[i].setFillColor(Color(0, 0, 255, 40));
         rectangleldbs[i].setOutlineColor(Color(51, 153, 255, 60));
         rectangleldbs[i].setOutlineThickness(2.8f);
-        leader[i].setFont(font1);
-        leader[i].setCharacterSize(50);
-        leader[i].setPosition(960, 200 + (100 * i));
-        leader[i].setFillColor(Color::White);
-        leader[i].setOutlineColor(Color::Blue);
+
+        leadername[i].setFont(font1);
+        leadername[i].setCharacterSize(50);
+        leadername[i].setPosition(300, 300 + (100 * i));
+        leadername[i].setFillColor(Color::White);
+
+        leaderscore[i].setFont(font1);
+        leaderscore[i].setCharacterSize(50);
+        leaderscore[i].setPosition(1440, 300 + (100 * i));
+        leaderscore[i].setFillColor(Color::White);
+
     }
+
+    nametext.setString("Name:");
+    nametext.setFont(font1);
+    nametext.setCharacterSize(50);
+    nametext.setFillColor(Color::White);
+    nametext.setPosition(300, 200);
+
+    numbertext.setString("Score:");
+    numbertext.setFont(font1);
+    numbertext.setCharacterSize(50);
+    numbertext.setFillColor(Color::White);
+    numbertext.setPosition(1440, 200);
  
     //Back Button
     rectangleback.setPosition(50, 900);
@@ -584,7 +604,7 @@ void IngameImages()
     rectanglecont.setOutlineColor(Color(51, 153, 255, 60));
     rectanglecont.setOutlineThickness(2.8f);
 
-    //leaderboard
+    //leadernameboard
     t1.setFont(font1);
     t2.setFont(font1);
     t3.setFont(font1);
@@ -628,12 +648,12 @@ void IngameImages()
     Options.setString("Options");
     Options.setFillColor(Color(204, 229, 255, 225));
   
-    //Leaderboard text
-    Leaderboard.setFont(font1);
-    Leaderboard.setCharacterSize(32);
-    Leaderboard.setPosition(880, 695);
-    Leaderboard.setString("Hall Of Fame");
-    Leaderboard.setFillColor(Color(204, 229, 255, 225));
+    //leadernameboard text
+    leadernameboard.setFont(font1);
+    leadernameboard.setCharacterSize(32);
+    leadernameboard.setPosition(880, 695);
+    leadernameboard.setString("Hall Of Fame");
+    leadernameboard.setFillColor(Color(204, 229, 255, 225));
     // first wave texts
     wave1first.setFont(font1);
     wave1first.setCharacterSize(50);
@@ -1244,12 +1264,10 @@ void PlayerMove()
 
     /*if (Keyboard::isKeyPressed(Keyboard::A) && Player.getPosition().x <= 1800)
     {
-        if (shipfire.getRotation() <= 320 || shipfire.getRotation() == 0)
+        if (shipfire.getRotation() >= 320 || shipfire.getRotation() == 0)
         {
             shipfire.rotate(-4);
         }
-        cout << shipfire.getRotation() << endl;
-
     }
     else
     {
@@ -1995,7 +2013,7 @@ void FoodMovment() {
         for (int j = 0; j < 5; j++) {
             if (Chicken[i][j].getPosition().x > 3000 && Chicken[i][j].getPosition().y > 3000)
             {
-                chicken_legs[i][j].move(0, 10); 
+                chicken_legs[i][j].move(0, foodmovespeed); 
                 chicken_legs[i][j].rotate(10);
             }
         }
@@ -2459,7 +2477,15 @@ void scorecalc() {
                     }
                     if (chicken.HP[j][z] <= 0)
                     {
-                        randomizer = 1 + rand() % 80;
+                        if (coopon)
+                        {
+                            randomizer = 0;
+                        }
+                        else
+                        {
+                            randomizer = 1 + rand() % 80;
+                        }
+                       
                         if (randomizer == 1|| randomizer==2)
                         {
                             iongift.setPosition(Chicken[j][z].getPosition().x, Chicken[j][z].getPosition().y);
@@ -2478,7 +2504,7 @@ void scorecalc() {
                         cnt += 1000;
                         chickendead[j][z] = 1;
                         eggvar -= 5;
-                        score.setString(to_string(cnt));                       
+                        score.setString(to_string(cnt));
                         missileScoreCount += 1000;
                     }
                     
@@ -2550,11 +2576,17 @@ void scorecalc() {
                         doublebullets ++;
                 }
 
+
+
                 if (chicken_legs[j][z].getGlobalBounds().intersects(Player.getGlobalBounds())) 
                 {
                     chicken_legs[j][z].setPosition(4000, -100);
+                    cnt+= 100;
+                    score.setString(to_string(cnt));
+                    score2.setString(to_string(cnt));
                     foodcnt += 1;
                     foodscore.setString(to_string(foodcnt));
+                    foodscore2.setString(to_string(foodcnt));
                     if (soundeffectON)
                     {
                         eating.play();
@@ -2567,6 +2599,7 @@ void scorecalc() {
                     {
                         chicken_legs[j][z].setPosition(4000, -100);
                         foodcnt += 1;
+                        foodscore.setString(to_string(foodcnt));
                         foodscore2.setString(to_string(foodcnt));
                         if (soundeffectON)
                         {
@@ -3216,6 +3249,7 @@ beginning: {};
         {
             if (searchl == 0)
             {
+                
                 mapfirst.clear();
                 mapsecond.clear();
                 mapthird.clear();
@@ -3259,11 +3293,174 @@ beginning: {};
                     lvl1score.push_back({ it.second,it.first});
                 }
                 sort(lvl1score.begin(), lvl1score.end());
-                for (int i = 0; i < lvl1score.size(); i++)
-                {
-                    cout << lvl1score[i].second << " " << lvl1score[i].first<<endl;
-                }
+                lvl1score.erase(unique(lvl1score.begin(), lvl1score.end()), lvl1score.end());
+                sort(lvl1score.begin(), lvl1score.end());
                 infile.close();
+
+                ifstream infile2;
+                infile2.open("secondlvl.txt", ios::in);
+                string line2;
+                while (getline(infile2, line2, '*'))
+                {
+                    long long indx = 0;
+                    long long scr = 0;
+                    string nm;
+                    for (int i = 0; i < line2.size(); i++)
+                    {
+                        if (line2[i] == ' ')
+                        {
+                            indx = i;
+                        }
+                    }
+                    for (int i = 0; i < indx; i++)
+                    {
+                        nm += line2[i];
+                    }
+                    for (int i = indx + 1; i < line2.size(); i++)
+                    {
+                        scr *= 10;
+                        scr += int(line2[i]) - 48;
+
+                    }
+                    for (int i = 0; i < nm.length(); i++)
+                    {
+                        if (nm[i] == '\n')
+                            nm.erase(nm.begin() + i);
+                    }
+                    mapsecond[nm] = scr;
+
+                }
+                for (auto it : mapsecond)
+                {
+                    lvl2score.push_back({ it.second,it.first });
+                }
+                sort(lvl2score.begin(), lvl2score.end());
+                lvl2score.erase(unique(lvl2score.begin(), lvl2score.end()), lvl2score.end());
+                sort(lvl2score.begin(), lvl2score.end());
+                infile2.close();
+                ifstream infile3;
+                infile3.open("thirdlvl.txt", ios::in);
+                string line3;
+                while (getline(infile3, line3, '*'))
+                {
+                    long long indx = 0;
+                    long long scr = 0;
+                    string nm;
+                    for (int i = 0; i < line3.size(); i++)
+                    {
+                        if (line3[i] == ' ')
+                        {
+                            indx = i;
+                        }
+                    }
+                    for (int i = 0; i < indx; i++)
+                    {
+                        nm += line3[i];
+                    }
+                    for (int i = indx + 1; i < line3.size(); i++)
+                    {
+                        scr *= 10;
+                        scr += int(line3[i]) - 48;
+
+                    }
+                    for (int i = 0; i < nm.length(); i++)
+                    {
+                        if (nm[i] == '\n')
+                            nm.erase(nm.begin() + i);
+                    }
+                    mapthird[nm] = scr;
+
+                }
+                for (auto it : mapthird)
+                {
+                    lvl3score.push_back({ it.second,it.first });
+                }
+                sort(lvl3score.begin(), lvl3score.end());
+                lvl3score.erase(unique(lvl3score.begin(), lvl3score.end()), lvl3score.end());
+                sort(lvl3score.begin(), lvl3score.end());
+                infile3.close();
+                fstream infile4;
+                infile4.open("fourthlvl.txt", ios::in);
+                string line4;
+                while (getline(infile4, line4, '*'))
+                {
+                    long long indx = 0;
+                    long long scr = 0;
+                    string nm;
+                    for (int i = 0; i < line4.size(); i++)
+                    {
+                        if (line4[i] == ' ')
+                        {
+                            indx = i;
+                        }
+                    }
+                    for (int i = 0; i < indx; i++)
+                    {
+                        nm += line4[i];
+                    }
+                    for (int i = indx + 1; i < line4.size(); i++)
+                    {
+                        scr *= 10;
+                        scr += int(line4[i]) - 48;
+
+                    }
+                    for (int i = 0; i < nm.length(); i++)
+                    {
+                        if (nm[i] == '\n')
+                            nm.erase(nm.begin() + i);
+                    }
+                    mapfourth[nm] = scr;
+
+                }
+                for (auto it : mapfourth)
+                {
+                    lvl4score.push_back({ it.second,it.first });
+                }
+                sort(lvl4score.begin(), lvl4score.end());
+                lvl4score.erase(unique(lvl4score.begin(), lvl4score.end()), lvl4score.end());
+                sort(lvl4score.begin(), lvl4score.end());
+                infile4.close();
+                fstream infile5;
+                infile5.open("fifthlvl.txt", ios::in);
+                string line5;
+                while (getline(infile5, line5, '*'))
+                {
+                    long long indx = 0;
+                    long long scr = 0;
+                    string nm;
+                    for (int i = 0; i < line5.size(); i++)
+                    {
+                        if (line5[i] == ' ')
+                        {
+                            indx = i;
+                        }
+                    }
+                    for (int i = 0; i < indx; i++)
+                    {
+                        nm += line5[i];
+                    }
+                    for (int i = indx + 1; i < line5.size(); i++)
+                    {
+                        scr *= 10;
+                        scr += int(line5[i]) - 48;
+
+                    }
+                    for (int i = 0; i < nm.length(); i++)
+                    {
+                        if (nm[i] == '\n')
+                            nm.erase(nm.begin() + i);
+                    }
+                    mapfifth[nm] = scr;
+
+                }
+                for (auto it : mapfifth)
+                {
+                    lvl5score.push_back({ it.second,it.first });
+                }
+                sort(lvl5score.begin(), lvl5score.end());
+                lvl5score.erase(unique(lvl5score.begin(), lvl5score.end()), lvl5score.end());
+                sort(lvl5score.begin(), lvl5score.end());
+                infile5.close();
                 searchl++;
             }
             reset();
@@ -3276,7 +3473,7 @@ beginning: {};
             mainmenu();
             window.draw(play);
             window.draw(Options);
-            window.draw(Leaderboard);
+            window.draw(leadernameboard);
             window.draw(Credits);
             window.draw(Quit);
             window.draw(sprite);
@@ -3477,16 +3674,16 @@ beginning: {};
             }
             mainmenu();
             /*if (Keyboard::isKeyPressed(Keyboard::Up)) {
-                if (leader[0].getPosition().y <= 5) {
+                if (leadername[0].getPosition().y <= 5) {
                     for (int i = 0; i < lines.size() + 10; i++) {
-                        leader[i].move(0, 20);
+                        leadername[i].move(0, 20);
                     }
                 }
             }
             if (Keyboard::isKeyPressed(Keyboard::Down)) {
-                if (leader[lines.size() - 1].getPosition().y >= window.getPosition().y + 1000) {
+                if (leadername[lines.size() - 1].getPosition().y >= window.getPosition().y + 1000) {
                     for (int i = 0; i < lines.size() + 10; i++) {
-                        leader[i].move(0, -20);
+                        leadername[i].move(0, -20);
                     }
                 }
             }*/
@@ -3500,39 +3697,41 @@ beginning: {};
                     {
                         if (lvl1score[a].second != " ")
                         {
-                            leader[x].setString(lvl1score[a].second);
+                            leadername[x].setString(lvl1score[a].second);        
+                            leaderscore[x].setString(to_string(lvl1score[a].first));
                         }
                     }
                 }
                 if (i == 1 && ldbcheck[i] == 1)
                 {
-                    for (int a = lvl1score.size() - 1, x = 0; x < 5; a--, x++)
+                    for (int a = lvl2score.size() - 1, x = 0; x < 5; a--, x++)
                     {
-                        if (lvl2score[a].second != " ")
-                        {
-                            leader[x].setString(lvl2score[a].second);
-                        }
+                            leadername[x].setString(lvl2score[a].second);        
+                            leaderscore[x].setString(to_string(lvl2score[a].first));
                     }
                 }
                 if (i == 2 && ldbcheck[i] == 1)
                 {
-                    for (int a = lvl3score.size() - 1; a >= 0; a--)
+                    for (int a = lvl3score.size() - 1, x = 0; x < 5; a--, x++)
                     {
-
+                            leadername[x].setString(lvl3score[a].second);     
+                            leaderscore[x].setString(to_string(lvl3score[a].first));
                     }
                 }
                 if (i == 3 && ldbcheck[i] == 1)
                 {
-                    for (int a = lvl4score.size() - 1; a >= 0; a--)
+                    for (int a = lvl4score.size() - 1, x = 0; x < 5; a--, x++)
                     {
-
+                        leadername[x].setString(lvl4score[a].second);
+                        leaderscore[x].setString(to_string(lvl4score[a].first));
                     }
                 }
                 if (i == 4 && ldbcheck[i] == 1)
                 {
-                    for (int a = lvl5score.size() - 1; a >= 0; a--)
+                    for (int a = lvl5score.size() - 1, x = 0; x < 5; a--, x++)
                     {
-
+                        leadername[x].setString(lvl5score[a].second);
+                        leaderscore[x].setString(to_string(lvl5score[a].first));
                     }
                 }
                 if (mousepos.x >= 50 + i * 370 && mousepos.x <= 400 + i * 370 && mousepos.y >= 25 && mousepos.y <= 95 && Mouse::isButtonPressed(Mouse::Left))
@@ -3569,8 +3768,12 @@ beginning: {};
             window.draw(rectangleback);
             window.draw(back);
             window.draw(sprite);  
-            for (int i = 0; i < 5; i++) {
-                window.draw(leader[i]);
+            window.draw(nametext);
+            window.draw(numbertext);
+            for (int i = 0; i < 5; i++) 
+            {
+                window.draw(leaderscore[i]);
+                window.draw(leadername[i]);
             }
         }
         // credits page ==4
@@ -3730,7 +3933,7 @@ beginning: {};
             window.draw(rectanglereturn);
             window.draw(cont); 
             window.draw(Options); 
-            window.draw(Leaderboard); 
+            window.draw(leadernameboard); 
             window.draw(Credits); 
             window.draw(ret); 
             window.draw(sprite); 
@@ -3764,6 +3967,7 @@ beginning: {};
                 if (clock4.getElapsedTime().asSeconds() >= 9)
                 {
                     backgroundspeed = 3;
+                    foodmovespeed = 10;
                     PlayerShooting();
                     rocketshooting();
                     ChickenMove();
@@ -3908,6 +4112,7 @@ beginning: {};
                 {
                    
                     backgroundspeed = 20;
+                    foodmovespeed = 20;
                     window.draw(health_bar);
                     window.draw(Gamebar);
                     window.draw(score);
@@ -3965,6 +4170,7 @@ beginning: {};
                 if (clock4.getElapsedTime().asSeconds() >= 9)
                 {
                     backgroundspeed = 3;
+                    foodmovespeed = 10;
                     meteormove();
                     PlayerShooting();
                     rocketshooting();
@@ -4057,6 +4263,7 @@ beginning: {};
                 else
                 {
                     backgroundspeed = 20;
+                    foodmovespeed = 20;
                     for (int j = 0; j < 5; j++)
                     {
                         for (int i = 0; i < 8; i++)
@@ -4126,6 +4333,7 @@ beginning: {};
                 if (clock4.getElapsedTime().asSeconds() >= 9)
                 {
                     backgroundspeed = 3;
+                    foodmovespeed = 10;
                     PlayerShooting();
                     rocketshooting();
                     ChickenMove();
@@ -4237,6 +4445,7 @@ beginning: {};
                 else
                 {
                     backgroundspeed = 20;
+                    foodmovespeed = 20;
                     window.draw(health_bar);
                     window.draw(Gamebar);
                     window.draw(score);
@@ -4292,6 +4501,7 @@ beginning: {};
                 if (clock4.getElapsedTime().asSeconds() >= 9)
                 {
                     backgroundspeed = 3;
+                    foodmovespeed = 10;
                     meteorfast();
                     PlayerShooting();
                     rocketshooting();
@@ -4384,6 +4594,7 @@ beginning: {};
                 else
                 {
                     backgroundspeed = 20;
+                    foodmovespeed = 20;
                     for (int j = 0; j < 5; j++)
                     {
                         for (int i = 0; i < 8; i++)
@@ -4453,6 +4664,7 @@ beginning: {};
                 if (clock4.getElapsedTime().asSeconds() >= 9)
                 {
                     backgroundspeed = 3;
+                    foodmovespeed = 10;
                     PlayerShooting();
                     rocketshooting();
                     bossmove();
@@ -4556,6 +4768,7 @@ beginning: {};
                 else
                 {
                     backgroundspeed = 20;
+                    foodmovespeed = 20;
                     window.draw(health_bar);
                     window.draw(Gamebar);
                     window.draw(score);

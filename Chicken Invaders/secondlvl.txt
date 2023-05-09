@@ -1,5 +1,5 @@
-testing lvl 2 6000*
-testi 6000*
-testin 6000*
-test 6000*
-tes 6000*
+noscore5 0*
+noscore4 0*
+noscore3 0*
+noscore2 0*
+noscore1 0*
