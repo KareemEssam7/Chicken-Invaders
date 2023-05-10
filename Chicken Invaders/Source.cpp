@@ -109,7 +109,7 @@ int soundeffectstart = 0;
 int coopclick = 0;
 int yolkanime = 0;
 int yolkvar = 100;
-int eggvar = 501;
+int eggvar = 601;
 int expbool = 0;
 int expbool2 = 0;
 int sparkbool = 0;
@@ -241,6 +241,7 @@ SoundBuffer explodingsfx;
 SoundBuffer eatingsfx;
 SoundBuffer upgradesfx;
 SoundBuffer shipinsfx;
+SoundBuffer gamewinsfx;
 // sounds
 Sound MenuClick;
 Sound shoot1[3];
@@ -251,6 +252,7 @@ Sound exploding;
 Sound eating;
 Sound upgradesound;
 Sound shipin;
+Sound gamewin;
 //music
 Music MenuMusic;
 Music ingamemusic;
@@ -421,6 +423,8 @@ void IngameImages()
     upgradesound.setBuffer(upgradesfx);
     shipinsfx.loadFromFile("player-starting.wav");
     shipin.setBuffer(shipinsfx);
+    gamewinsfx.loadFromFile("game win.wav");
+    gamewin.setBuffer(gamewinsfx);
     // music
     MenuMusic.openFromFile("IntroMenu.wav");
     ingamemusic.openFromFile("ingame.wav");
@@ -930,7 +934,7 @@ void IngameImages()
     rotatecheck=1;
 
     // player 2 image
-    Player2Skin.loadFromFile("playerr2.png");
+    Player2Skin.loadFromFile("playerr22.png");
     Player2ship.setTexture(Player2Skin);
     Player2ship.setTextureRect(IntRect(Player2Movement * 60, 0, 60, 42));
     Player2ship.setPosition(960, 850);
@@ -1300,11 +1304,11 @@ void spark_fog() {
         for (int j = 0; j < 8; j++) {
             for (int z = 0; z < 5; z++) {
                 if (Bullets[i].getGlobalBounds().intersects(Chicken[j][z].getGlobalBounds())) {
-                    Fog.fogcooldown = Fog.fogcooldownvar;
-                    Spark.sparkcooldown = Spark.sparkcooldownvar;
                     chickenalive = false;
                     spark[i].setPosition(Chicken[j][z].getPosition() - Vector2f(50, 50));
-                    fog[i].setPosition(Chicken[j][z].getPosition() - Vector2f(-50, -20));
+                
+                       
+                   
                 }
             }
         }
@@ -1333,20 +1337,7 @@ void spark_fog() {
         }
 
     }
-    if (Spark.currentspark == 49) {
-        Spark.currentspark = 0;
-    }
-    Spark.currentspark++;
-    if (Spark.sparkcooldown > 0) {
-        Spark.sparkcooldown--;
-    }
-    if (Fog.currentfog == 49) {
-        Fog.currentfog = 0;
-    }
-    Fog.currentfog++;
-    if (Fog.fogcooldown > 0) {
-        Fog.fogcooldown--;
-    }
+ 
     
 }
     
@@ -1938,7 +1929,18 @@ void eggmovement()
             for (int i = 0; i < 8; i++)
             {
 
-                timer[i][j] = rand() % eggvar;
+                timer[i][j] = 0;
+
+            }
+
+        }
+        eggvar =601- chicken.chicken_health * 50;
+        for (int j = 0; j < 5; j++)
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                
+                timer[i][j] = rand() %eggvar;
 
             }
 
@@ -2497,7 +2499,7 @@ void scorecalc() {
                         }
                         else
                         {
-                            randomizer = 1 + rand() % 80;
+                            randomizer = 1 + rand() % 160;
                         }
                        
                         if (randomizer == 1|| randomizer==2)
@@ -2511,13 +2513,12 @@ void scorecalc() {
                             crystalgift.setPosition(Chicken[j][z].getPosition().x, Chicken[j][z].getPosition().y);
                           
                         }
-                       
+                        fog[i].setPosition(Chicken[j][z].getPosition() - Vector2f(-50, -20)); 
                         chicken_legs[j][z].setPosition(Chicken[j][z].getPosition().x, Chicken[j][z].getPosition().y);
                         Chicken[j][z].setPosition(10000, 10000);
                         Bullets[i].setPosition(-10000, -10000);
                         cnt += 1000;
                         chickendead[j][z] = 1;
-                        eggvar -= 5;
                         score.setString(to_string(cnt));
                         missileScoreCount += 1000;
                     }
@@ -2589,6 +2590,49 @@ void scorecalc() {
                     else if(doublebullets<2)
                         doublebullets ++;
                 }
+                /*if (gameover)
+                {
+                    searchl = 0;
+                    if (lvl == '1')
+                    {
+                        ofstream offile;
+                        offile.open("firstlvl.txt", ios::app);
+                        offile << Name << " " << cnt << "*" << endl;
+                        offile.close();
+
+                    }
+                    if (lvl == '2')
+                    {
+                        ofstream offile;
+                        offile.open("secondlvl.txt", ios::app);
+                        offile << Name << " " << cnt << "*" << endl;
+                        offile.close();
+                    }
+                    if (lvl == '3')
+                    {
+                        ofstream offile;
+                        offile.open("thirdlvl.txt", ios::app);
+                        offile << Name << " " << cnt << "*" << endl;
+                        offile.close();
+                    }
+                    if (lvl == '4')
+                    {
+                        ofstream offile;
+                        offile.open("fourthlvl.txt", ios::app);
+                        offile << Name << " " << cnt << "*" << endl;
+                        offile.close();
+                    }
+                    if (lvl == '5')
+                    {
+                        ofstream offile;
+                        offile.open("fifthlvl.txt", ios::app);
+                        offile << Name << " " << cnt << "*" << endl;
+                        offile.close();
+                    }
+                    gameover = false;
+                    temptest = 1;
+                    page = 1;
+                }*/
 
 
 
@@ -3027,6 +3071,8 @@ void bossmove() {
 
 void reset()
 {
+    eggvar = 501;
+    chicken.chicken_healthvar = 1;
     if (soundeffectON)
     {
         for (int i = 0; i < 3; i++)
@@ -3140,7 +3186,7 @@ void reset()
         }
     }
     bosssprite.setPosition(Vector2f(200, 200));
-    
+    x = 0;
 }
 
 void lvldiff()
@@ -4167,6 +4213,7 @@ beginning: {};
                 wave1second.setString("Wave " + to_string(prevwave - 48));
                 if (prevwave == '1')
                 {
+                    x = 0;
                     clock3.restart();
                     clock4.restart();
                     for (int i = 0; i < 8; i++)
@@ -4177,6 +4224,7 @@ beginning: {};
                             eggyolk[i][a].setPosition(10000, 10000);
                             Eggs[i][a].setPosition(10000, 10000);
                             chickendead[i][a] = 0;
+                            chicken.chicken_healthvar = 3;
                         }
                     }
                     chickeninitialpos = 0;
@@ -4198,6 +4246,43 @@ beginning: {};
                     window.draw(rectangle2);
 
                     if (gameover == true) {
+                        searchl = 0;
+                        if (lvl == '1')
+                        {
+                            ofstream offile;
+                            offile.open("firstlvl.txt", ios::app);
+                            offile << Name << " " << cnt << "*" << endl;
+                            offile.close();
+
+                        }
+                        if (lvl == '2')
+                        {
+                            ofstream offile;
+                            offile.open("secondlvl.txt", ios::app);
+                            offile << Name << " " << cnt << "*" << endl;
+                            offile.close();
+                        }
+                        if (lvl == '3')
+                        {
+                            ofstream offile;
+                            offile.open("thirdlvl.txt", ios::app);
+                            offile << Name << " " << cnt << "*" << endl;
+                            offile.close();
+                        }
+                        if (lvl == '4')
+                        {
+                            ofstream offile;
+                            offile.open("fourthlvl.txt", ios::app);
+                            offile << Name << " " << cnt << "*" << endl;
+                            offile.close();
+                        }
+                        if (lvl == '5')
+                        {
+                            ofstream offile;
+                            offile.open("fifthlvl.txt", ios::app);
+                            offile << Name << " " << cnt << "*" << endl;
+                            offile.close();
+                        }
                         gameover = false;
                         temptest = 1;
                         page = 1;
@@ -4362,6 +4447,43 @@ beginning: {};
                     window.draw(rectangle2);
 
                     if (gameover == true) {
+                        searchl = 0;
+                        if (lvl == '1')
+                        {
+                            ofstream offile;
+                            offile.open("firstlvl.txt", ios::app);
+                            offile << Name << " " << cnt << "*" << endl;
+                            offile.close();
+
+                        }
+                        if (lvl == '2')
+                        {
+                            ofstream offile;
+                            offile.open("secondlvl.txt", ios::app);
+                            offile << Name << " " << cnt << "*" << endl;
+                            offile.close();
+                        }
+                        if (lvl == '3')
+                        {
+                            ofstream offile;
+                            offile.open("thirdlvl.txt", ios::app);
+                            offile << Name << " " << cnt << "*" << endl;
+                            offile.close();
+                        }
+                        if (lvl == '4')
+                        {
+                            ofstream offile;
+                            offile.open("fourthlvl.txt", ios::app);
+                            offile << Name << " " << cnt << "*" << endl;
+                            offile.close();
+                        }
+                        if (lvl == '5')
+                        {
+                            ofstream offile;
+                            offile.open("fifthlvl.txt", ios::app);
+                            offile << Name << " " << cnt << "*" << endl;
+                            offile.close();
+                        }
                         gameover = false;
                         temptest = 1;
                         page = 1;
@@ -4492,6 +4614,8 @@ beginning: {};
             }
             else if (Wave4 == true)
             {
+                x = 0;
+                chicken.chicken_healthvar = 0;
                 powerlvls = 3;
                 powerlvl2.setString(to_string(powerlvls));
                 powerlvl.setString(to_string(powerlvls));
@@ -4529,6 +4653,43 @@ beginning: {};
                     window.draw(rectangle2);
 
                     if (gameover == true) {
+                        searchl = 0;
+                        if (lvl == '1')
+                        {
+                            ofstream offile;
+                            offile.open("firstlvl.txt", ios::app);
+                            offile << Name << " " << cnt << "*" << endl;
+                            offile.close();
+
+                        }
+                        if (lvl == '2')
+                        {
+                            ofstream offile;
+                            offile.open("secondlvl.txt", ios::app);
+                            offile << Name << " " << cnt << "*" << endl;
+                            offile.close();
+                        }
+                        if (lvl == '3')
+                        {
+                            ofstream offile;
+                            offile.open("thirdlvl.txt", ios::app);
+                            offile << Name << " " << cnt << "*" << endl;
+                            offile.close();
+                        }
+                        if (lvl == '4')
+                        {
+                            ofstream offile;
+                            offile.open("fourthlvl.txt", ios::app);
+                            offile << Name << " " << cnt << "*" << endl;
+                            offile.close();
+                        }
+                        if (lvl == '5')
+                        {
+                            ofstream offile;
+                            offile.open("fifthlvl.txt", ios::app);
+                            offile << Name << " " << cnt << "*" << endl;
+                            offile.close();
+                        }
                         gameover = false;
                         temptest = 1;
                         page = 1;
@@ -4692,6 +4853,43 @@ beginning: {};
                     window.draw(rectangle2);
 
                     if (gameover == true) {
+                        searchl = 0;
+                        if (lvl == '1')
+                        {
+                            ofstream offile;
+                            offile.open("firstlvl.txt", ios::app);
+                            offile << Name << " " << cnt << "*" << endl;
+                            offile.close();
+
+                        }
+                        if (lvl == '2')
+                        {
+                            ofstream offile;
+                            offile.open("secondlvl.txt", ios::app);
+                            offile << Name << " " << cnt << "*" << endl;
+                            offile.close();
+                        }
+                        if (lvl == '3')
+                        {
+                            ofstream offile;
+                            offile.open("thirdlvl.txt", ios::app);
+                            offile << Name << " " << cnt << "*" << endl;
+                            offile.close();
+                        }
+                        if (lvl == '4')
+                        {
+                            ofstream offile;
+                            offile.open("fourthlvl.txt", ios::app);
+                            offile << Name << " " << cnt << "*" << endl;
+                            offile.close();
+                        }
+                        if (lvl == '5')
+                        {
+                            ofstream offile;
+                            offile.open("fifthlvl.txt", ios::app);
+                            offile << Name << " " << cnt << "*" << endl;
+                            offile.close();
+                        }
                         gameover = false;
                         temptest = 1;
                         page = 1;
@@ -4801,6 +4999,17 @@ beginning: {};
                                 Chicken[i][a].setPosition(10000, 10000);
                             }
                         }
+                        
+                        IngameMusicPlaying = false;
+                        if (musicON)
+                        {
+                            
+                            ingamemusic.stop();
+                        }
+                        if (soundeffectON)
+                        {
+                            gamewin.play();
+                        }
                     }
                     shield_move();
                     window.draw(Shield);
@@ -4817,6 +5026,7 @@ beginning: {};
                     {
                         page = 5;
                         shipin.stop();
+                        gamewin.stop();
                     }
                 }
                 else
@@ -4929,6 +5139,7 @@ beginning: {};
             {
                 page = 5;
                 shipin.stop();
+                gamewin.stop();
             }
         }
 
