@@ -6,3 +6,5 @@ noscore1 0*Malek 20000*
 Mohamed Wael 32300*
 Malek 33200*
  4400*
+Winner 97200*
+Maro 101100*

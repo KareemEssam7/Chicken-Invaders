@@ -22,7 +22,6 @@ struct ChickenStruct
 struct bulletstruct
 {
     double bulletdamage = 1;
-    int heldWeapon = 1;
     float bulletSpeed = 10;
     int currentBullet = 0;
     float bulletCoolDownvar = 8;
@@ -482,7 +481,7 @@ void IngameImages()
     explosionimage2.loadFromFile("PlayerDeath.png");
     explosion2.setTexture(explosionimage2);
     explosion2.setPosition(8000, 8000);
-    sparkimage.loadFromFile("sparkspink.png");
+    sparkimage.loadFromFile("sparkswhite.png");
 
     for (int i = 0; i < 50; i++) {
         spark[i].setTexture(sparkimage);
@@ -1312,17 +1311,18 @@ void spark_fog() {
     }
     if (chickenalive == false) {
         for (int i = 0; i < 50; i++) {
-            spark[i].setTextureRect(IntRect(277 * sparkx, 0, 277, 269));
+            spark[i].setTextureRect(IntRect(266 * sparkx, 0, 266, 266));
             fog[i].setTextureRect(IntRect(64 * fogx, 0, 64, 62));
         }
         fogx++;
         sparkx++;
-        if (sparkx == 10 && fogx == 10) {
+        if (sparkx == 5)
+        {
             sparkx = 0;
+            spark[Spark.currentspark].setPosition(10000, 10000);
+        }
+        if (fogx == 10) {
             fogx = 0;
-
-
-
 
             chickenalive = true;
             if (chickenalive == true)
@@ -1798,7 +1798,6 @@ void playerdamage() {
                                 MenuMusic.play();
                                 ingamemusic.stop();
                             }
-                            
                         }
                         else
                         {
@@ -4745,6 +4744,44 @@ beginning: {};
                     camerashake();
                     if (aliveboss <= 0)
                     {
+                        
+                        searchl = 0;
+                        if (lvl == '1')
+                        {
+                            ofstream offile;
+                            offile.open("firstlvl.txt", ios::app);
+                            offile << Name << " " << cnt << "*" << endl;
+                            offile.close();
+
+                        }
+                        if (lvl == '2')
+                        {
+                            ofstream offile;
+                            offile.open("secondlvl.txt", ios::app);
+                            offile << Name << " " << cnt << "*" << endl;
+                            offile.close();
+                        }
+                        if (lvl == '3')
+                        {
+                            ofstream offile;
+                            offile.open("thirdlvl.txt", ios::app);
+                            offile << Name << " " << cnt << "*" << endl;
+                            offile.close();
+                        }
+                        if (lvl == '4')
+                        {
+                            ofstream offile;
+                            offile.open("fourthlvl.txt", ios::app);
+                            offile << Name << " " << cnt << "*" << endl;
+                            offile.close();
+                        }
+                        if (lvl == '5')
+                        {
+                            ofstream offile;
+                            offile.open("fifthlvl.txt", ios::app);
+                            offile << Name << " " << cnt << "*" << endl;
+                            offile.close();
+                        }
                         view1.setSize(sf::Vector2f(1920.f, 1080.f));
                         bosssprite.setPosition(11112, 11112);
                         Wave5 = false;
@@ -4857,6 +4894,13 @@ beginning: {};
                 }
                 else
                 {
+                    MainMusicPlaying = true;
+                    IngameMusicPlaying = false;
+                    if (musicON)
+                    {
+                        MenuMusic.play();
+                        ingamemusic.stop();
+                    }
                     temptest = 1;
                     page = 1;
                     reset();
