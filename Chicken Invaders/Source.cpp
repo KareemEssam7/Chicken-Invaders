@@ -3065,6 +3065,7 @@ void reset()
         spark[i].setPosition(100000, 100000);
         fog[i].setPosition(100000, 100000);
     }
+    chicken_enter = 0;
     randomizer = 0;
     chick = 0;
     chickeninitialpos = 0;
@@ -4179,6 +4180,7 @@ beginning: {};
                             chicken.chicken_healthvar = 3;
                         }
                     }
+                    chicken_enter = 0;
                     chickeninitialpos = 0;
                     rectangle3.setPosition(770, 400);
                 }
