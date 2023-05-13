@@ -126,7 +126,7 @@ Sprite fog[50];
 /////////////////////////////////////////////////////////////////////////////////////////
 
 //player1 and 2 variables
-double PlayerMovement = 9, PlayerSpeed = 12, Player2Movement = 9, Player2Speed = 12;
+double PlayerMovement = 9, PlayerSpeed = 22, Player2Movement = 9, Player2Speed = 12;
 bool playeralive = true, player2alive = true; 
 bool player_2 = 1;
 Texture PlayerSkin;
@@ -1120,7 +1120,6 @@ void IngameImages()
             eggyolk[i][j].setTexture(eggbreak);
             eggyolk[i][j].setTextureRect(IntRect(28 * 5, 0, 28, 24));
             eggyolk[i][j].setScale(2, 2);
-
     
         }
 
@@ -1179,6 +1178,34 @@ void PlayerMove()
             PlayerMovement--;
         }
     }
+    else if (Keyboard::isKeyPressed(Keyboard::W) && Player.getPosition().y >= 15)
+    {
+        Player.move(0, -PlayerSpeed);
+        if (PlayerMovement > 9)
+        {
+            PlayerMovement--;
+            Player.setTextureRect(IntRect(PlayerMovement * 60, 0, 60, 42));
+        }
+        else if (PlayerMovement < 9)
+        {
+            PlayerMovement++;
+            Player.setTextureRect(IntRect(PlayerMovement * 60, 0, 60, 42));
+        }
+    }
+    else if (Keyboard::isKeyPressed(Keyboard::S) && Player.getPosition().y <= 1001)
+    {
+        Player.move(0, PlayerSpeed);
+        if (PlayerMovement > 9)
+        {
+            PlayerMovement--;
+            Player.setTextureRect(IntRect(PlayerMovement * 60, 0, 60, 42));
+        }
+        else if (PlayerMovement < 9)
+        {
+            PlayerMovement++;
+            Player.setTextureRect(IntRect(PlayerMovement * 60, 0, 60, 42));
+        }
+    }
     else
     {
         if (PlayerMovement > 9)
@@ -1215,6 +1242,34 @@ void PlayerMove()
         if (Player2Movement > 0)
         {
             Player2Movement--;
+        }
+    }
+    else if (Keyboard::isKeyPressed(Keyboard::Up) && Player2ship.getPosition().y >= 15)
+    {
+        Player2ship.move(0, -PlayerSpeed);
+        if (Player2Movement > 9)
+        {
+            Player2Movement--;
+            Player2ship.setTextureRect(IntRect(Player2Movement * 60, 0, 60, 42));
+        }
+        else if (Player2Movement < 9)
+        {
+            Player2Movement++;
+            Player2ship.setTextureRect(IntRect(Player2Movement * 60, 0, 60, 42));
+        }
+    }
+    else if (Keyboard::isKeyPressed(Keyboard::Down) && Player2ship.getPosition().y <= 1001)
+    {
+        Player2ship.move(0, PlayerSpeed);
+        if (Player2Movement > 9)
+        {
+            Player2Movement--;
+            Player2ship.setTextureRect(IntRect(Player2Movement * 60, 0, 60, 42));
+        }
+        else if (Player2Movement < 9)
+        {
+            Player2Movement++;
+            Player2ship.setTextureRect(IntRect(Player2Movement * 60, 0, 60, 42));
         }
     }
     else
@@ -1670,7 +1725,10 @@ void playerdamage() {
             for (int i = 0; i < 8; i++)
             {
                 if (Eggs[i][j].getGlobalBounds().intersects(Player.getGlobalBounds())) {
-                    health -= 1;
+                    if (health >= 1)
+                    {
+                        health -= 1;
+                    }
                     if (doublebullets > 0)
                         doublebullets -= 1;
                     if (soundeffectON)
@@ -1682,7 +1740,10 @@ void playerdamage() {
                 }
                 if (Eggs[i][j].getGlobalBounds().intersects(Player2ship.getGlobalBounds()) && coopon)
                 {
-                    health3 -= 1;
+                    if (health3 >= 1)
+                    {
+                        health3 -= 1;
+                    }
                     if (soundeffectON)
                     {
                         exploding.play();
@@ -1690,6 +1751,38 @@ void playerdamage() {
                     hp2.setString(to_string(health3));
                     Eggs[i][j].setPosition(4000, 5000);
 
+                }
+                if (Chicken[i][j].getGlobalBounds().intersects(Player2ship.getGlobalBounds()) &&coopon && shield_on2==false)
+                {
+                    if (health3 >= 1)
+                    {
+                        health3 -= 1;
+                    }
+                    if (soundeffectON)
+                    {
+                        exploding.play();
+                    }
+                    hp2.setString(to_string(health3));
+                    chicken.HP[i][j] = 0;
+                    chickendead[i][j] = 1;
+                    Chicken[i][j].setPosition(4000, 5000);
+                }
+                if (Chicken[i][j].getGlobalBounds().intersects(Player.getGlobalBounds()) && shield_on == false)
+                {
+                    if (health >= 1)
+                    {
+                        health -= 1;
+                    }
+                    if (doublebullets > 0)
+                        doublebullets -= 1;
+                    if (soundeffectON)
+                    {
+                        exploding.play();
+                    }
+                    hp.setString(to_string(health));
+                    chicken.HP[i][j] = 0;
+                    chickendead[i][j] = 1;
+                    Chicken[i][j].setPosition(4000, 5000);
                 }
 
             }
@@ -1726,7 +1819,10 @@ void playerdamage() {
 
 
             if (bossegg[i].getGlobalBounds().intersects(Player.getGlobalBounds())) {
-                health -= 1;
+                if (health >= 1)
+                {
+                    health -= 1;
+                }
                 if (soundeffectON)
                 {
                     exploding.play();
@@ -1746,8 +1842,12 @@ void playerdamage() {
 
             }
 
-            if (bossegg1[i].getGlobalBounds().intersects(Player.getGlobalBounds())) {
-                health -= 1;
+            if (bossegg1[i].getGlobalBounds().intersects(Player.getGlobalBounds())) 
+            {
+                if (health >= 1)
+                {
+                    health -= 1;
+                }
                 if (soundeffectON)
                 {
                     exploding.play();
@@ -1757,7 +1857,10 @@ void playerdamage() {
             }
             if (bossegg1[i].getGlobalBounds().intersects(Player2ship.getGlobalBounds()) && coopon)
             {
-                health3 -= 1;
+                if (health3 >= 1)
+                {
+                    health3 -= 1;
+                }
                 if (soundeffectON)
                 {
                     exploding.play();
@@ -1768,7 +1871,10 @@ void playerdamage() {
             }
 
             if (bossegg2[i].getGlobalBounds().intersects(Player.getGlobalBounds())) {
-                health -= 1;
+                if (health >= 1)
+                {
+                    health -= 1;
+                }
                 if (soundeffectON)
                 {
                     exploding.play();
@@ -1778,7 +1884,10 @@ void playerdamage() {
             }
             if (bossegg2[i].getGlobalBounds().intersects(Player2ship.getGlobalBounds()) && coopon)
             {
-                health3 -= 1;
+                if (health3 >= 1)
+                {
+                    health3 -= 1;
+                }
                 if (soundeffectON)
                 {
                     exploding.play();
@@ -2203,7 +2312,10 @@ void meteormove()
 
     for (int i = 0; i < 40; i++) {
         if (Player.getGlobalBounds().intersects(meteor[i].getGlobalBounds()) && shield_on == false) {
-            health -= 1;
+            if(health>=1)
+            {
+                health -= 1;
+            }
             if (soundeffectON)
             {
                 exploding.play();
@@ -3022,8 +3134,32 @@ void bossmove() {
         }
 
     }
-
-
+    if (Player.getGlobalBounds().intersects(bosssprite.getGlobalBounds()) && shield_on == false)
+    {
+        if (health >= 1)
+        {
+            health -= 1;
+        }
+        if (doublebullets > 0)
+            doublebullets -= 1;
+        if (soundeffectON)
+        {
+            exploding.play();
+        }
+        hp.setString(to_string(health));
+    }
+    if (Player2ship.getGlobalBounds().intersects(bosssprite.getGlobalBounds())&& coopon && shield_on2 == false)
+    {
+        if (health3 >= 1)
+        {
+            health3 -= 1;
+        }
+        if (soundeffectON)
+        {
+            exploding.play();
+        }
+        hp2.setString(to_string(health3));
+    }
 
 
 }
@@ -3082,7 +3218,7 @@ void reset()
     powerlvls = 0;
     powerlvl2.setString(to_string(powerlvls));
     powerlvl.setString(to_string(powerlvls));
-    rockets = 0;
+    rockets = 40;
     rocket.setString(to_string(rockets));
     rocket2.setString(to_string(rockets));
     missileScoreCount = 0;
@@ -3141,6 +3277,7 @@ void reset()
             chickendead[i][j] = 0;
             Eggs[i][j].setPosition(11112, 11112);
             chicken_legs[i][j].setPosition(-10000, -10000);
+            Chicken[i][j].setPosition(9000, 9000);
         }
     }
     bosssprite.setPosition(Vector2f(200, 200));
