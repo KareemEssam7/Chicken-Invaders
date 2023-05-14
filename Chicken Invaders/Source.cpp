@@ -989,7 +989,7 @@ void IngameImages()
     //background chicken
     menuchicken.setTexture(ChickenSkin);
     menuchicken.setPosition(200, 200);
-    menuchicken.setScale(1.5,1.5);
+    menuchicken.setScale(0.19761235955, 0.20070422535);
     //Egg image
     eggTex.loadFromFile("egg.png");
     eggbreak.loadFromFile("eggBreak.png");
@@ -1622,7 +1622,7 @@ void ChickenMove()
         for (int i = 0; i < 8; i++)
         {
             Chicken[i][j].setTexture(ChickenSkin);
-            Chicken[i][j].setScale(3.25, 3.25);
+            Chicken[i][j].setScale(0.42816011236, 0.43485915493);
             if (chickeninitialpos == 0) 
             {
                 if (j == 0 || j == 2)
@@ -1633,7 +1633,7 @@ void ChickenMove()
                 else
                 Chicken[i][j].setPosition(2065 + (i * 170), 70 + (j * 150));
             }
-            Chicken[i][j].setTextureRect(IntRect(ChickenMovement * 46.9, 0, 46.9, 38));
+            Chicken[i][j].setTextureRect(IntRect(ChickenMovement * 356 , 0, 356, 284));
 
 
             
@@ -1676,7 +1676,7 @@ void ChickenMove()
             }
             else
             {
-                Chicken[i][j].setTextureRect(IntRect(ChickenMovement * 46.9, 0, 46.9, 38));
+                Chicken[i][j].setTextureRect(IntRect(ChickenMovement * 356, 0, 356, 284));
                 if (rectangle3.getGlobalBounds().intersects(rectangle2.getGlobalBounds()))
                 {
                     rectdir = 0;
@@ -2176,7 +2176,7 @@ void FoodMovment() {
 
 void bouncingchicken() 
 {
-    menuchicken.setTextureRect(IntRect(ChickenMovement * 46.9, 0, 46.9, 38));
+    menuchicken.setTextureRect(IntRect(ChickenMovement * 356, 0, 356, 284));
     if (ChickenMovement == 9)
         checkchickenanimation = false;
     else if (ChickenMovement == 0)
@@ -2185,7 +2185,7 @@ void bouncingchicken()
         ChickenMovement--;
     else
         ChickenMovement++;
-    menuchicken.setOrigin(23,19);
+    menuchicken.setOrigin(178,142);
     menuchicken.rotate(7);
     
 
@@ -3218,7 +3218,7 @@ void reset()
     powerlvls = 0;
     powerlvl2.setString(to_string(powerlvls));
     powerlvl.setString(to_string(powerlvls));
-    rockets = 40;
+    rockets = 0;
     rocket.setString(to_string(rockets));
     rocket2.setString(to_string(rockets));
     missileScoreCount = 0;
@@ -5478,12 +5478,3 @@ beginning: {};
     }
     return 0;
 }
-
-
-
-
-
-
-
-
-
