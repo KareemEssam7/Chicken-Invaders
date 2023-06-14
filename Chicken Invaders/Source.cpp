@@ -292,7 +292,6 @@ Text back;
 Text cont;
 Text single;
 Text shop;
-Text  shopcustomize;
 Sprite _GameBackground[2];
 Sprite Logo;
 Sprite menubg[2];
@@ -408,8 +407,17 @@ RectangleShape rectanglecont(Vector2f(350, 70));
 RectangleShape rectanglereturn(Vector2f(350, 70));
 
 /////////////////////////////////////////////////////////////////////////////////////////
-
-
+ 
+//shop variables
+RectangleShape rectangleshopoptions[4];
+RectangleShape shipcolor[2][2];
+int rectangleshopx = 100,rectangleshopy = 250,shipcolorx=1260,shipcolory = 200,shopbutton=1;
+Text shopcustomize;
+Text Base;
+Text Cockpit;
+Text Engine;
+Text Default;
+bool shopcheck[3] = { 1,0,0};
 
 // Loading Ingame Files
 void IngameImages()
@@ -549,6 +557,38 @@ void IngameImages()
         rectanglelevels[i].setOutlineColor(Color(51, 153, 255, 60));
         rectanglelevels[i].setOutlineThickness(2.8f);
     }
+
+    //Buttons in shop
+    for (int i = 0; i < 3; i++)
+    {
+        rectangleshopoptions[i].setSize(Vector2f(350, 70));
+        rectangleshopoptions[i].setPosition(rectangleshopx, rectangleshopy + i * 180);
+        rectangleshopoptions[i].setFillColor(Color(0, 0, 255, 40));
+        rectangleshopoptions[i].setOutlineColor(Color(51, 153, 255, 60));
+        rectangleshopoptions[i].setOutlineThickness(2.8f);
+    }
+    rectangleshopoptions[3].setSize(Vector2f(350, 70));
+    rectangleshopoptions[3].setPosition(785, 820);
+    rectangleshopoptions[3].setFillColor(Color(0, 0, 255, 40));
+    rectangleshopoptions[3].setOutlineColor(Color(51, 153, 255, 60));
+    rectangleshopoptions[3].setOutlineThickness(2.8f);
+
+     //color buttons
+    for (int j = 0; j < 2; j++)
+    {
+        for (int i = 0; i < 2; i++)
+        {
+            shipcolor[i][j].setSize(Vector2f(250, 250));
+            shipcolor[i][j].setPosition(shipcolorx + i * 350, shipcolory + j * 320);
+            shipcolor[i][j].setOutlineColor(Color(0, 0, 0, 255));
+            shipcolor[i][j].setOutlineThickness(6.0f);
+        }
+    }
+    shipcolor[0][0].setFillColor(Color(0,0,171,255));
+    shipcolor[1][0].setFillColor(Color(152, 0, 0, 255));
+    shipcolor[0][1].setFillColor(Color(0, 0, 0, 255));
+    shipcolor[1][1].setFillColor(Color(0, 103, 0, 255));
+
     //Buttons in options menu
     for (int i = 0; i < 2; i++)
     {
@@ -675,18 +715,49 @@ void IngameImages()
     play.setPosition(860, 495);
     play.setString("Save The World");
     play.setFillColor(Color(204, 229, 255,225));
+
     // shop text
     shop.setFont(font1);
     shop.setCharacterSize(32);
     shop.setPosition(shopbuttonx, shopbuttony);
     shop.setString("Shop");
     shop.setFillColor(Color(204, 229, 255, 225));
+
     // shop customization
     shopcustomize.setFont(font1);
     shopcustomize.setCharacterSize(64);
-    shopcustomize.setPosition(660, 90);
+    shopcustomize.setPosition(650, 90);
     shopcustomize.setString("Spaceship Customization");
     shopcustomize.setFillColor(Color(204, 229, 255, 225));
+
+    //Base text
+    Base.setFont(font1);
+    Base.setCharacterSize(40);
+    Base.setPosition(rectangleshopx +135, rectangleshopy +10);
+    Base.setString("Base");
+    Base.setFillColor(Color(204, 229, 255, 225));
+
+    //Cockpit text
+    Cockpit.setFont(font1);
+    Cockpit.setCharacterSize(40);
+    Cockpit.setPosition(rectangleshopx + 115, rectangleshopy + 10 +180);
+    Cockpit.setString("Cockpit");
+    Cockpit.setFillColor(Color(204, 229, 255, 225));
+
+    //Engine text
+    Engine.setFont(font1);
+    Engine.setCharacterSize(40);
+    Engine.setPosition(rectangleshopx + 125, rectangleshopy + 10 +2*180);
+    Engine.setString("Engine");
+    Engine.setFillColor(Color(204, 229, 255, 225));
+
+    //Default text
+    Default.setFont(font1);
+    Default.setCharacterSize(40);
+    Default.setPosition(785 +115, 820 +10);
+    Default.setString("Default");
+    Default.setFillColor(Color(204, 229, 255, 225));
+
     //Options text
     Options.setFont(font1);
     Options.setCharacterSize(32);
@@ -2803,6 +2874,38 @@ void mainmenu()
         rectangleshop.setFillColor(Color(0, 0, 255, 40));
         rectangleshop.setOutlineColor(Color(51, 153, 255, 60));
     }
+    
+    for (int j = 0; j < 2; j++)
+    {
+        for (int i = 0; i < 2; i++)
+        {
+
+            if (mousepos.x >= shipcolorx + i*350 && mousepos.x <= shipcolorx + i*350 +250 && mousepos.y >= shipcolory + j * 320 && mousepos.y <= shipcolory + 250 + j * 320)
+            {
+                //Buttons in shop
+                shipcolor[i][j].setOutlineColor(Color(192, 192, 192, 192));
+            }
+            else
+            {
+                //Buttons in shop 
+                shipcolor[i][j].setOutlineColor(Color(0, 0, 0, 255));
+            }
+
+        }
+    }
+
+    if (mousepos.x >= 785 && mousepos.x <= 960 + 350 && mousepos.y >=  820 && mousepos.y <=  820 + 70 )
+    {
+        //Buttons in shop
+        rectangleshopoptions[3].setFillColor(Color(0, 128, 255, 40));
+        rectangleshopoptions[3].setOutlineColor(Color(102, 178, 255, 255));
+    }
+    else
+    {
+        //Buttons in shop 
+        rectangleshopoptions[3].setFillColor(Color(0, 0, 255, 40));
+        rectangleshopoptions[3].setOutlineColor(Color(51, 153, 255, 60));
+    }
     //Buttons in select mode menu
     for (int i = 0; i < 2; i++)
     {
@@ -3218,6 +3321,7 @@ void reset()
     crystalgift.setPosition(-10000, -10000);
     iongift.setPosition(-10000, -10000);
     Player.setPosition(900, 850);
+    Player.setScale(1.5, 1.5); 
     Player2ship.setPosition(1000, 850);
     coopon = false;
     validname = false;
@@ -5508,20 +5612,103 @@ beginning: {};
             //shop
             if (page == 11)
             {
+
+                Player.setPosition(800, 400);
+                Player.setScale(4, 4);
+      
                 mainmenu();
+               
                 if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left))
                 {
-                    if (soundeffectON)
-                        MenuClick.play();
+                   /* if (soundeffectON)
+                        MenuClick.play();*/
                     backdelay = 0;
                     page = 0;
                 }
 
+               /* if (mousepos.x >= 785 && mousepos.x <= 785 + 350 && mousepos.y >= 820 && mousepos.y <= 820 + 70 && Mouse::isButtonPressed(Mouse::Left))
+                {
+                    if (soundeffectON)
+                        MenuClick.play();
+                }*/
+
+                for (int i = 0; i < 3; i++)
+                {
+                    if (mousepos.x >= rectangleshopx && mousepos.x <= rectangleshopx + 350 && mousepos.y >= rectangleshopy + i * 180 && mousepos.y <= rectangleshopy + 70 + i * 180 && Mouse::isButtonPressed(Mouse::Left))
+                {
+                    shopcheck[shopbutton - 1] = 0;
+                    shopcheck[i] = 1;
+                    shopbutton = i + 1;
+                  /*  if (soundeffectON)
+                    {
+                        MenuClick.play();
+                    }*/
+                }
+
+                    
+                if (shopcheck[i] == 1)
+                {
+                    rectangleshopoptions[i].setFillColor(Color(0, 128, 255, 40));
+                    rectangleshopoptions[i].setOutlineColor(Color(102, 178, 255, 255));
+                }
+                else
+                {
+                    
+                    rectangleshopoptions[i].setFillColor(Color(0, 0, 255, 40));
+                    rectangleshopoptions[i].setOutlineColor(Color(51, 153, 255, 60));
+                }
+
+                if (i == 0 && shopcheck[i] == 1)
+                {
+                    shipcolor[0][0].setFillColor(Color(0, 0, 171, 255));
+                    shipcolor[1][0].setFillColor(Color(152, 0, 0, 255));
+                    shipcolor[0][1].setFillColor(Color(0, 0, 0, 255));
+                    shipcolor[1][1].setFillColor(Color(0, 103, 0, 255));
+                }
+
+                if ((i == 1 || i==2) && shopcheck[i] == 1)
+                {
+                    shipcolor[0][0].setFillColor(Color(0, 164, 255, 255));
+                    shipcolor[1][0].setFillColor(Color(216, 0, 0, 255));
+                    shipcolor[0][1].setFillColor(Color(194, 74, 255, 255));
+                    shipcolor[1][1].setFillColor(Color(0, 139, 0, 255));
+                }
+
+                }
+               /* for (int j = 0; j < 2; j++)
+                {
+                    for (int i = 0; i < 2; i++)
+                    {
+
+                        if (mousepos.x >= shipcolorx + i * 350 && mousepos.x <= shipcolorx + i * 350 + 250 && mousepos.y >= shipcolory + j * 320 && mousepos.y <= shipcolory + 250 + j * 320 && Mouse::isButtonPressed(Mouse::Left))
+                        {
+                            if (soundeffectON)
+                                MenuClick.play();
+                        }
+
+                    }
+                }*/
+
                 window.draw(rectangleback);
                 window.draw(back);
-                window.draw(sprite);
                 window.draw(shopcustomize);
-
+                window.draw(Base);
+                window.draw(Cockpit);
+                window.draw(Engine);
+                window.draw(Default);
+                window.draw(Player);
+                for (int i = 0; i < 4; i++)
+                {
+                 window.draw(rectangleshopoptions[i]);
+                }
+                for (int j = 0; j < 2; j++)
+                {
+                    for (int i = 0; i < 2; i++)
+                    {
+                        window.draw(shipcolor[i][j]);
+                    }
+                }
+                window.draw(sprite);
             }
         sprite.setPosition(static_cast<Vector2f>(Mouse::getPosition(window))); // Set position 
         
