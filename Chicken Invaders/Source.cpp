@@ -291,6 +291,8 @@ Text Quit;
 Text back;
 Text cont;
 Text single;
+Text shop;
+Text  shopcustomize;
 Sprite _GameBackground[2];
 Sprite Logo;
 Sprite menubg[2];
@@ -298,6 +300,7 @@ Sprite Earth;
 Sprite menuchicken;
 RectangleShape rectanglemainmenu[5];
 RectangleShape rectangleback(Vector2f(200, 70));
+RectangleShape rectangleshop(Vector2f(200, 70));
 SoundBuffer Select;
 
 //borders for interactive background
@@ -364,7 +367,9 @@ Text musiccheck;
 Text soundeffectcheck;
 RectangleShape rectangleoption[2];
 RectangleShape rectanglecontrols[6][2];
-
+/////////////////////////////////////////////////////////////////////////////////////////
+// coordinates
+int shopbuttonx = 1660, shopbuttony = 65;
 /////////////////////////////////////////////////////////////////////////////////////////
 
 //credits
@@ -409,7 +414,6 @@ RectangleShape rectanglereturn(Vector2f(350, 70));
 // Loading Ingame Files
 void IngameImages()
 {
-
     //borders for chicken bounce
     topborder.setPosition(0, 0);
     bottomborder.setPosition(0, 980);
@@ -624,7 +628,11 @@ void IngameImages()
     rectangleback.setFillColor(Color(0, 0, 255, 40));
     rectangleback.setOutlineColor(Color(51, 153, 255, 60));
     rectangleback.setOutlineThickness(2.8f);
-
+    // shop button
+    rectangleshop.setPosition(1600, 50);
+    rectangleshop.setFillColor(Color(0, 0, 255, 40));
+    rectangleshop.setOutlineColor(Color(51, 153, 255, 60));
+    rectangleshop.setOutlineThickness(2.8f);
     //continue Button
     rectanglecont.setPosition(785, 480);
     rectanglecont.setFillColor(Color(0, 0, 255, 40));
@@ -667,7 +675,18 @@ void IngameImages()
     play.setPosition(860, 495);
     play.setString("Save The World");
     play.setFillColor(Color(204, 229, 255,225));
-
+    // shop text
+    shop.setFont(font1);
+    shop.setCharacterSize(32);
+    shop.setPosition(shopbuttonx, shopbuttony);
+    shop.setString("Shop");
+    shop.setFillColor(Color(204, 229, 255, 225));
+    // shop customization
+    shopcustomize.setFont(font1);
+    shopcustomize.setCharacterSize(64);
+    shopcustomize.setPosition(660, 90);
+    shopcustomize.setString("Spaceship Customization");
+    shopcustomize.setFillColor(Color(204, 229, 255, 225));
     //Options text
     Options.setFont(font1);
     Options.setCharacterSize(32);
@@ -2771,7 +2790,19 @@ void mainmenu()
 {
     Vector2i mousepos = Mouse::getPosition(window);
 
-
+    //shop animation
+    if (mousepos.x>=1595 && mousepos.x<=1789 && mousepos.y>=44 && mousepos.y<=115)
+    {
+        //Buttons in shop
+        rectangleshop.setFillColor(Color(0, 128, 255, 40));
+        rectangleshop.setOutlineColor(Color(102, 178, 255, 255));
+    }
+    else
+    {
+        //Buttons in shop 
+        rectangleshop.setFillColor(Color(0, 0, 255, 40));
+        rectangleshop.setOutlineColor(Color(51, 153, 255, 60));
+    }
     //Buttons in select mode menu
     for (int i = 0; i < 2; i++)
     {
@@ -2788,7 +2819,6 @@ void mainmenu()
             rectangleselectmode[i].setOutlineColor(Color(51, 153, 255, 60));
         }
     }
-
     for (int i = 0; i < 5; i++)
     {
         if (mousepos.x >= 50 + i * 370 && mousepos.x <= 400 + i * 370 && mousepos.y >= 25 && mousepos.y <= 95)
@@ -3642,6 +3672,7 @@ beginning: {};
             window.draw(leadernameboard);
             window.draw(Credits);
             window.draw(Quit);
+            window.draw(shop);
             window.draw(sprite);
             /*window.draw(topborder);
             window.draw(bottomborder);
@@ -3650,12 +3681,18 @@ beginning: {};
             bouncingchicken();
             
             
-            
+            window.draw(rectangleshop);
             for (int i = 0; i < 5; i++)
             {
                 window.draw(rectanglemainmenu[i]);
             }
-
+            if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 1595 && mousepos.x <= 1789 && mousepos.y >= 44 && mousepos.y <= 114)
+            {
+                if (soundeffectON)
+                    MenuClick.play();
+                page = 11;
+                goto pagecode;
+            }
             if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550 )
             {
                 if (soundeffectON)
@@ -5468,7 +5505,24 @@ beginning: {};
                     window.draw(t2);
 
             }
-            
+            //shop
+            if (page == 11)
+            {
+                mainmenu();
+                if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left))
+                {
+                    if (soundeffectON)
+                        MenuClick.play();
+                    backdelay = 0;
+                    page = 0;
+                }
+
+                window.draw(rectangleback);
+                window.draw(back);
+                window.draw(sprite);
+                window.draw(shopcustomize);
+
+            }
         sprite.setPosition(static_cast<Vector2f>(Mouse::getPosition(window))); // Set position 
         
         // window display
