@@ -418,6 +418,7 @@ Text Cockpit;
 Text Engine;
 Text Default;
 bool shopcheck[3] = { 1,0,0};
+pair<int, int> customship;
 
 // Loading Ingame Files
 void IngameImages()
@@ -584,10 +585,10 @@ void IngameImages()
             shipcolor[i][j].setOutlineThickness(6.0f);
         }
     }
-    shipcolor[0][0].setFillColor(Color(0,0,171,255));
-    shipcolor[1][0].setFillColor(Color(152, 0, 0, 255));
+    shipcolor[0][0].setFillColor(Color(0, 0, 255, 255));
+    shipcolor[1][0].setFillColor(Color(255, 0, 0, 255));
     shipcolor[0][1].setFillColor(Color(0, 0, 0, 255));
-    shipcolor[1][1].setFillColor(Color(0, 103, 0, 255));
+    shipcolor[1][1].setFillColor(Color(0, 255, 0, 255));
 
     //Buttons in options menu
     for (int i = 0; i < 2; i++)
@@ -2894,7 +2895,7 @@ void mainmenu()
         }
     }
 
-    if (mousepos.x >= 785 && mousepos.x <= 960 + 350 && mousepos.y >=  820 && mousepos.y <=  820 + 70 )
+    if (mousepos.x >= 785 && mousepos.x <= 785 + 350 && mousepos.y >=  820 && mousepos.y <=  820 + 70 )
     {
         //Buttons in shop
         rectangleshopoptions[3].setFillColor(Color(0, 128, 255, 40));
@@ -5660,34 +5661,167 @@ beginning: {};
 
                 if (i == 0 && shopcheck[i] == 1)
                 {
-                    shipcolor[0][0].setFillColor(Color(0, 0, 171, 255));
-                    shipcolor[1][0].setFillColor(Color(152, 0, 0, 255));
                     shipcolor[0][1].setFillColor(Color(0, 0, 0, 255));
-                    shipcolor[1][1].setFillColor(Color(0, 103, 0, 255));
                 }
 
                 if ((i == 1 || i==2) && shopcheck[i] == 1)
                 {
-                    shipcolor[0][0].setFillColor(Color(0, 164, 255, 255));
-                    shipcolor[1][0].setFillColor(Color(216, 0, 0, 255));
-                    shipcolor[0][1].setFillColor(Color(194, 74, 255, 255));
-                    shipcolor[1][1].setFillColor(Color(0, 139, 0, 255));
+                    shipcolor[0][1].setFillColor(Color(255, 153, 255, 255));
                 }
 
                 }
-               /* for (int j = 0; j < 2; j++)
+                for (int k = 0; k < 3; k++) 
                 {
-                    for (int i = 0; i < 2; i++)
+                    for (int j = 0; j < 2; j++)
                     {
-
-                        if (mousepos.x >= shipcolorx + i * 350 && mousepos.x <= shipcolorx + i * 350 + 250 && mousepos.y >= shipcolory + j * 320 && mousepos.y <= shipcolory + 250 + j * 320 && Mouse::isButtonPressed(Mouse::Left))
+                        for (int i = 0; i < 2; i++)
                         {
-                            if (soundeffectON)
-                                MenuClick.play();
-                        }
 
+                            if (mousepos.x >= shipcolorx + i * 350 && mousepos.x <= shipcolorx + i * 350 + 250 && mousepos.y >= shipcolory + j * 320 && mousepos.y <= shipcolory + 250 + j * 320 && Mouse::isButtonPressed(Mouse::Left))
+                            {
+                                // if (soundeffectON)
+                                    // MenuClick.play();
+                                if (k == 0 && shopcheck[k] == 1)
+                                {
+                                    if (i == 0 && j == 0)
+                                        customship.first = 1;
+                                    if (i == 1 && j == 0)
+                                        customship.first = 2;
+                                    if (i == 0 && j == 1)
+                                        customship.first = 3;
+                                    if (i == 1 && j == 1)
+                                        customship.first = 4;
+
+                                }
+
+                                if (k == 1 && shopcheck[k] == 1)
+                                {
+                                    if (i == 0 && j == 0)
+                                        customship.second = 1;
+                                    if (i == 1 && j == 0)
+                                        customship.second = 2;
+                                    if (i == 0 && j == 1)
+                                        customship.second = 3;
+                                    if (i == 1 && j == 1)
+                                        customship.second = 4;
+                                }
+                            }
+                                if (mousepos.x >= 785 && mousepos.x <= 785 + 350 && mousepos.y >= 820 && mousepos.y <= 820 + 70 && Mouse::isButtonPressed(Mouse::Left)) 
+                                {
+                                    if (k == 0 && shopcheck[k] == 1)
+                                    {
+                                        customship.first = 0;
+                                    }
+                                    if (k == 1 && shopcheck[k] == 1)
+                                    {
+                                        customship.second = 0;
+                                    }
+                                }
+                                if (customship.first == 0 && customship.second == 0)
+                                {
+                                    PlayerSkin.loadFromFile("playerr.png");
+                                }
+                                if (customship.first == 0 && customship.second == 1)
+                                {
+                                    PlayerSkin.loadFromFile("playerdefaultblue.png");
+                                }
+                                if (customship.first == 0 && customship.second == 2)
+                                {
+                                    PlayerSkin.loadFromFile("playerdefaultred.png");
+                                }
+                                if (customship.first == 0 && customship.second == 3)
+                                {
+                                    PlayerSkin.loadFromFile("playerdefaultpurple.png");
+                                }
+                                if (customship.first == 0 && customship.second == 4)
+                                {
+                                    PlayerSkin.loadFromFile("playerdefaultgreen.png");
+                                }
+                                if (customship.first == 1 && customship.second == 0)
+                                {
+                                    PlayerSkin.loadFromFile("playerbluedefault.png");
+                                }
+                                if (customship.first == 1 && customship.second == 1)
+                                {
+                                    PlayerSkin.loadFromFile("playerblueblue.png");
+                                }
+                                if (customship.first == 1 && customship.second == 2)
+                                {
+                                    PlayerSkin.loadFromFile("playerbluered.png");
+                                }
+                                /*if (customship.first == 1 && customship.second == 3)
+                                {
+                                    PlayerSkin.loadFromFile("playerbluepurple.png");
+                                }
+                                if (customship.first == 1 && customship.second == 4)
+                                {
+                                    PlayerSkin.loadFromFile("playerbluegreen.png");
+                                }*/
+                                if (customship.first == 2 && customship.second == 0)
+                                {
+                                    PlayerSkin.loadFromFile("playerreddefault.png");
+                                }
+                               /* if (customship.first == 2 && customship.second == 1)
+                                {
+                                    PlayerSkin.loadFromFile("playerredblue.png");
+                                }
+                                if (customship.first == 2 && customship.second == 2)
+                                {
+                                    PlayerSkin.loadFromFile("playerredred.png");
+                                }*/
+                                if (customship.first == 2 && customship.second == 3)
+                                {
+                                    PlayerSkin.loadFromFile("playerredpurple.png");
+                                }
+                                if (customship.first == 2 && customship.second == 4)
+                                {
+                                    PlayerSkin.loadFromFile("playerredgreen.png");
+                                }
+                                if (customship.first == 3 && customship.second == 0)
+                                {
+                                    PlayerSkin.loadFromFile("playerblackdefault.png");
+                                }
+                                if (customship.first == 3 && customship.second == 1)
+                                {
+                                    PlayerSkin.loadFromFile("playerblackblue.png");
+                                }
+                                if (customship.first == 3 && customship.second == 2)
+                                {
+                                    PlayerSkin.loadFromFile("playerblackred.png");
+                                }
+                                if (customship.first == 3 && customship.second == 3)
+                                {
+                                    PlayerSkin.loadFromFile("playerblackpurple.png");
+                                }
+                                if (customship.first == 3 && customship.second == 4)
+                                {
+                                    PlayerSkin.loadFromFile("playerblackgreen.png");
+                                }
+                                if (customship.first == 4 && customship.second == 0)
+                                {
+                                    PlayerSkin.loadFromFile("playergreendefault.png");
+                                }
+                                /*if (customship.first == 4 && customship.second == 1)
+                                {
+                                    PlayerSkin.loadFromFile("playergreenblue.png");
+                                }
+                                if (customship.first == 4 && customship.second == 2)
+                                {
+                                    PlayerSkin.loadFromFile("playergreeenred.png");
+                                }
+                                if (customship.first == 4 && customship.second == 3)
+                                {
+                                    PlayerSkin.loadFromFile("playergreenpurple.png");
+                                }
+                                if (customship.first == 4 && customship.second == 4)
+                                {
+                                    PlayerSkin.loadFromFile("playergreengreen.png");
+                                }*/
+                            
+
+                        }
                     }
-                }*/
+                }
 
                 window.draw(rectangleback);
                 window.draw(back);
