@@ -5615,7 +5615,7 @@ beginning: {};
             {
 
                 Player.setPosition(800, 400);
-                Player.setScale(4, 4);
+                Player.setScale(5, 5);
       
                 mainmenu();
                
@@ -5666,7 +5666,7 @@ beginning: {};
 
                 if ((i == 1 || i==2) && shopcheck[i] == 1)
                 {
-                    shipcolor[0][1].setFillColor(Color(255, 153, 255, 255));
+                    shipcolor[0][1].setFillColor(Color(127, 0, 255, 255));
                 }
 
                 }
@@ -5755,26 +5755,26 @@ beginning: {};
                 {
                     PlayerSkin.loadFromFile("playerbluered.png");
                 }
-                /*if (customship.first == 1 && customship.second == 3)
+                if (customship.first == 1 && customship.second == 3)
                 {
                     PlayerSkin.loadFromFile("playerbluepurple.png");
                 }
                 if (customship.first == 1 && customship.second == 4)
                 {
                     PlayerSkin.loadFromFile("playerbluegreen.png");
-                }*/
+                }
                 if (customship.first == 2 && customship.second == 0)
                 {
                     PlayerSkin.loadFromFile("playerreddefault.png");
                 }
-                /* if (customship.first == 2 && customship.second == 1)
+                 if (customship.first == 2 && customship.second == 1)
                  {
                      PlayerSkin.loadFromFile("playerredblue.png");
                  }
                  if (customship.first == 2 && customship.second == 2)
                  {
                      PlayerSkin.loadFromFile("playerredred.png");
-                 }*/
+                 }
                 if (customship.first == 2 && customship.second == 3)
                 {
                     PlayerSkin.loadFromFile("playerredpurple.png");
@@ -5807,13 +5807,13 @@ beginning: {};
                 {
                     PlayerSkin.loadFromFile("playergreendefault.png");
                 }
-                /*if (customship.first == 4 && customship.second == 1)
+                if (customship.first == 4 && customship.second == 1)
                 {
                     PlayerSkin.loadFromFile("playergreenblue.png");
                 }
                 if (customship.first == 4 && customship.second == 2)
                 {
-                    PlayerSkin.loadFromFile("playergreeenred.png");
+                    PlayerSkin.loadFromFile("playergreenred.png");
                 }
                 if (customship.first == 4 && customship.second == 3)
                 {
@@ -5822,7 +5822,7 @@ beginning: {};
                 if (customship.first == 4 && customship.second == 4)
                 {
                     PlayerSkin.loadFromFile("playergreengreen.png");
-                }*/
+                }
 
                 window.draw(rectangleback);
                 window.draw(back);
