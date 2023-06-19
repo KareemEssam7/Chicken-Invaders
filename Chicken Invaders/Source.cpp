@@ -14,7 +14,7 @@ using namespace sf;
 // Chicken Struct
 struct ChickenStruct
 {
-    double HP[8][4], speed = 4;
+    double HP[8][4], speed = 4, HPtriangle[2][6];
     double chicken_healthvar = 1, chicken_health = 1;
 };
 
@@ -78,7 +78,8 @@ bool checkchickenanimation = true;
 bool chickenalive = true, chickenalive2 = true;
 int currentchickensfx = 0;
 ChickenStruct chicken;
-bool chickendead[8][4];
+bool chickendead[8][4], chickendeadtriangle[2][6];
+
 int alivechicken = 0;
 int chick = 0;
 int chicken_enter = 0;
@@ -87,6 +88,8 @@ Texture ChickenSkin;
 SoundBuffer chickensfx;
 Sprite Chicken[8][4];
 Sprite Chicken2[8][4];
+Sprite Chickentriangle[2][6];
+int chickentriangleip = 0;
 
 // adding chicken border
 RectangleShape rectangle1(Vector2f(60, 1080));
@@ -1497,10 +1500,7 @@ void spark_fog() {
             for (int z = 0; z < 4; z++) {
                 if (Bullets[i].getGlobalBounds().intersects(Chicken[j][z].getGlobalBounds())) {
                     chickenalive = false;
-                    spark[i].setPosition(Chicken[j][z].getPosition() - Vector2f(50, 50));
-                
-                       
-                   
+                    spark[i].setPosition(Chicken[j][z].getPosition() - Vector2f(50, 50));     
                 }
             }
         }
@@ -1746,10 +1746,7 @@ void ChickenMove()
                 else
                 Chicken[i][j].setPosition(2065 + (i * 170), 70 + (j * 150));
             }
-            Chicken[i][j].setTextureRect(IntRect(ChickenMovement * 356 , 0, 356, 284));
-
-
-            
+            Chicken[i][j].setTextureRect(IntRect(ChickenMovement * 356 , 0, 356, 284));      
         }
     }
     chickeninitialpos = 1;
@@ -2190,86 +2187,169 @@ void shield_move()
 }
 
 // egg movement function
-void eggmovement()
+void eggmovement(int wavetype = 0)
 {
-    if (x == 0)
+    if (wavetype == 0)
     {
-        for (int j = 0; j < 4; j++)
+        if (x == 0)
         {
-            for (int i = 0; i < 8; i++)
+            for (int j = 0; j < 4; j++)
             {
-
-                timer[i][j] = 0;
-
-            }
-
-        }
-        eggvar = 601 - chicken.chicken_health * 50;
-        for (int j = 0; j < 4; j++)
-        {
-            for (int i = 0; i < 8; i++)
-            {
-
-                timer[i][j] = rand() % eggvar;
-
-            }
-
-        }
-        x++;
-    }
-
-    for (int j = 0; j < 4; j++)
-    {
-        for (int i = 0; i < 8; i++)
-        {
-
-            if (timer[i][j] > 0)
-            {
-                timer[i][j]--;
-            }
-
-            if (timer[i][j] == 0)
-            {
-                eggyolk[i][j].setScale(0, 0);
-                Eggs[i][j].setScale(0.13, 0.13);
-                Eggs[i][j].setPosition(Chicken[i][j].getPosition().x + 53.45, Chicken[i][j].getPosition().y + 75);
-
-
-                if (soundeffectON && Eggs[i][j].getPosition().x < 1920)
+                for (int i = 0; i < 8; i++)
                 {
-                    eggshoot[currenteggshootsfx].play();
-                    currenteggshootsfx++;
-                    if (currenteggshootsfx == 2)
-                    {
-                        currenteggshootsfx = 0;
-                    }
+
+                    timer[i][j] = 0;
+
                 }
-                timer[i][j]--;
             }
-            if (timer[i][j] == -1)
+            eggvar = 601 - chicken.chicken_health * 50;
+            for (int j = 0; j < 4; j++)
             {
-                Eggs[i][j].move(0, 9.8f);
+                for (int i = 0; i < 8; i++)
+                {
+
+                    timer[i][j] = rand() % eggvar;
+
+                }
             }
-            if (Eggs[i][j].getPosition().y >= 1000)
+            x++;
+        }
+
+        for (int j = 0; j < 4; j++)
+        {
+            for (int i = 0; i < 8; i++)
             {
-                eggyolk[i][j].setPosition(Eggs[i][j].getPosition().x, 1000);
-                timer[i][j] = rand() % eggvar;
-                timer[i][j]--;
-                Eggs[i][j].setScale(0, 0);
-                eggyolk[i][j].setScale(2, 2);
+
+                if (timer[i][j] > 0)
+                {
+                    timer[i][j]--;
+                }
+
+                if (timer[i][j] == 0)
+                {
+                    eggyolk[i][j].setScale(0, 0);
+                    Eggs[i][j].setScale(0.13, 0.13);
+                    Eggs[i][j].setPosition(Chicken[i][j].getPosition().x + 53.45, Chicken[i][j].getPosition().y + 75);
+
+
+                    if (soundeffectON && Eggs[i][j].getPosition().x < 1920)
+                    {
+                        eggshoot[currenteggshootsfx].play();
+                        currenteggshootsfx++;
+                        if (currenteggshootsfx == 2)
+                        {
+                            currenteggshootsfx = 0;
+                        }
+                    }
+                    timer[i][j]--;
+                }
+                if (timer[i][j] == -1)
+                {
+                    Eggs[i][j].move(0, 9.8f);
+                }
+                if (Eggs[i][j].getPosition().y >= 1000)
+                {
+                    eggyolk[i][j].setPosition(Eggs[i][j].getPosition().x, 1000);
+                    timer[i][j] = rand() % eggvar;
+                    timer[i][j]--;
+                    Eggs[i][j].setScale(0, 0);
+                    eggyolk[i][j].setScale(2, 2);
+
+                }
+                if (Eggs[i][j].getGlobalBounds().intersects(Shield.getGlobalBounds()))
+                {
+                    Eggs[i][j].setPosition(10000, 10000);
+                }
+                if (Eggs[i][j].getGlobalBounds().intersects(Shield2.getGlobalBounds()))
+                {
+                    Eggs[i][j].setPosition(10000, 10000);
+                }
 
             }
-            if (Eggs[i][j].getGlobalBounds().intersects(Shield.getGlobalBounds()))
-            {
-                Eggs[i][j].setPosition(10000, 10000);
-            }
-            if (Eggs[i][j].getGlobalBounds().intersects(Shield2.getGlobalBounds()))
-            {
-                Eggs[i][j].setPosition(10000, 10000);
-            }
-
         }
     }
+    else if (wavetype == 1)
+    {
+        if (x == 0)
+        {
+            for (int j = 0; j < 6; j++)
+            {
+                for (int i = 0; i < 2; i++)
+                {
+
+                    timer[i][j] = 0;
+
+                }
+
+            }
+            eggvar = 300 - chicken.chicken_health * 50;
+            for (int j = 0; j < 6; j++)
+            {
+                for (int i = 0; i < 2; i++)
+                {
+
+                    timer[i][j] = rand() % eggvar;
+
+                }
+
+            }
+            x++;
+        }
+
+        for (int i = 0; i < 2; i++)
+        {
+            for (int j = 0; j < 6; j++)
+            {
+
+                if (timer[i][j] > 0)
+                {
+                    timer[i][j]--;
+                }
+
+                if (timer[i][j] == 0)
+                {
+                    eggyolk[i][j].setScale(0, 0);
+                    Eggs[i][j].setScale(0.11, 0.11);
+                    Eggs[i][j].setPosition(Chickentriangle[i][j].getPosition().x + 52.45, Chickentriangle[i][j].getPosition().y + 65);
+
+
+                    if (soundeffectON && Eggs[i][j].getPosition().x < 1920)
+                    {
+                        eggshoot[currenteggshootsfx].play();
+                        currenteggshootsfx++;
+                        if (currenteggshootsfx == 2)
+                        {
+                            currenteggshootsfx = 0;
+                        }
+                    }
+                    timer[i][j]--;
+                }
+                if (timer[i][j] == -1)
+                {
+                    Eggs[i][j].move(0, 15);
+                }
+                if (Eggs[i][j].getPosition().y >= 1000)
+                {
+                    eggyolk[i][j].setPosition(Eggs[i][j].getPosition().x, 1000);
+                    timer[i][j] = rand() % eggvar;
+                    timer[i][j]--;
+                    Eggs[i][j].setScale(0, 0);
+                    eggyolk[i][j].setScale(2, 2);
+
+                }
+                if (Eggs[i][j].getGlobalBounds().intersects(Shield.getGlobalBounds()))
+                {
+                    Eggs[i][j].setPosition(10000, 10000);
+                }
+                if (Eggs[i][j].getGlobalBounds().intersects(Shield2.getGlobalBounds()))
+                {
+                    Eggs[i][j].setPosition(10000, 10000);
+                }
+
+            }
+        }
+    }
+    
 }
 //Food Movment Function
 void FoodMovment() {
@@ -2878,6 +2958,74 @@ void scorecalc() {
             }
         }
     }
+    for (int i = 0; i < bullet.numberofbullets; i++)
+    {
+        for (int j = 0; j < 2; j++)
+        {
+            for (int z = 0; z < 6; z++)
+            {
+                if (Bullets[i].getGlobalBounds().intersects(Chickentriangle[j][z].getGlobalBounds()))
+                {
+                    if (chicken.HPtriangle[j][z] > 0)
+                    {
+                        Bullets[i].setPosition(-10000, -10000);
+                        chicken.HPtriangle[j][z] = chicken.HPtriangle[j][z] - (powerlvls * 0.5) - bullet.bulletdamage;
+                    }
+                    if (chicken.HPtriangle[j][z] <= 0)
+                    {
+                        if (coopon)
+                        {
+                            randomizer = 0;
+                        }
+                        else
+                        {
+                            randomizer = 1 + rand() % 160;
+                        }
+
+                        if (randomizer == 1 || randomizer == 2)
+                        {
+                            iongift.setPosition(Chickentriangle[j][z].getPosition().x, Chickentriangle[j][z].getPosition().y);
+
+                        }
+                        if (randomizer == 3)
+                        {
+
+                            crystalgift.setPosition(Chickentriangle[j][z].getPosition().x, Chickentriangle[j][z].getPosition().y);
+
+                        }
+                        fog[i].setPosition(Chickentriangle[j][z].getPosition() - Vector2f(-50, -20));
+                        chicken_legs[z][j].setPosition(Chickentriangle[j][z].getPosition().x, Chickentriangle[j][z].getPosition().y);
+                        Chickentriangle[j][z].setPosition(10000, 10000);
+                        Bullets[i].setPosition(-10000, -10000);
+                        cnt += 1000;
+                        chickendeadtriangle[j][z] = 1;
+                        score.setString(to_string(cnt));
+                        missileScoreCount += 1000;
+                    }
+
+                    if (missileScoreCount == 70000)
+                    {
+                        missileScoreCount = 0;
+                        rockets += 1;
+                        rocket.setString(to_string(rockets));
+                        rocket2.setString(to_string(rockets));
+                    }
+                    if (soundeffectON)
+                    {
+                        chickenhurt[currentchickensfx].play();
+                        currentchickensfx++;
+                        if (currentchickensfx == 2)
+                        {
+                            currentchickensfx = 0;
+                        }
+                    }
+
+
+                }
+                
+            }
+        }
+    }
 }
 //Main menu 
 void mainmenu()
@@ -3321,10 +3469,12 @@ void bossmove() {
 }
 void reset()
 {
+    
     triangle.setPosition(600, 200);
     triangle2.setPosition(1320, 200);
     triangle1health = 15; 
     triangle2health = 15;
+    chickentriangleip = 0;
     eggvar = 501;
     chicken.chicken_healthvar = 1;
     if (soundeffectON)
@@ -3441,6 +3591,13 @@ void reset()
             Chicken[i][j].setPosition(9000, 9000);
         }
     }
+    for (int i = 0; i < 2; i++)
+    {
+        for (int j = 0; j < 6; j++)
+        {
+            chickendeadtriangle[i][j] = 0;
+        }
+    }
     bosssprite.setPosition(Vector2f(200, 200));
     x = 0;
 }
@@ -3495,6 +3652,51 @@ void lvldiff()
 }
 void trianglewavemove()
 {
+    if (chickentriangleip == 0)
+    {
+        for (int i = 0; i < 2; i++)
+        {
+            for (int j = 0; j < 6; j++)
+            {
+                Chickentriangle[i][j].setTexture(ChickenSkin);
+                Chickentriangle[i][j].setScale(0.3, 0.3);
+                Chickentriangle[i][j].setTextureRect(IntRect(ChickenMovement * 356, 0, 356, 284)); 
+            }          
+        }
+        Chickentriangle[0][0].setPosition(triangle.getPosition().x + 195, triangle.getPosition().y + 70);
+        Chickentriangle[0][1].setPosition(triangle.getPosition().x + 130, triangle.getPosition().y + 170);
+        Chickentriangle[0][2].setPosition(triangle.getPosition().x + 255, triangle.getPosition().y + 170);
+        Chickentriangle[0][3].setPosition(triangle.getPosition().x + 80, triangle.getPosition().y + 270);
+        Chickentriangle[0][4].setPosition(triangle.getPosition().x + 195, triangle.getPosition().y + 270);
+        Chickentriangle[0][5].setPosition(triangle.getPosition().x + 320, triangle.getPosition().y + 270);
+
+        Chickentriangle[1][0].setPosition(triangle2.getPosition().x + 195, triangle2.getPosition().y + 70);
+        Chickentriangle[1][1].setPosition(triangle2.getPosition().x + 130, triangle2.getPosition().y + 170);
+        Chickentriangle[1][2].setPosition(triangle2.getPosition().x + 255, triangle2.getPosition().y + 170);
+        Chickentriangle[1][3].setPosition(triangle2.getPosition().x + 80, triangle2.getPosition().y + 270);
+        Chickentriangle[1][4].setPosition(triangle2.getPosition().x + 195, triangle2.getPosition().y + 270);
+        Chickentriangle[1][5].setPosition(triangle2.getPosition().x + 320, triangle2.getPosition().y + 270);
+        for (int i = 0; i < 8; i++)
+        {
+            for (int a = 0; a < 4; a++)
+            {
+                Chicken[i][a].setPosition(10000, 10000);
+                eggyolk[i][a].setPosition(10000, 10000);
+                Eggs[i][a].setPosition(10000, 10000);
+            }
+        }
+            for (int i = 0; i < 2; i++)
+            {
+                for (int j = 0; j < 6; j++)
+                {
+                    chicken.HPtriangle[i][j] = chicken.chicken_health + (chicken.chicken_healthvar * 0.5 + 0.5);
+                }
+            }
+    }
+    chickentriangleip = 1;
+    
+    
+    
     if (triangle.getPosition().x >= 1500)
     {
         triangle1direction = 'L';
@@ -3523,6 +3725,27 @@ void trianglewavemove()
     {
         triangle2.move(-12, 0);
     }
+    for (int j = 0; j < 6; j++)
+    {
+        if (triangle1direction == 'R')
+        {
+            Chickentriangle[0][j].move(12, 0);
+        }
+        else
+        {
+            Chickentriangle[0][j].move(-12, 0);
+        }
+        if (triangle2direction == 'R')
+        {
+            Chickentriangle[1][j].move(12, 0);
+        }
+        else
+        {
+            Chickentriangle[1][j].move(-12, 0);
+        }
+        Chickentriangle[0][j].setTextureRect(IntRect(ChickenMovement * 356, 0, 356, 284));
+        Chickentriangle[1][j].setTextureRect(IntRect(ChickenMovement * 356, 0, 356, 284));
+    }
     if (Player.getGlobalBounds().intersects(triangle.getGlobalBounds()) && shield_on == false || (Player.getGlobalBounds().intersects(triangle2.getGlobalBounds())) && shield_on == false)
     {
         if (health >= 1)
@@ -3544,6 +3767,47 @@ void trianglewavemove()
         }
         hp2.setString(to_string(health3));
     }
+    for (int i = 0; i < 2; i++)
+    {
+        for (int j = 0; j < 6; j++)
+        {
+            if (Player.getGlobalBounds().intersects(Chickentriangle[i][j].getGlobalBounds()) && shield_on == false)
+            {
+                if (health >= 1)
+                {
+                    health -= 1;
+                }
+                if (soundeffectON)
+                {
+                    exploding.play();
+                }
+                hp.setString(to_string(health));
+                chicken.HPtriangle[i][j]--;
+                if (chicken.HPtriangle[i][j] <= 0)
+                {
+                    Chickentriangle[i][j].setPosition(5000, 50000);
+                    chickendeadtriangle[i][j] = 1;
+
+                }
+            }
+            if (Player2ship.getGlobalBounds().intersects(Chickentriangle[i][j].getGlobalBounds()) && coopon && shield_on2 == false)
+            {
+                health3 -= 1;
+                if (soundeffectON)
+                {
+                    exploding.play();
+                }
+                hp2.setString(to_string(health3));
+                chicken.HPtriangle[i][j]--;
+                if (chicken.HPtriangle[i][j] <= 0)
+                {
+                    Chickentriangle[i][j].setPosition(5000, 50000);
+                    chickendeadtriangle[i][j] = 1;
+
+                }
+            }
+        }
+    }
     for (int i = 0; i < bullet.numberofbullets; i++)
     {
         if (Bullets[i].getGlobalBounds().intersects(triangle.getGlobalBounds()))
@@ -3559,12 +3823,20 @@ void trianglewavemove()
     }
     if (triangle1health <= 0)
     {
-        triangle.setPosition(5000, 5000);
+        triangle.setPosition(triangle.getPosition().x, 5000);
     }
     if (triangle2health <= 0)
     {
-        triangle2.setPosition(5000, 5000);
+        triangle2.setPosition(triangle2.getPosition().x, 5000);
     }
+    if (ChickenMovement == 9)
+        checkchickenanimation = false;
+    else if (ChickenMovement == 0)
+        checkchickenanimation = true;
+    if (checkchickenanimation == false)
+        ChickenMovement--;
+    else
+        ChickenMovement++;
 }
 int main()
 {
@@ -4362,10 +4634,11 @@ beginning: {};
                     foodmovespeed = 10;
                     PlayerShooting();
                     rocketshooting();
+                    eggmovement(1);
                     scorecalc();
                     window.draw(rectangle1);
                     window.draw(rectangle2);
-
+               
                     if (gameover == true) {
                         searchl = 0;
                         if(lvl=='1')
@@ -4439,13 +4712,64 @@ beginning: {};
                             Bullets[i].setPosition(4000, 4000);
                         }
                     }
+
+                    for (int i = 0; i < 2; i++)
+                    {
+                        for (int j = 0; j < 6; j++)
+                        {
+                            if (chickendeadtriangle[i][j] == 0)
+                                alivechicken++;
+                        }
+                    }
                     camerashake();
+
+                    if (alivechicken == 0)
+                    {
+                        Wave1 = false;
+                        Wave2 = true;
+                        clock4.restart();
+                        clock3.restart();
+                        for (int i = 0; i < bullet.numberofbullets; i++)
+                        {
+                            Bullets[i].setPosition(9000, 9000);
+                            spark[i].setPosition(9000, 9000);
+                            fog[i].setPosition(9000, 9000);
+
+                        }
+                        for (int i = 0; i < 2; i++)
+                        {
+                            for (int a = 0; a < 6; a++)
+                            {
+                                Chickentriangle[i][a].setPosition(-2000, 2000);
+                            }
+                        }
+                    }
+
                     shield_move();
+                    FoodMovment();
                     trianglewavemove();
                     window.draw(Shield);
                     window.draw(Shield2);
                     window.draw(triangle);
                     window.draw(triangle2);
+                    for (int i = 0; i < 2; i++)
+                    {
+                        for (int j = 0; j < 6; j++)
+                        {
+                            window.draw(Chickentriangle[i][j]);
+                        }
+                    }
+                    for (int j = 0; j < 4; j++)
+                    {
+                        for (int i = 0; i < 8; i++)
+                        {
+
+                            window.draw(eggyolk[i][j]);
+                            window.draw(Eggs[i][j]);
+                            window.draw(chicken_legs[i][j]);
+
+                        }
+                    }
                     //drawing missile
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
@@ -5895,6 +6219,7 @@ beginning: {};
                     }
                 }
                 window.draw(sprite);
+                
             }
         sprite.setPosition(static_cast<Vector2f>(Mouse::getPosition(window))); // Set position 
         
