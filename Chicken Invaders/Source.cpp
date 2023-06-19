@@ -419,10 +419,32 @@ Text Engine;
 Text Default;
 bool shopcheck[3] = { 1,0,0};
 pair<int, int> customship;
-
+//////////////////////////////////////////////////////////
+//shapes for  triangle wave
+CircleShape triangle;
+CircleShape triangle2;
+char triangle1direction = 'R';
+char triangle2direction = 'L';
+int triangle1health = 15;
+int triangle2health = 15;
 // Loading Ingame Files
 void IngameImages()
 {
+    // setting up shapes for triangle wave
+    triangle.setRadius(50.f);
+    triangle.setPointCount(3);
+    triangle.setPosition(600, 200);
+    triangle.setOutlineThickness(5.f);
+    triangle.setFillColor(Color::Blue);
+    triangle.setOutlineColor(Color::Black);
+    triangle.setScale(5, 5);
+    triangle2.setRadius(50.f);
+    triangle2.setPointCount(3);
+    triangle2.setPosition(1320, 200);
+    triangle2.setOutlineThickness(5.f);
+    triangle2.setFillColor(Color::Blue);
+    triangle2.setOutlineColor(Color::Black);
+    triangle2.setScale(5, 5);
     //borders for chicken bounce
     topborder.setPosition(0, 0);
     bottomborder.setPosition(0, 980);
@@ -3299,6 +3321,10 @@ void bossmove() {
 }
 void reset()
 {
+    triangle.setPosition(600, 200);
+    triangle2.setPosition(1320, 200);
+    triangle1health = 15; 
+    triangle2health = 15;
     eggvar = 501;
     chicken.chicken_healthvar = 1;
     if (soundeffectON)
@@ -3467,7 +3493,79 @@ void lvldiff()
         meteors.meteorspeed = 13.5;
     }
 }
-
+void trianglewavemove()
+{
+    if (triangle.getPosition().x >= 1500)
+    {
+        triangle1direction = 'L';
+    }
+    if (triangle.getPosition().x <= 50)
+        triangle1direction = 'R';
+    if (triangle1direction == 'R')
+    {
+            triangle.move(12, 0);
+    }
+    else if (triangle1direction == 'L')
+    {
+            triangle.move(-12, 0);
+    }
+    if (triangle2.getPosition().x >= 1500)
+    {
+        triangle2direction = 'L';
+    }
+    if (triangle2.getPosition().x <= 50)
+        triangle2direction = 'R';
+    if (triangle2direction == 'R')
+    {
+        triangle2.move(12, 0);
+    }
+    else if (triangle2direction == 'L')
+    {
+        triangle2.move(-12, 0);
+    }
+    if (Player.getGlobalBounds().intersects(triangle.getGlobalBounds()) && shield_on == false || (Player.getGlobalBounds().intersects(triangle2.getGlobalBounds())) && shield_on == false)
+    {
+        if (health >= 1)
+        {
+            health -= 1;
+        }
+        if (soundeffectON)
+        {
+            exploding.play();
+        }
+        hp.setString(to_string(health));
+    }
+    if (Player2ship.getGlobalBounds().intersects(triangle.getGlobalBounds()) && shield_on2 == false || (Player2ship.getGlobalBounds().intersects(triangle2.getGlobalBounds())) && coopon && shield_on2 == false)
+    {
+        health3 -= 1;
+        if (soundeffectON)
+        {
+            exploding.play();
+        }
+        hp2.setString(to_string(health3));
+    }
+    for (int i = 0; i < bullet.numberofbullets; i++)
+    {
+        if (Bullets[i].getGlobalBounds().intersects(triangle.getGlobalBounds()))
+        {
+            Bullets[i].setPosition(10000, 10000);
+            triangle1health -= 1;
+        }
+        if (Bullets[i].getGlobalBounds().intersects(triangle2.getGlobalBounds()))
+        {
+            Bullets[i].setPosition(10000, 10000);
+            triangle2health -= 1;
+        }
+    }
+    if (triangle1health <= 0)
+    {
+        triangle.setPosition(5000, 5000);
+    }
+    if (triangle2health <= 0)
+    {
+        triangle2.setPosition(5000, 5000);
+    }
+}
 int main()
 {
     //variable for game pages
@@ -4264,12 +4362,7 @@ beginning: {};
                     foodmovespeed = 10;
                     PlayerShooting();
                     rocketshooting();
-                    ChickenMove();
-                    eggmovement();
-                    spark_fog();
                     scorecalc();
-                    FoodMovment();
-                    
                     window.draw(rectangle1);
                     window.draw(rectangle2);
 
@@ -4318,22 +4411,6 @@ beginning: {};
                         goto beginning;
 
                     }
-
-
-                    for (int j = 0; j < 4; j++)
-                    {
-                        for (int i = 0; i < 8; i++)
-                        {
-
-                            window.draw(eggyolk[i][j]);
-                            window.draw(Chicken[i][j]);
-                            window.draw(Eggs[i][j]);
-                            window.draw(chicken_legs[i][j]);
-
-                        }
-                    }
-                  
-
                     window.draw(crystalgift); 
                     window.draw(iongift);
                     window.draw(health_bar);
@@ -4362,40 +4439,14 @@ beginning: {};
                             Bullets[i].setPosition(4000, 4000);
                         }
                     }
-                    for (int i = 0; i < 8; i++)
-                    {
-                        for (int j = 0; j < 4; j++)
-                        {
-                            if (chickendead[i][j] == 0)
-                                alivechicken++;
-                        }
-                    }
                     camerashake();
-                    if (alivechicken == 0)
-                    {
-                        Wave1 = false;
-                        Wave2 = true;
-                        clock4.restart();
-                        clock3.restart();
-                        for (int i = 0; i < bullet.numberofbullets; i++)
-                        {
-                            Bullets[i].setPosition(9000, 9000);
-                                spark[i].setPosition(9000, 9000);
-                                fog[i].setPosition(9000, 9000);
-                        }
-                    }
                     shield_move();
+                    trianglewavemove();
                     window.draw(Shield);
                     window.draw(Shield2);
-
-
+                    window.draw(triangle);
+                    window.draw(triangle2);
                     //drawing missile
-                    window.draw(missile);
-                    for (int i = 0; i < 50; i++) {
-                        window.draw(spark[i]);
-                        window.draw(fog[i]);
-                    }
-               
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
                         page = 5;
