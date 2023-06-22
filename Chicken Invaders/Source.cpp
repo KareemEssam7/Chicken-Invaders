@@ -14,7 +14,7 @@ using namespace sf;
 // Chicken Struct
 struct ChickenStruct
 {
-    double HP[8][4], speed = 4, HPtriangle[2][6];
+    double HP[8][4], speed = 4, HPtriangle[2][6] , smol_hp[40];
     double chicken_healthvar = 1, chicken_health = 1;
 };
 
@@ -24,7 +24,7 @@ struct bulletstruct
     double bulletdamage = 1;
     float bulletSpeed = 10;
     int currentBullet = 0;
-    float bulletCoolDownvar = 8;
+    float bulletCoolDownvar = 12;
     float bulletCoolDown = 0;
     float bulletCoolDown2 = 0;
     const int numberofbullets = 50;
@@ -430,6 +430,25 @@ char triangle1direction = 'R';
 char triangle2direction = 'L';
 int triangle1health = 15;
 int triangle2health = 15;
+
+///////////////////////////////////////////////////////////
+//Baby chicks
+int initialsmol = 0;
+Sprite smol[40];
+int smol_enter[40];
+bool right_move[40];
+int col = 1;
+bool smol_ded[40];
+Texture chicksy;
+int chickmove = 0;
+bool chickright = true;
+int timer_smol[40];
+Texture eggsmoltex;
+Sprite eggs_smol[40];
+Sprite eggyolk_smol[40];
+int smolalive = 0;
+int s=0;
+
 // Loading Ingame Files
 void IngameImages()
 {
@@ -522,7 +541,7 @@ void IngameImages()
     //ship fire
     shipfiretx.loadFromFile("shipfire.png");
     shipfire.setTexture(shipfiretx);
-    shipfire.setOrigin(15, 0);
+    shipfire.setOrigin(14.5, 0);
     shipfire.setColor(Color(255, 165, 6, 240));
 
     shipfiretx2.loadFromFile("shipfire.png");
@@ -561,7 +580,7 @@ void IngameImages()
     //Shield
     Shield.setFillColor(Color(0, 102, 204, 140));
     Shield.setPosition(10000, 10000);
-
+    Shield.setScale(1.5, 1.5);
     Shield2.setFillColor(Color(0, 102, 204, 140));
     Shield2.setPosition(10500, 10500);
 
@@ -1070,7 +1089,7 @@ void IngameImages()
     Player.setTexture(PlayerSkin);
     Player.setTextureRect(IntRect(PlayerMovement * 60, 0, 60, 42));
     Player.setPosition(960, 850);
-    Player.setScale(1.5, 1.5);
+    Player.setScale(2.25, 2.25);
     rotatecheck=1;
 
     // player 2 image
@@ -1206,7 +1225,7 @@ void IngameImages()
     for (int i = 0; i < bullet.numberofbullets; i++)
     {
         Bullets[i].setTexture(bulletImage);
-        Bullets[i].setScale(2, 2);
+        Bullets[i].setScale(2.7, 2.7);
         Bullets[i].setPosition(-1000, -1000);
 
     }
@@ -1241,6 +1260,9 @@ void IngameImages()
 
     }
 
+    //Eggs small chicks
+    
+
     //setting chicken legs
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 4; j++) {
@@ -1261,8 +1283,18 @@ void IngameImages()
     GiftCrystal.loadFromFile("GIFTHypergun.png");
     crystalgift.setTexture(GiftCrystal);
     crystalgift.setPosition(-100, -100);
-}
 
+
+    //smol chicken
+    chicksy.loadFromFile("chick.png");
+    for (int i = 0; i < 40; i++)
+    {
+        smol[i].setTexture(chicksy);
+        smol_enter[i] = 0;
+        right_move[i] = true;
+    }
+
+}
 
 // function for player movement
 void PlayerMove()
@@ -1402,15 +1434,15 @@ void PlayerMove()
         }
     }
     //shipe fire
-    shipfire.setPosition(Player.getPosition().x + 45, Player.getPosition().y + 45);
+    shipfire.setPosition(Player.getPosition().x + 67, Player.getPosition().y + 70 );
     if (shipfirescale == 0)
     {
-        shipfire.setScale(1, 1.2);
+        shipfire.setScale(1.45, 1.45);
         shipfirescale++;
     }
     else
     {
-        shipfire.setScale(1, 1);
+        shipfire.setScale(1.45, 1.45);
         shipfirescale--;
     }
     if (Keyboard::isKeyPressed(Keyboard::D) && Player.getPosition().x <= 1800)
@@ -1550,11 +1582,11 @@ void PlayerShooting() {
     {
         bullet.bulletCoolDown = bullet.bulletCoolDownvar;
         if (doublebullets==0)
-        Bullets[bullet.currentBullet].setPosition(Player.getPosition().x + 35, Player.getPosition().y - 45);
+        Bullets[bullet.currentBullet].setPosition(Player.getPosition().x + 59.5, Player.getPosition().y - 50);
         else if (doublebullets == 1)
         {
-            Bullets[bullet.currentBullet].setPosition(Player.getPosition().x + 20, Player.getPosition().y - 45);
-            Bullets[bullet.currentBullet+1].setPosition(Player.getPosition().x + 50, Player.getPosition().y - 45);
+            Bullets[bullet.currentBullet].setPosition(Player.getPosition().x + 20, Player.getPosition().y - 50);
+            Bullets[bullet.currentBullet+1].setPosition(Player.getPosition().x + 50, Player.getPosition().y - 50);
             bullet.currentBullet++;
             if (bullet.currentBullet >= 40 ) {
                 bullet.currentBullet = 0;
@@ -1735,7 +1767,7 @@ void ChickenMove()
         for (int i = 0; i < 8; i++)
         {
             Chicken[i][j].setTexture(ChickenSkin);
-            Chicken[i][j].setScale(0.42816011236, 0.43485915493);
+            Chicken[i][j].setScale(0.65, 0.65);
             if (chickeninitialpos == 0) 
             {
                 if (j == 0 || j == 2)
@@ -1897,6 +1929,71 @@ void playerdamage() {
 
             }
         }
+        for (int i = 0; i < 40; i++)
+        {
+            if (eggs_smol[i].getGlobalBounds().intersects(Player.getGlobalBounds())) {
+                if (health >= 1)
+                {
+                    health -= 1;
+                }
+                if (doublebullets > 0)
+                    doublebullets -= 1;
+                if (soundeffectON)
+                {
+                    exploding.play();
+                }
+                hp.setString(to_string(health));
+                eggs_smol[i].setPosition(4000, 5000);
+            }
+            if (eggs_smol[i].getGlobalBounds().intersects(Player2ship.getGlobalBounds()) && coopon)
+            {
+                if (health3 >= 1)
+                {
+                    health3 -= 1;
+                }
+                if (soundeffectON)
+                {
+                    exploding.play();
+                }
+                hp2.setString(to_string(health3));
+                smol[i].setPosition(4000, 5000);
+
+            }
+            if (smol[i].getGlobalBounds().intersects(Player2ship.getGlobalBounds()) && coopon && shield_on2 == false)
+            {
+                if (health3 >= 1)
+                {
+                    health3 -= 1;
+                }
+                if (soundeffectON)
+                {
+                    exploding.play();
+                }
+                hp2.setString(to_string(health3));
+                chicken.smol_hp[i] = 0;
+               
+                smol[i].setPosition(4000, 5000);
+            }
+            if (smol[i].getGlobalBounds().intersects(Player.getGlobalBounds()) && shield_on == false)
+            {
+                if (health >= 1)
+                {
+                    health -= 1;
+                }
+                if (doublebullets > 0)
+                    doublebullets -= 1;
+                if (soundeffectON)
+                {
+                    exploding.play();
+                }
+                hp.setString(to_string(health));
+                chicken.smol_hp[i] = 0;
+                
+                smol[i].setPosition(4000, 5000);
+            }
+
+        }
+
         //boss egg damage
         for (int i = 0; i < 5; i++)
         {
@@ -2164,7 +2261,7 @@ void shield_move()
     if (shield_on == 1 && shield_timer > 0)
     {
 
-        Shield.setPosition(Player.getPosition().x - 18, Player.getPosition().y - 25);
+        Shield.setPosition(Player.getPosition().x - 27, Player.getPosition().y - 37);
         shield_timer--;
     }
     else
@@ -2175,7 +2272,7 @@ void shield_move()
     if (shield_on2 == 1 && shield_timer2 > 0)
     {
 
-        Shield2.setPosition(Player2ship.getPosition().x - 18, Player2ship.getPosition().y - 25);
+        Shield2.setPosition(Player2ship.getPosition().x - 27, Player2ship.getPosition().y - 37);
         shield_timer2--;
     }
     else
@@ -2190,6 +2287,75 @@ void shield_move()
 void eggmovement(int wavetype = 0)
 {
     if (wavetype == 0)
+    {
+        if (x == 0)
+        {
+            for (int j = 0; j < 40; j++)
+            {
+
+                timer_smol[j] = 0;
+
+
+            }
+            eggvar = 200;
+            for (int j = 0; j < 40; j++)
+            {
+                timer_smol[j] = rand() % eggvar;
+            }
+            x++;
+        }
+
+        for (int i = 0; i < 40; i++)
+        {
+            if (timer_smol[i] > 0)
+            {
+                timer_smol[i]--;
+            }
+            if (timer[i] == 0)
+            {
+                eggyolk_smol[i].setScale(0, 0);
+                eggs_smol[i].setScale(0.1, 0.1);
+                eggs_smol[i].setPosition(smol[i].getPosition().x + 52.45, smol[i].getPosition().y + 65);
+
+
+                if (soundeffectON && eggs_smol[i].getPosition().x < 1920)
+                {
+                    eggshoot[currenteggshootsfx].play();
+                    currenteggshootsfx++;
+                    if (currenteggshootsfx == 2)
+                    {
+                        currenteggshootsfx = 0;
+                    }
+                }
+                timer_smol[i]--;
+            }
+            if (timer_smol[i] == -1)
+            {
+                eggs_smol[i].move(0, 9.8f);
+            }
+            if (eggs_smol[i].getPosition().y >= 1000)
+            {
+                eggyolk_smol[i].setPosition(eggs_smol[i].getPosition().x, 1000);
+                timer_smol[i] = rand() % eggvar;
+                timer_smol[i]--;
+                eggs_smol[i].setScale(0, 0);
+                eggyolk_smol[i].setScale(2, 2);
+
+            }
+            if (eggs_smol[i].getGlobalBounds().intersects(Shield.getGlobalBounds()))
+            {
+                eggs_smol[i].setPosition(10000, 10000);
+            }
+            if (eggs_smol[i].getGlobalBounds().intersects(Shield2.getGlobalBounds()))
+            {
+                eggs_smol[i].setPosition(10000, 10000);
+            }
+
+        }
+    }
+
+
+    else if (wavetype == 1)
     {
         if (x == 0)
         {
@@ -2230,7 +2396,7 @@ void eggmovement(int wavetype = 0)
                     eggyolk[i][j].setScale(0, 0);
                     Eggs[i][j].setScale(0.13, 0.13);
                     Eggs[i][j].setPosition(Chicken[i][j].getPosition().x + 53.45, Chicken[i][j].getPosition().y + 75);
-
+                    
 
                     if (soundeffectON && Eggs[i][j].getPosition().x < 1920)
                     {
@@ -2268,7 +2434,7 @@ void eggmovement(int wavetype = 0)
             }
         }
     }
-    else if (wavetype == 1)
+    else if (wavetype == 2)
     {
         if (x == 0)
         {
@@ -2349,6 +2515,8 @@ void eggmovement(int wavetype = 0)
             }
         }
     }
+
+    
     
 }
 //Food Movment Function
@@ -3026,6 +3194,117 @@ void scorecalc() {
             }
         }
     }
+
+    for (int i = 0; i < bullet.numberofbullets; i++) {
+        for (int j = 0; j < 40; j++) {
+                if (Bullets[i].getGlobalBounds().intersects(smol[j].getGlobalBounds()))
+                {
+                    if (chicken.smol_hp[j] > 0)
+                    {
+                        Bullets[i].setPosition(-10000, -10000);
+                        chicken.smol_hp[j] = chicken.smol_hp[j] - (powerlvls * 0.5) - bullet.bulletdamage;
+                    }
+                    if (chicken.smol_hp[j] <= 0)
+                    {
+                        if (coopon)
+                        {
+                            randomizer = 0;
+                        }
+                        else
+                        {
+                            randomizer = 1 + rand() % 160;
+                        }
+
+                        if (randomizer == 1 || randomizer == 2)
+                        {
+                            iongift.setPosition(smol[j].getPosition().x, smol[j].getPosition().y);
+
+                        }
+                        if (randomizer == 3)
+                        {
+
+                            crystalgift.setPosition(smol[j].getPosition().x, smol[j].getPosition().y);
+
+                        }
+                        smol[j].setPosition(10000, 10000);
+                        Bullets[i].setPosition(-10000, -10000);
+                        cnt += 1000;
+                        smol_ded[j] = 1;
+                        score.setString(to_string(cnt));
+                        missileScoreCount += 1000;
+                    }
+
+                    if (missileScoreCount == 70000)
+                    {
+                        missileScoreCount = 0;
+                        rockets += 1;
+                        rocket.setString(to_string(rockets));
+                        rocket2.setString(to_string(rockets));
+                    }
+                    if (soundeffectON)
+                    {
+                        chickenhurt[currentchickensfx].play();
+                        currentchickensfx++;
+                        if (currentchickensfx == 2)
+                        {
+                            currentchickensfx = 0;
+                        }
+                    }
+
+
+                }
+                if (checkbullet == 'b')
+                {
+                    bullet.bulletdamage = 2;
+                }
+                else if (checkbullet == 'r')
+                {
+                    bullet.bulletdamage = 1;
+                }
+
+                if (iongift.getGlobalBounds().intersects(Player.getGlobalBounds()))
+                {
+                    if (soundeffectON)
+                    {
+                        upgradesound.play();
+                    }
+                    iongift.setPosition(4000, -100);
+                    for (int i = 0; i < 50; i++)
+                    {
+                        Bullets[i].setTexture(bulletImage);
+                    }
+                    if (checkbullet == 'b')
+                    {
+                        doublebullets = 0;
+                        checkbullet = 'r';
+                    }
+                    else if (doublebullets < 2)
+                        doublebullets++;
+
+                }
+                if (crystalgift.getGlobalBounds().intersects(Player.getGlobalBounds()))
+                {
+                    if (soundeffectON)
+                    {
+                        upgradesound.play();
+                    }
+                    crystalgift.setPosition(4000, -100);
+                    for (int i = 0; i < 50; i++)
+                    {
+                        Bullets[i].setTexture(crystaltear);
+                    }
+                    if (checkbullet == 'r')
+                    {
+                        doublebullets = 0;
+                        checkbullet = 'b';
+                    }
+                    else if (doublebullets < 2)
+                        doublebullets++;
+                }
+            
+        }
+    }
+
 }
 //Main menu 
 void mainmenu()
@@ -3469,7 +3748,12 @@ void bossmove() {
 }
 void reset()
 {
-    
+    for (int i = 0; i < 3; i++)
+    {
+        smol_ded[i] = 0;
+    }
+    initialsmol = 0;
+    Player.setTextureRect(IntRect(540, 0, 60, 42));
     triangle.setPosition(600, 200);
     triangle2.setPosition(1320, 200);
     triangle1health = 15; 
@@ -3498,7 +3782,7 @@ void reset()
     crystalgift.setPosition(-10000, -10000);
     iongift.setPosition(-10000, -10000);
     Player.setPosition(900, 850);
-    Player.setScale(1.5, 1.5); 
+    Player.setScale(2.25, 2.25); 
     Player2ship.setPosition(1000, 850);
     coopon = false;
     validname = false;
@@ -3597,6 +3881,11 @@ void reset()
         {
             chickendeadtriangle[i][j] = 0;
         }
+    }
+    for (int i = 0; i < 40; i++)
+    {
+        eggs_smol[i].setPosition(10000,10000);
+        eggyolk_smol[i].setPosition(10000,10000);
     }
     bosssprite.setPosition(Vector2f(200, 200));
     x = 0;
@@ -3838,6 +4127,191 @@ void trianglewavemove()
     else
         ChickenMovement++;
 }
+
+void smolchick()
+{
+    if (initialsmol == 0)
+    {
+        for (int i = 0; i < 40; i++)
+        {
+            smol[i].setTexture(chicksy);
+            smol[i].setTextureRect(IntRect(chickmove*255 , 0, 255, 225));
+            smol[i].setScale(0.5, 0.5);                      
+            smol[i].setPosition(-8000 + (i * 200), 100);   
+
+            chicken.smol_hp[i] = 2;
+
+            eggs_smol[i].setTexture(eggTex);
+            eggs_smol[i].setPosition(10000, -10000);
+            eggs_smol[i].setScale(0.13, 0.13);
+
+            eggyolk_smol[i].setTexture(eggbreak);
+            eggyolk_smol[i].setTextureRect(IntRect(28 * 5, 0, 28, 24));
+            eggyolk_smol[i].setScale(2, 2);
+        }
+    }
+    initialsmol = 1;
+
+    for (int i = 0; i < 40; i++)
+    {
+        if (smol_enter[i] == 0 && right_move[i] == true)
+        {
+            smol[i].move(8, 0);
+            smol[i].setTextureRect(IntRect(chickmove * 255, 0, 255, 225));
+        }
+        if (smol_enter[i] == 0 && right_move[i] == false)
+        {
+            smol[i].move(-8, 0);
+            smol[i].setTextureRect(IntRect(chickmove * 255, 0, 255, 225));
+        }
+        if (smol[i].getPosition().x <= 55 && right_move[i] == false)
+        {
+            smol_enter[i] = 1;
+        }
+        if (smol[i].getPosition().x >= 1760 &&right_move[i] == true)
+        {
+            smol_enter[i] = 1;          
+        }
+        if (smol_enter[i] == 1)
+        {
+            smol[i].move(0, 8);
+            smol[i].setTextureRect(IntRect(chickmove * 255, 0, 255, 225));
+        }
+        if (smol[i].getPosition().y >=400 && smol[i].getPosition().y <= 410)
+        {
+            smol_enter[i] = 0;
+            right_move[i] = false;
+        }
+        if (smol[i].getPosition().y >= 700 && smol[i].getPosition().y <= 710)
+        {
+            smol_enter[i] = 0;
+            right_move[i] = true;
+        }
+        
+
+
+    }
+    if (chickmove == 25)
+    {
+        chickright = false;
+    }
+    else if(chickmove == 0)
+        chickright = true;
+
+    if (chickright==false)
+        chickmove--;
+    else
+        chickmove++;
+
+    for (int i = 0; i < 40; i++)
+    {
+  
+            if (Player.getGlobalBounds().intersects(smol[i].getGlobalBounds()) && shield_on == false)
+            {
+                if (health >= 1)
+                {
+                    health -= 1;
+                }
+                if (soundeffectON)
+                {
+                    exploding.play();
+                }
+                hp.setString(to_string(health));
+                chicken.smol_hp[i]--;
+                if (chicken.smol_hp[i] <= 0)
+                {
+                    smol[i].setPosition(5000, 50000);
+                    smol_ded[i]= 1;
+
+                }
+            }
+            if (Player2ship.getGlobalBounds().intersects(smol[i].getGlobalBounds()) && coopon && shield_on2 == false)
+            {
+                health3 -= 1;
+                if (soundeffectON)
+                {
+                    exploding.play();
+                }
+                hp2.setString(to_string(health3));
+                chicken.smol_hp[i]--;
+                if (chicken.smol_hp[i] <= 0)
+                {
+                    smol[i].setPosition(5000, 50000);
+                    smol_ded[i] = 1;
+
+                }
+            }
+    }   
+}
+
+void chick_shit()
+{
+    if (s == 0)
+    {
+        for (int j = 0; j < 40; j++)
+        {
+
+            timer_smol[j] = 0;
+
+
+        }
+        eggvar = 400;
+        for (int j = 0; j < 40; j++)
+        {
+            timer_smol[j] = rand() % eggvar;
+        }
+        s++;
+    }
+
+    for (int i = 0; i < 40; i++)
+    {
+        if (timer_smol[i] > 0)
+        {
+            timer_smol[i]--;
+        }
+        if (timer_smol[i] == 0)
+        {
+            eggyolk_smol[i].setScale(0, 0);
+            eggs_smol[i].setScale(0.11, 0.11);
+            eggs_smol[i].setPosition(smol[i].getPosition().x + 127, smol[i].getPosition().y + 112);
+
+
+            if (soundeffectON && eggs_smol[i].getPosition().x < 1920)
+            {
+                eggshoot[currenteggshootsfx].play();
+                currenteggshootsfx++;
+                if (currenteggshootsfx == 2)
+                {
+                    currenteggshootsfx = 0;
+                }
+            }
+            timer_smol[i]--;
+        }
+        if (timer_smol[i] == -1)
+        {
+            eggs_smol[i].move(0, 9.8f);
+        }
+        if (eggs_smol[i].getPosition().y >= 1000)
+        {
+            eggyolk_smol[i].setPosition(eggs_smol[i].getPosition().x, 1000);
+            timer_smol[i] = rand() % eggvar;
+            timer_smol[i]--;
+            eggs_smol[i].setScale(0, 0);
+            eggyolk_smol[i].setScale(2, 2);
+
+        }
+        if (eggs_smol[i].getGlobalBounds().intersects(Shield.getGlobalBounds()))
+        {
+            eggs_smol[i].setPosition(10000, 10000);
+        }
+        if (eggs_smol[i].getGlobalBounds().intersects(Shield2.getGlobalBounds()))
+        {
+            eggs_smol[i].setPosition(10000, 10000);
+        }
+
+    }
+}
+
 int main()
 {
     //variable for game pages
@@ -4628,14 +5102,15 @@ beginning: {};
                 chicken.chicken_healthvar = 1;
                 prevwave = '1';
                 alivechicken = 0;
+                smolalive = 0;
                 if (clock4.getElapsedTime().asSeconds() >= 9)
                 {
                     backgroundspeed = 3;
                     foodmovespeed = 10;
                     PlayerShooting();
                     rocketshooting();
-                    eggmovement(1);
                     scorecalc();
+                    
                     window.draw(rectangle1);
                     window.draw(rectangle2);
                
@@ -4699,6 +5174,7 @@ beginning: {};
                         window.draw(powerlvl2);
                         window.draw(explosion2);
                     }
+                   
                     window.draw(foodscore);
                     window.draw(hp);
                     window.draw(rocket);
@@ -4713,7 +5189,27 @@ beginning: {};
                         }
                     }
 
-                    for (int i = 0; i < 2; i++)
+                    for (int i = 0; i < 40; i++)
+                    {
+                        if (smol[i].getPosition().y < 1100 && smol[i].getPosition().x < 1920)
+                        {
+                            smolalive++;
+                        }
+                    }
+                    if (smolalive == 0)
+                    {
+                        Wave1 = false;
+                        Wave2 = true;
+                        clock4.restart();
+                        clock3.restart();
+                        for (int i = 0; i < bullet.numberofbullets; i++)
+                        {
+                            Bullets[i].setPosition(9000, 9000);
+                            spark[i].setPosition(9000, 9000);
+                            fog[i].setPosition(9000, 9000);
+                        }
+                    }
+                    /*for (int i = 0; i < 2; i++)
                     {
                         for (int j = 0; j < 6; j++)
                         {
@@ -4721,9 +5217,9 @@ beginning: {};
                                 alivechicken++;
                         }
                     }
-                    camerashake();
+                    camerashake();*/
 
-                    if (alivechicken == 0)
+                    /*if (alivechicken == 0)
                     {
                         Wave1 = false;
                         Wave2 = true;
@@ -4743,16 +5239,26 @@ beginning: {};
                                 Chickentriangle[i][a].setPosition(-2000, 2000);
                             }
                         }
-                    }
+                    }*/
 
                     shield_move();
+                    smolchick();
                     FoodMovment();
-                    trianglewavemove();
+                    chick_shit();
+                    //trianglewavemove();
                     window.draw(Shield);
                     window.draw(Shield2);
-                    window.draw(triangle);
-                    window.draw(triangle2);
-                    for (int i = 0; i < 2; i++)
+
+                    for (int i = 0; i < 40; i++)
+                    {
+                        window.draw(smol[i]);
+                        window.draw(eggs_smol[i]);
+                        window.draw(eggyolk_smol[i]);
+                    }
+
+                   /* window.draw(triangle);
+                    window.draw(triangle2);*/
+                    /*for (int i = 0; i < 2; i++)
                     {
                         for (int j = 0; j < 6; j++)
                         {
@@ -4769,7 +5275,7 @@ beginning: {};
                             window.draw(chicken_legs[i][j]);
 
                         }
-                    }
+                    }*/
                     //drawing missile
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
@@ -4984,7 +5490,7 @@ beginning: {};
 
                         }
                     }
-                    eggmovement();
+                    eggmovement(1);
                     scorecalc();
                     FoodMovment();
                     window.draw(crystalgift);
@@ -5046,7 +5552,7 @@ beginning: {};
                     PlayerShooting();
                     rocketshooting();
                     ChickenMove();
-                    eggmovement();
+                    eggmovement(0);
                     spark_fog();
                     scorecalc();
                     FoodMovment();
@@ -5393,7 +5899,7 @@ beginning: {};
                     }
                     window.draw(crystalgift);
                     window.draw(iongift);
-                    eggmovement();
+                    eggmovement(1);
                     scorecalc();
                     FoodMovment();
                     window.draw(health_bar);
