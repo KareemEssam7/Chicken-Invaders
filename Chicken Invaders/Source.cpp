@@ -2286,76 +2286,9 @@ void shield_move()
 // egg movement function
 void eggmovement(int wavetype = 0)
 {
-    if (wavetype == 0)
-    {
-        if (x == 0)
-        {
-            for (int j = 0; j < 40; j++)
-            {
+    
 
-                timer_smol[j] = 0;
-
-
-            }
-            eggvar = 200;
-            for (int j = 0; j < 40; j++)
-            {
-                timer_smol[j] = rand() % eggvar;
-            }
-            x++;
-        }
-
-        for (int i = 0; i < 40; i++)
-        {
-            if (timer_smol[i] > 0)
-            {
-                timer_smol[i]--;
-            }
-            if (timer[i] == 0)
-            {
-                eggyolk_smol[i].setScale(0, 0);
-                eggs_smol[i].setScale(0.1, 0.1);
-                eggs_smol[i].setPosition(smol[i].getPosition().x + 52.45, smol[i].getPosition().y + 65);
-
-
-                if (soundeffectON && eggs_smol[i].getPosition().x < 1920)
-                {
-                    eggshoot[currenteggshootsfx].play();
-                    currenteggshootsfx++;
-                    if (currenteggshootsfx == 2)
-                    {
-                        currenteggshootsfx = 0;
-                    }
-                }
-                timer_smol[i]--;
-            }
-            if (timer_smol[i] == -1)
-            {
-                eggs_smol[i].move(0, 9.8f);
-            }
-            if (eggs_smol[i].getPosition().y >= 1000)
-            {
-                eggyolk_smol[i].setPosition(eggs_smol[i].getPosition().x, 1000);
-                timer_smol[i] = rand() % eggvar;
-                timer_smol[i]--;
-                eggs_smol[i].setScale(0, 0);
-                eggyolk_smol[i].setScale(2, 2);
-
-            }
-            if (eggs_smol[i].getGlobalBounds().intersects(Shield.getGlobalBounds()))
-            {
-                eggs_smol[i].setPosition(10000, 10000);
-            }
-            if (eggs_smol[i].getGlobalBounds().intersects(Shield2.getGlobalBounds()))
-            {
-                eggs_smol[i].setPosition(10000, 10000);
-            }
-
-        }
-    }
-
-
-    else if (wavetype == 1)
+     if (wavetype == 1)
     {
         if (x == 0)
         {
@@ -2434,7 +2367,7 @@ void eggmovement(int wavetype = 0)
             }
         }
     }
-    else if (wavetype == 2)
+    else if (wavetype == 0)
     {
         if (x == 0)
         {
@@ -3748,9 +3681,14 @@ void bossmove() {
 }
 void reset()
 {
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 40; i++)
     {
         smol_ded[i] = 0;
+       
+            smol[i].setTexture(chicksy);
+            smol_enter[i] = 0;
+            right_move[i] = true;
+            smol[i].setPosition(-9000, -9000);
     }
     initialsmol = 0;
     Player.setTextureRect(IntRect(540, 0, 60, 42));
@@ -3889,6 +3827,7 @@ void reset()
     }
     bosssprite.setPosition(Vector2f(200, 200));
     x = 0;
+    s = 0;
 }
 
 void lvldiff()
@@ -4217,7 +4156,7 @@ void smolchick()
                     exploding.play();
                 }
                 hp.setString(to_string(health));
-                chicken.smol_hp[i]--;
+                chicken.smol_hp[i]-=2;
                 if (chicken.smol_hp[i] <= 0)
                 {
                     smol[i].setPosition(5000, 50000);
@@ -4233,7 +4172,7 @@ void smolchick()
                     exploding.play();
                 }
                 hp2.setString(to_string(health3));
-                chicken.smol_hp[i]--;
+                chicken.smol_hp[i]-=2;
                 if (chicken.smol_hp[i] <= 0)
                 {
                     smol[i].setPosition(5000, 50000);
@@ -4244,7 +4183,7 @@ void smolchick()
     }   
 }
 
-void chick_shit()
+void chick_drop()
 {
     if (s == 0)
     {
@@ -4265,7 +4204,7 @@ void chick_shit()
 
     for (int i = 0; i < 40; i++)
     {
-        if (timer_smol[i] > 0)
+        if (timer_smol[i] > 0 && smol[i].getPosition().x >= 0 && smol[i].getPosition().y >= 0 && smol[i].getPosition().x <= 1920 && smol[i].getPosition().y <= 1080)
         {
             timer_smol[i]--;
         }
@@ -5244,7 +5183,7 @@ beginning: {};
                     shield_move();
                     smolchick();
                     FoodMovment();
-                    chick_shit();
+                    chick_drop();
                     //trianglewavemove();
                     window.draw(Shield);
                     window.draw(Shield2);
@@ -5254,11 +5193,12 @@ beginning: {};
                         window.draw(smol[i]);
                         window.draw(eggs_smol[i]);
                         window.draw(eggyolk_smol[i]);
+                        window.draw(meteor[i]);
                     }
 
-                   /* window.draw(triangle);
-                    window.draw(triangle2);*/
-                    /*for (int i = 0; i < 2; i++)
+                    //window.draw(triangle);
+                   // window.draw(triangle2);
+                    for (int i = 0; i < 2; i++)
                     {
                         for (int j = 0; j < 6; j++)
                         {
@@ -5273,9 +5213,9 @@ beginning: {};
                             window.draw(eggyolk[i][j]);
                             window.draw(Eggs[i][j]);
                             window.draw(chicken_legs[i][j]);
-
+                            window.draw(Chicken[i][j]);
                         }
-                    }*/
+                    } 
                     //drawing missile
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
@@ -5285,37 +5225,38 @@ beginning: {};
                 }
                 else
                 {
-                   
-                    backgroundspeed = 20;
-                    foodmovespeed = 20;
-                    window.draw(health_bar);
-                    window.draw(Gamebar);
-                    window.draw(score);
-                    window.draw(Bottombar);
-                   
-                    if (coopon)
-                    {
-                        window.draw(Bottombar2);
-                        window.draw(foodscore2);
-                        window.draw(hp2);
-                        window.draw(rocket2);
-                        window.draw(powerlvl2);
-                        window.draw(explosion2);
-                    }
                     
-                    window.draw(foodscore);
-                    window.draw(hp);
-                    window.draw(rocket);
-                    window.draw(powerlvl);
-                    if (clock3.getElapsedTime().asSeconds() <= 8)
-                    {
-                        if (clock3.getElapsedTime().asSeconds() <= 5)
+                        backgroundspeed = 20;
+                        foodmovespeed = 20;
+                        window.draw(health_bar);
+                        window.draw(Gamebar);
+                        window.draw(score);
+                        window.draw(Bottombar);
+
+                        if (coopon)
                         {
-                            window.draw(wave1second);
+                            window.draw(Bottombar2);
+                            window.draw(foodscore2);
+                            window.draw(hp2);
+                            window.draw(rocket2);
+                            window.draw(powerlvl2);
+                            window.draw(explosion2);
                         }
-                        window.draw(wave1first);
+
+                        window.draw(foodscore);
+                        window.draw(hp);
+                        window.draw(rocket);
+                        window.draw(powerlvl);
+                        if (clock3.getElapsedTime().asSeconds() <= 8)
+                        {
+                            if (clock3.getElapsedTime().asSeconds() <= 5)
+                            {
+                                window.draw(wave1second);
+                            }
+                            window.draw(wave1first);
+                        }
                     }
-                }
+                
             }
             else if (Wave2 == true)
             {
