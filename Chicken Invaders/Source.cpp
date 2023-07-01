@@ -14,7 +14,7 @@ using namespace sf;
 // Chicken Struct
 struct ChickenStruct
 {
-    double HP[8][4], speed = 4, HPtriangle[2][6] , smol_hp[40];
+    double HP[8][4], speed = 7, HPtriangle[2][6], smol_hp[40];
     double chicken_healthvar = 1, chicken_health = 1;
 };
 
@@ -48,9 +48,9 @@ struct fogstruct {
 
 //Meteor Struct
 struct meteorstruct {
-    double meteorspeed = 5;
+    int meteorspeed = 100;
     int meteorhp = 10;
-    int meteorcount = 40;
+    int meteorcount = 100;
 };
 
 //Boss struct
@@ -65,7 +65,10 @@ struct bossstruct {
 
 //camera
 sf::View view1(sf::Vector2f(960.f, 540.f), sf::Vector2f(1920.f, 1080.f));
-
+RectangleShape vignette(Vector2f(1920, 1080));
+int vignettealpha = 250;
+bool vignettestop = false;
+bool vignettebool = false;
 // Creating Game Window
 RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders", Style::Fullscreen);
 
@@ -90,6 +93,8 @@ Sprite Chicken[8][4];
 Sprite Chicken2[8][4];
 Sprite Chickentriangle[2][6];
 int chickentriangleip = 0;
+Sound bouncingchickenhurt;
+Clock intro;
 
 // adding chicken border
 RectangleShape rectangle1(Vector2f(60, 1080));
@@ -130,7 +135,7 @@ Sprite fog[50];
 
 //player1 and 2 variables
 double PlayerMovement = 9, PlayerSpeed = 22, Player2Movement = 9, Player2Speed = 12;
-bool playeralive = true, player2alive = true; 
+bool playeralive = true, player2alive = true;
 bool player_2 = 1;
 Texture PlayerSkin;
 Texture Player2Skin;
@@ -144,7 +149,7 @@ Sprite shipfire;
 Sprite shipfire2;
 int shipfirescale = 0;
 int shipfirescale2 = 0;
-
+bool enginecheck = false;
 //coop variables
 bool coopon = false;
 int coopclick = 0;
@@ -205,7 +210,7 @@ Texture crystaltear;
 //score-bars variables
 int health = 3;
 int health3 = 3;
-int rockets = 0;    
+int rockets = 0;
 int powerlvls = 0;
 long long cnt = 0;
 int foodcnt = 0;
@@ -236,10 +241,10 @@ Sprite Bottombar2;
 bossstruct boss;
 double  bossdir = 0;
 int z = 0;
-bool  bossanimation=true;
+bool  bossanimation = true;
 bool bossalive = 0;
 int aliveboss = 1;
-int bosslvl=1;
+int bosslvl = 1;
 int animation = 0;
 Texture bossimage;
 Sprite bosssprite;
@@ -257,12 +262,12 @@ Sprite bossegg2[5];
 //////////////////////////////////////////////////////////////////////////////////////////
 
 //meteorite variables
-int tmp, meteortimer[40], meteorhp[40], meteorx = 0;
-int xmeteor=0, ymeteor=0;
+int tmp, meteortimer[100], meteorhp[100], meteorx = 0;
+int xmeteor = 0, ymeteor = 0;
 meteorstruct meteors;
 int meteoralive = 0;
 Texture meteortex;
-Sprite meteor[40];
+Sprite meteor[100];
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -297,19 +302,23 @@ Text single;
 Text shop;
 Sprite _GameBackground[2];
 Sprite Logo;
+Sprite menulogo;
 Sprite menubg[2];
 Sprite Earth;
 Sprite menuchicken;
 RectangleShape rectanglemainmenu[5];
 RectangleShape rectangleback(Vector2f(200, 70));
-RectangleShape rectangleshop(Vector2f(200, 70));
+RectangleShape rectangleshop(Vector2f(350, 70));
 SoundBuffer Select;
+Clock menuchickendelay;
 
 //borders for interactive background
 RectangleShape topborder(Vector2f(1920, 100));
 RectangleShape bottomborder(Vector2f(1920, 100));
 RectangleShape leftborder(Vector2f(100, 1080));
 RectangleShape rightborder(Vector2f(100, 1080));
+RectangleShape mousesquare(Vector2f(64, 64));
+
 
 ///////////////////////////////////////////////////////////////////////////////
 //leaderboard variables
@@ -371,7 +380,7 @@ RectangleShape rectangleoption[2];
 RectangleShape rectanglecontrols[6][2];
 /////////////////////////////////////////////////////////////////////////////////////////
 // coordinates
-int shopbuttonx = 1660, shopbuttony = 65;
+int shopbuttonx = 1560, shopbuttony = 895;
 /////////////////////////////////////////////////////////////////////////////////////////
 
 //credits
@@ -410,18 +419,20 @@ RectangleShape rectanglecont(Vector2f(350, 70));
 RectangleShape rectanglereturn(Vector2f(350, 70));
 
 /////////////////////////////////////////////////////////////////////////////////////////
- 
+
 //shop variables
 RectangleShape rectangleshopoptions[4];
 RectangleShape shipcolor[2][2];
-int rectangleshopx = 100,rectangleshopy = 250,shipcolorx=1260,shipcolory = 200,shopbutton=1;
+int rectangleshopx = 100, rectangleshopy = 250, shipcolorx = 1260, shipcolory = 200, shopbutton = 1;
 Text shopcustomize;
 Text Base;
 Text Cockpit;
 Text Engine;
 Text Default;
-bool shopcheck[3] = { 1,0,0};
+bool shopcheck[3] = { 1,0,0 };
 pair<int, int> customship;
+int customengine;
+Clock shopdelay;
 //////////////////////////////////////////////////////////
 //shapes for  triangle wave
 CircleShape triangle;
@@ -432,6 +443,7 @@ int triangle1health = 15;
 int triangle2health = 15;
 
 ///////////////////////////////////////////////////////////
+
 //Baby chicks
 int initialsmol = 0;
 Sprite smol[40];
@@ -447,7 +459,7 @@ Texture eggsmoltex;
 Sprite eggs_smol[40];
 Sprite eggyolk_smol[40];
 int smolalive = 0;
-int s=0;
+int s = 0, smolx = 0, smoly = 0;
 
 // Loading Ingame Files
 void IngameImages()
@@ -472,6 +484,7 @@ void IngameImages()
     bottomborder.setPosition(0, 980);
     leftborder.setPosition(0, 0);
     rightborder.setPosition(1820, 0);
+    
     //fonts
     font1.loadFromFile("RobotoCondensed-Bold.ttf");
     font3.loadFromFile("Wedgie_Regular.ttf");
@@ -489,6 +502,7 @@ void IngameImages()
     {
         chickenhurt[i].setBuffer(chickensfx);
     }
+    bouncingchickenhurt.setBuffer(chickensfx);
     eggshootsfx.loadFromFile("eggshoot.wav");
     for (int i = 0; i < 2; i++)
     {
@@ -510,8 +524,8 @@ void IngameImages()
     MenuMusic.openFromFile("IntroMenu.wav");
     ingamemusic.openFromFile("ingame.wav");
     // background
-    Background.loadFromFile("IngameBackground.png");
-    
+    Background.loadFromFile("ingamebg1.png");
+
     for (int i = 0; i < 2; i++)
     {
         _GameBackground[i].setTexture(Background);
@@ -524,30 +538,33 @@ void IngameImages()
     }
 
     menubg[1].setPosition(0, -1080);
-    
+
     gamelogo.loadFromFile("logo.png");
     Logo.setTexture(gamelogo);
     Logo.setPosition(423.5, -25);
     Logo.setScale(1, 0.7f);
+
+    menulogo.setTexture(gamelogo);
+    menulogo.setPosition(435, 200);
+    
+
     // ingame images
     GameBarSkin.setSmooth(true);
     GameBarSkin.loadFromFile("TopBar.png");
     BottomBarSkin.loadFromFile("leftbar1.png");
     BottomBarSkin.setSmooth(true);
     Bottombar.setTexture(BottomBarSkin);
-    Bottombar.setPosition(-70 , 1004);
+    Bottombar.setPosition(-70, 1004);
     Bottombar.setScale(1, 1);
 
     //ship fire
     shipfiretx.loadFromFile("shipfire.png");
     shipfire.setTexture(shipfiretx);
     shipfire.setOrigin(14.5, 0);
-    shipfire.setColor(Color(255, 165, 6, 240));
 
     shipfiretx2.loadFromFile("shipfire.png");
     shipfire2.setTexture(shipfiretx2);
     shipfire2.setOrigin(15, 0);
-    shipfire2.setColor(Color(255, 165, 6, 240));
 
     BottomBarSkin2.loadFromFile("rightbar1.png");
     BottomBarSkin2.setSmooth(true);
@@ -571,11 +588,11 @@ void IngameImages()
     for (int i = 0; i < 50; i++) {
         spark[i].setTexture(sparkimage);
         spark[i].setPosition(8000, 8000);
-    fogimage.loadFromFile("fogwhite.png"); 
-    fog[i].setTexture(fogimage);
-    fog[i].setPosition(9000, 9000);
+        fogimage.loadFromFile("fogwhite.png");
+        fog[i].setTexture(fogimage);
+        fog[i].setPosition(9000, 9000);
     }
-    
+
 
     //Shield
     Shield.setFillColor(Color(0, 102, 204, 140));
@@ -588,7 +605,7 @@ void IngameImages()
     for (int i = 0; i < 5; i++)
     {
         rectanglemainmenu[i].setSize(Vector2f(350, 70));
-        rectanglemainmenu[i].setPosition(785, 480 +i*100);
+        rectanglemainmenu[i].setPosition(785, 480 + i * 100);
         rectanglemainmenu[i].setFillColor(Color(0, 0, 255, 40));
         rectanglemainmenu[i].setOutlineColor(Color(51, 153, 255, 60));
         rectanglemainmenu[i].setOutlineThickness(2.8f);
@@ -618,7 +635,7 @@ void IngameImages()
     rectangleshopoptions[3].setOutlineColor(Color(51, 153, 255, 60));
     rectangleshopoptions[3].setOutlineThickness(2.8f);
 
-     //color buttons
+    //color buttons
     for (int j = 0; j < 2; j++)
     {
         for (int i = 0; i < 2; i++)
@@ -648,7 +665,7 @@ void IngameImages()
     for (int i = 0; i < 2; i++)
     {
         rectangleselectmode[i].setSize(Vector2f(350, 70));
-        rectangleselectmode[i].setPosition(585+i*400 , 480);
+        rectangleselectmode[i].setPosition(585 + i * 400, 480);
         rectangleselectmode[i].setFillColor(Color(0, 0, 255, 40));
         rectangleselectmode[i].setOutlineColor(Color(51, 153, 255, 60));
         rectangleselectmode[i].setOutlineThickness(2.8f);
@@ -679,7 +696,7 @@ void IngameImages()
     for (int i = 0; i < 5; i++)
     {
         rectangleldbs[i].setSize(Vector2f(350, 70));
-        rectangleldbs[i].setPosition(50+i*370, 25 );
+        rectangleldbs[i].setPosition(50 + i * 370, 25);
         rectangleldbs[i].setFillColor(Color(0, 0, 255, 40));
         rectangleldbs[i].setOutlineColor(Color(51, 153, 255, 60));
         rectangleldbs[i].setOutlineThickness(2.8f);
@@ -707,14 +724,14 @@ void IngameImages()
     numbertext.setCharacterSize(50);
     numbertext.setFillColor(Color::White);
     numbertext.setPosition(1440, 200);
- 
+
     //Back Button
     rectangleback.setPosition(50, 900);
     rectangleback.setFillColor(Color(0, 0, 255, 40));
     rectangleback.setOutlineColor(Color(51, 153, 255, 60));
     rectangleback.setOutlineThickness(2.8f);
     // shop button
-    rectangleshop.setPosition(1600, 50);
+    rectangleshop.setPosition(1450, 880);
     rectangleshop.setFillColor(Color(0, 0, 255, 40));
     rectangleshop.setOutlineColor(Color(51, 153, 255, 60));
     rectangleshop.setOutlineThickness(2.8f);
@@ -759,13 +776,13 @@ void IngameImages()
     play.setCharacterSize(32);
     play.setPosition(860, 495);
     play.setString("Save The World");
-    play.setFillColor(Color(204, 229, 255,225));
+    play.setFillColor(Color(204, 229, 255, 225));
 
     // shop text
     shop.setFont(font1);
     shop.setCharacterSize(32);
     shop.setPosition(shopbuttonx, shopbuttony);
-    shop.setString("Shop");
+    shop.setString("Customize");
     shop.setFillColor(Color(204, 229, 255, 225));
 
     // shop customization
@@ -778,38 +795,38 @@ void IngameImages()
     //Base text
     Base.setFont(font1);
     Base.setCharacterSize(40);
-    Base.setPosition(rectangleshopx +135, rectangleshopy +10);
+    Base.setPosition(rectangleshopx + 135, rectangleshopy + 10);
     Base.setString("Base");
     Base.setFillColor(Color(204, 229, 255, 225));
 
     //Cockpit text
     Cockpit.setFont(font1);
     Cockpit.setCharacterSize(40);
-    Cockpit.setPosition(rectangleshopx + 115, rectangleshopy + 10 +180);
+    Cockpit.setPosition(rectangleshopx + 115, rectangleshopy + 10 + 180);
     Cockpit.setString("Cockpit");
     Cockpit.setFillColor(Color(204, 229, 255, 225));
 
     //Engine text
     Engine.setFont(font1);
     Engine.setCharacterSize(40);
-    Engine.setPosition(rectangleshopx + 125, rectangleshopy + 10 +2*180);
+    Engine.setPosition(rectangleshopx + 125, rectangleshopy + 10 + 2 * 180);
     Engine.setString("Engine");
     Engine.setFillColor(Color(204, 229, 255, 225));
 
     //Default text
     Default.setFont(font1);
     Default.setCharacterSize(40);
-    Default.setPosition(785 +115, 820 +10);
+    Default.setPosition(785 + 115, 820 + 10);
     Default.setString("Default");
     Default.setFillColor(Color(204, 229, 255, 225));
 
     //Options text
     Options.setFont(font1);
     Options.setCharacterSize(32);
-    Options.setPosition(905, 595); 
+    Options.setPosition(905, 595);
     Options.setString("Options");
     Options.setFillColor(Color(204, 229, 255, 225));
-  
+
     //leadernameboard text
     leadernameboard.setFont(font1);
     leadernameboard.setCharacterSize(32);
@@ -826,7 +843,7 @@ void IngameImages()
     wave1second.setFont(font1);
     wave1second.setCharacterSize(30);
     wave1second.setPosition(920, 600);
-    wave1second.setString("Wave "+to_string(prevwave-48));
+    wave1second.setString("Wave " + to_string(prevwave - 48));
     wave1second.setFillColor(Color(204, 229, 255, 225));
 
     endofwave1.setFont(font1);
@@ -875,7 +892,7 @@ void IngameImages()
     sound.setFillColor(Color(204, 229, 255, 225));
 
     //back text
-    back.setFont(font1); 
+    back.setFont(font1);
     back.setCharacterSize(32);
     back.setPosition(100, 915);
     back.setString("< Back");
@@ -915,8 +932,8 @@ void IngameImages()
     {
         levels[i].setFont(font1);
         levels[i].setCharacterSize(32);
-        levels[i].setPosition(910, 195+i*120);
-        levels[i].setString("Level " + to_string(i+1));
+        levels[i].setPosition(910, 195 + i * 120);
+        levels[i].setString("Level " + to_string(i + 1));
         levels[i].setFillColor(Color(204, 229, 255, 225));
     }
 
@@ -974,7 +991,7 @@ void IngameImages()
     A.setFont(font1);
     A.setString("A");
     A.setScale(1.5, 1.5);
-    A.setPosition(870,585);
+    A.setPosition(870, 585);
     Fire.setFont(font1);
     Fire.setString("Fire");
     Fire.setScale(1.5, 1.5);
@@ -1024,8 +1041,7 @@ void IngameImages()
         Cred[i].setFont(font3);
         Cred[i].setPosition(900, 1400 + i * 150);
         Cred[i].setCharacterSize(100);
-        Cred[i].setFillColor(Color(255, 255, 255, 255));  
-        
+        Cred[i].setFillColor(Color(255, 255, 255, 255));
     }
     //inputing the names
     Cred[0].setString("Kareem Essam");
@@ -1041,10 +1057,10 @@ void IngameImages()
     {
         checkbox[i].setTexture(checkmark);
         checkbox[i].setScale(0.3, 0.3);
-        checkbox[i].setPosition(985 , 480+i*100);
+        checkbox[i].setPosition(985, 480 + i * 100);
         checkbox[i].setColor(Color::Green);
     }
-  
+
 
     //settings arrows for control menu
     arrow1.loadFromFile("arrow.png");
@@ -1054,23 +1070,23 @@ void IngameImages()
         arrow_l[i].setScale(0.25, 0.25);
         arrow_l[i].setPosition(515 + i * 470, 470);
     }
- 
+
     for (int i = 0; i < 2; i++)
     {
         arrow_r[i].setTexture(arrow1);
         arrow_r[i].setScale(0.25, 0.25);
         arrow_r[i].setPosition(600 + i * 470, 660);
-        if(rotatecheck==0)
+        if (rotatecheck == 0)
             arrow_r[i].rotate(180);
     }
-    
+
     for (int i = 0; i < 2; i++)
     {
         arrow_up[i].setTexture(arrow1);
         arrow_up[i].setScale(0.25, 0.25);
         arrow_up[i].setPosition(510 + i * 470, 745);
         arrow_up[i].setTextureRect(IntRect(100, 0, 360, 360));
-        if(rotatecheck==0)
+        if (rotatecheck == 0)
             arrow_up[i].rotate(270);
     }
 
@@ -1080,7 +1096,7 @@ void IngameImages()
         arrow_dw[i].setScale(0.25, 0.25);
         arrow_dw[i].setPosition(599 + i * 470, 788);
         arrow_dw[i].setTextureRect(IntRect(100, 0, 360, 360));
-        if(rotatecheck==0)
+        if (rotatecheck == 0)
             arrow_dw[i].rotate(90);
     }
 
@@ -1090,7 +1106,7 @@ void IngameImages()
     Player.setTextureRect(IntRect(PlayerMovement * 60, 0, 60, 42));
     Player.setPosition(960, 850);
     Player.setScale(2.25, 2.25);
-    rotatecheck=1;
+    rotatecheck = 1;
 
     // player 2 image
     Player2Skin.loadFromFile("playerr22.png");
@@ -1110,9 +1126,9 @@ void IngameImages()
     rectangle3.setPosition(770, 400);
     rectangle3.setFillColor(Color::Transparent);
 
-    
+
     //boss borders
-    rectangle4.setPosition((window.getSize().x / 2), (window.getSize().y / 2)+200);
+    rectangle4.setPosition((window.getSize().x / 2), (window.getSize().y / 2) + 200);
     rectangle4.setOrigin(window.getSize().x / 2, 75 / 2);
     rectangle5.setPosition(0, -50);
     rectangle4.setFillColor(Color::Transparent);
@@ -1135,8 +1151,8 @@ void IngameImages()
     Chickenlegs.loadFromFile("chicken leg.png");
 
     //boss image
-    bossimage.loadFromFile("bossRed.png");
-  
+    bossimage.loadFromFile("bossRed (2).png");
+
     //bullet image
     bulletImage.loadFromFile("Bullet1Image.png");
     crystaltear.loadFromFile("crystaltear.png");
@@ -1193,7 +1209,7 @@ void IngameImages()
     foodscore.setCharacterSize(35);
     foodscore.setOrigin(0, 0);
     foodscore.setPosition(420, window.getSize().y - 58);
-    foodscore.setString( to_string(foodcnt));
+    foodscore.setString(to_string(foodcnt));
 
     hp2.setFont(font1);
     hp2.setCharacterSize(35);
@@ -1214,13 +1230,13 @@ void IngameImages()
     missile.setTexture(missileTexture);
     missile.setPosition(10000, 10000);
     missile.setScale(0.3, 0.3);
-    
+
 
     //boss texture and position
     bosssprite.setTexture(bossimage);
     bosssprite.setPosition(Vector2f(200, 200));
-    bosssprite.setScale(0.3436 , 0.385);
-    bosssprite.setTextureRect(IntRect(982*animation, 0, 982, 794));
+    bosssprite.setScale(0.3436, 0.385);
+    bosssprite.setTextureRect(IntRect(982 * animation, 0, 982, 794));
     //setting bullet textures
     for (int i = 0; i < bullet.numberofbullets; i++)
     {
@@ -1255,13 +1271,13 @@ void IngameImages()
             eggyolk[i][j].setTexture(eggbreak);
             eggyolk[i][j].setTextureRect(IntRect(28 * 5, 0, 28, 24));
             eggyolk[i][j].setScale(2, 2);
-    
+
         }
 
     }
 
     //Eggs small chicks
-    
+
 
     //setting chicken legs
     for (int i = 0; i < 8; i++) {
@@ -1301,7 +1317,7 @@ void PlayerMove()
 {
     // Kareem Essam and Mohamed Wael
     // Creating Movement For Right Direction
-    if (Keyboard::isKeyPressed(Keyboard::D)&& Player.getPosition().x <= 1800)
+    if (Keyboard::isKeyPressed(Keyboard::D) && Player.getPosition().x <= 1800)
     {
         // changing ship to be facing to the right
         Player.setTextureRect(IntRect(PlayerMovement * 60, 0, 60, 42));
@@ -1311,9 +1327,9 @@ void PlayerMove()
         {
             PlayerMovement++;
         }
-        
+
     }
-    
+
     //Creating Movement For Left Direction
     else if (Keyboard::isKeyPressed(Keyboard::A) && Player.getPosition().x >= 15)
     {
@@ -1434,7 +1450,7 @@ void PlayerMove()
         }
     }
     //shipe fire
-    shipfire.setPosition(Player.getPosition().x + 67, Player.getPosition().y + 70 );
+    shipfire.setPosition(Player.getPosition().x + 67, Player.getPosition().y + 70);
     if (shipfirescale == 0)
     {
         shipfire.setScale(1.45, 1.45);
@@ -1450,7 +1466,7 @@ void PlayerMove()
         if (shipfire.getRotation() <= 40)
         {
             shipfire.rotate(4);
-            
+
         }
 
     }
@@ -1459,7 +1475,7 @@ void PlayerMove()
         if (shipfire.getRotation() > 0 && shipfire.getRotation() < 50)
         {
             shipfire.rotate(-4);
-            
+
         }
     }
 
@@ -1532,7 +1548,7 @@ void spark_fog() {
             for (int z = 0; z < 4; z++) {
                 if (Bullets[i].getGlobalBounds().intersects(Chicken[j][z].getGlobalBounds())) {
                     chickenalive = false;
-                    spark[i].setPosition(Chicken[j][z].getPosition() - Vector2f(50, 50));     
+                    spark[i].setPosition(Chicken[j][z].getPosition() - Vector2f(50, 50));
                 }
             }
         }
@@ -1561,15 +1577,15 @@ void spark_fog() {
         }
 
     }
- 
-    
+
+
 }
-    
+
 //shooting function
 void PlayerShooting() {
 
     //Shooting
-    
+
 
     if ((Keyboard::isKeyPressed(Keyboard::Space)) && bullet.bulletCoolDown == 0 && pausecooldown == 0 || (Mouse::isButtonPressed(Mouse::Left)) && bullet.bulletCoolDown == 0 && pausecooldown == 0)
     {
@@ -1581,34 +1597,34 @@ void PlayerShooting() {
     if ((Keyboard::isKeyPressed(Keyboard::Space)) && bullet.bulletCoolDown == 0 && pausecooldown == 1)
     {
         bullet.bulletCoolDown = bullet.bulletCoolDownvar;
-        if (doublebullets==0)
-        Bullets[bullet.currentBullet].setPosition(Player.getPosition().x + 59.5, Player.getPosition().y - 50);
+        if (doublebullets == 0)
+            Bullets[bullet.currentBullet].setPosition(Player.getPosition().x + 59.5, Player.getPosition().y - 50);
         else if (doublebullets == 1)
         {
             Bullets[bullet.currentBullet].setPosition(Player.getPosition().x + 20, Player.getPosition().y - 50);
-            Bullets[bullet.currentBullet+1].setPosition(Player.getPosition().x + 50, Player.getPosition().y - 50);
+            Bullets[bullet.currentBullet + 1].setPosition(Player.getPosition().x + 50, Player.getPosition().y - 50);
             bullet.currentBullet++;
-            if (bullet.currentBullet >= 40 ) {
+            if (bullet.currentBullet >= 40) {
                 bullet.currentBullet = 0;
             }
         }
         else if (doublebullets == 2)
         {
             Bullets[bullet.currentBullet].setPosition(Player.getPosition().x + 20, Player.getPosition().y - 45);
-            if (bullet.currentBullet+1 >= 40) {
+            if (bullet.currentBullet + 1 >= 40) {
                 bullet.currentBullet = 0;
             }
             Bullets[bullet.currentBullet + 1].setPosition(Player.getPosition().x + 50, Player.getPosition().y - 45);
-            if (bullet.currentBullet+2 >= 40) {
+            if (bullet.currentBullet + 2 >= 40) {
                 bullet.currentBullet = 0;
             }
-            Bullets[bullet.currentBullet + 2].setPosition(Player.getPosition().x + 35, Player.getPosition().y -70);
+            Bullets[bullet.currentBullet + 2].setPosition(Player.getPosition().x + 35, Player.getPosition().y - 70);
             bullet.currentBullet += 2;
             if (bullet.currentBullet >= 40) {
                 bullet.currentBullet = 0;
             }
         }
-       
+
 
         //sfx
         if (soundeffectON && playeralive)
@@ -1625,7 +1641,7 @@ void PlayerShooting() {
             bullet.currentBullet = 0;
         }
         bullet.currentBullet++;
-        
+
     }
     if ((Mouse::isButtonPressed(Mouse::Left)) && bullet.bulletCoolDown2 == 0 && pausecooldown == 1 && coopon)
     {
@@ -1687,7 +1703,7 @@ void rocketshooting()
     if (Mouse::isButtonPressed(Mouse::Right) && activemissile == false && rockets > 0 && coopon)
     {
         activemissile = true;
-        if (soundeffectON) 
+        if (soundeffectON)
         {
             rocketshoot.play();
         }
@@ -1762,46 +1778,46 @@ void camerashake()
 void ChickenMove()
 {
     // mohamed wael and kareem essam
-    for (int j = 0; j < 4; j++)
+    for (int j = 0; j < 3; j++)
     {
         for (int i = 0; i < 8; i++)
         {
             Chicken[i][j].setTexture(ChickenSkin);
-            Chicken[i][j].setScale(0.65, 0.65);
-            if (chickeninitialpos == 0) 
+            Chicken[i][j].setScale(0.5, 0.5);
+            if (chickeninitialpos == 0)
             {
                 if (j == 0 || j == 2)
                 {
-                    
-                    Chicken[i][j].setPosition(-1842 + (i * 170), 70 + (j * 150));
+
+                    Chicken[i][j].setPosition(-1842 + (i * 180), 70 + (j * 200));
                 }
                 else
-                Chicken[i][j].setPosition(2065 + (i * 170), 70 + (j * 150));
+                    Chicken[i][j].setPosition(1885 + (i * 180), 70 + (j * 200));
             }
-            Chicken[i][j].setTextureRect(IntRect(ChickenMovement * 356 , 0, 356, 284));      
+            Chicken[i][j].setTextureRect(IntRect(ChickenMovement * 356, 0, 356, 284));
         }
     }
     chickeninitialpos = 1;
 
-    if (chick==0)
+    if (chick == 0)
     {
         for (int i = 0; i < 8; i++)
         {
-            for (int j = 0; j < 4; j++)
+            for (int j = 0; j < 3; j++)
             {
                 chicken.HP[i][j] = chicken.chicken_health + (chicken.chicken_healthvar * 0.5 + 0.5);
             }
         }
-        
+
 
         chick++;
     }
-    
-    
-    for (int j = 0; j < 4; j++)
+
+
+    for (int j = 0; j < 3; j++)
     {
         for (int i = 0; i < 8; i++)
-        {   
+        {
             if (chicken_enter == 0)
             {
                 if (j == 0 || j == 2)
@@ -1810,8 +1826,8 @@ void ChickenMove()
                 }
                 else
                     Chicken[i][j].move(-8, 0);
-                
-                if (Chicken[0][0].getPosition().x >= 115)
+
+                if (Chicken[0][0].getPosition().x >= 30)
                 {
                     chicken_enter = 1;
                 }
@@ -1838,14 +1854,14 @@ void ChickenMove()
 
         }
     }
-            
+
     if (chicken_enter != 0)
     {
         if (rectdir == 0)
             rectangle3.move(-chicken.speed, 0);
         else if (rectdir == 1)
             rectangle3.move(chicken.speed, 0);
-        
+
     }
     if (ChickenMovement == 9)
         checkchickenanimation = false;
@@ -1862,7 +1878,7 @@ void playerdamage() {
 
     if (true)
     {
-        for (int j = 0; j < 4; j++)
+        for (int j = 0; j < 3; j++)
         {
             for (int i = 0; i < 8; i++)
             {
@@ -1894,7 +1910,7 @@ void playerdamage() {
                     Eggs[i][j].setPosition(4000, 5000);
 
                 }
-                if (Chicken[i][j].getGlobalBounds().intersects(Player2ship.getGlobalBounds()) &&coopon && shield_on2==false)
+                if (Chicken[i][j].getGlobalBounds().intersects(Player2ship.getGlobalBounds()) && coopon && shield_on2 == false)
                 {
                     if (health3 >= 1)
                     {
@@ -1971,7 +1987,7 @@ void playerdamage() {
                 }
                 hp2.setString(to_string(health3));
                 chicken.smol_hp[i] = 0;
-               
+
                 smol[i].setPosition(4000, 5000);
             }
             if (smol[i].getGlobalBounds().intersects(Player.getGlobalBounds()) && shield_on == false)
@@ -1988,7 +2004,7 @@ void playerdamage() {
                 }
                 hp.setString(to_string(health));
                 chicken.smol_hp[i] = 0;
-                
+
                 smol[i].setPosition(4000, 5000);
             }
 
@@ -2049,7 +2065,7 @@ void playerdamage() {
 
             }
 
-            if (bossegg1[i].getGlobalBounds().intersects(Player.getGlobalBounds())) 
+            if (bossegg1[i].getGlobalBounds().intersects(Player.getGlobalBounds()))
             {
                 if (health >= 1)
                 {
@@ -2104,7 +2120,7 @@ void playerdamage() {
 
             }
         }
-        
+
         if (health < health2) {
 
             playeralive = false;
@@ -2163,7 +2179,7 @@ void playerdamage() {
 
                         }
                     }
-                   
+
                     if (coopon)
                     {
                         if (health == 0 && health3 == 0) {
@@ -2189,8 +2205,8 @@ void playerdamage() {
 
                         }
                     }
-                    
-                    
+
+
 
                 }
                 else
@@ -2224,7 +2240,7 @@ void playerdamage() {
                     Timer2 = 2;
 
 
-                    if (health3 == 0 ) {
+                    if (health3 == 0) {
                         Player2ship.setPosition(11111, 11111);
                         player_2 = 0;
                     }
@@ -2286,13 +2302,13 @@ void shield_move()
 // egg movement function
 void eggmovement(int wavetype = 0)
 {
-    
 
-     if (wavetype == 1)
+
+    if (wavetype == 1)
     {
         if (x == 0)
         {
-            for (int j = 0; j < 4; j++)
+            for (int j = 0; j < 3; j++)
             {
                 for (int i = 0; i < 8; i++)
                 {
@@ -2302,7 +2318,7 @@ void eggmovement(int wavetype = 0)
                 }
             }
             eggvar = 601 - chicken.chicken_health * 50;
-            for (int j = 0; j < 4; j++)
+            for (int j = 0; j < 3; j++)
             {
                 for (int i = 0; i < 8; i++)
                 {
@@ -2314,12 +2330,12 @@ void eggmovement(int wavetype = 0)
             x++;
         }
 
-        for (int j = 0; j < 4; j++)
+        for (int j = 0; j < 3; j++)
         {
             for (int i = 0; i < 8; i++)
             {
 
-                if (timer[i][j] > 0)
+                if (timer[i][j] > 0 && Chicken[i][j].getPosition().x >= 20 && Chicken[i][j].getPosition().y >= 0 && Chicken[i][j].getPosition().x <= 1900 && Chicken[i][j].getPosition().y <= 1080)
                 {
                     timer[i][j]--;
                 }
@@ -2329,7 +2345,7 @@ void eggmovement(int wavetype = 0)
                     eggyolk[i][j].setScale(0, 0);
                     Eggs[i][j].setScale(0.13, 0.13);
                     Eggs[i][j].setPosition(Chicken[i][j].getPosition().x + 53.45, Chicken[i][j].getPosition().y + 75);
-                    
+
 
                     if (soundeffectON && Eggs[i][j].getPosition().x < 1920)
                     {
@@ -2449,17 +2465,17 @@ void eggmovement(int wavetype = 0)
         }
     }
 
-    
-    
+
+
 }
 //Food Movment Function
 void FoodMovment() {
 
     for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 4; j++) {
+        for (int j = 0; j < 3; j++) {
             if (Chicken[i][j].getPosition().x > 3000 && Chicken[i][j].getPosition().y > 3000)
             {
-                chicken_legs[i][j].move(0, foodmovespeed); 
+                chicken_legs[i][j].move(0, foodmovespeed);
                 chicken_legs[i][j].rotate(10);
             }
         }
@@ -2468,8 +2484,30 @@ void FoodMovment() {
     }
 }
 
-void bouncingchicken() 
+void vignettetransition(long long& page)
 {
+    if (vignettealpha < 250 && vignettestop == false)
+    {
+        vignettealpha += 5;
+    }
+    if (vignettealpha >= 245)
+    {
+        vignettestop = true;
+        page = 0;
+    }
+    if (vignettealpha >= 10 && vignettestop == true)
+    {
+        vignettealpha -= 5;
+    }
+
+}
+
+
+void bouncingchicken(long long page)
+{
+    
+    
+
     menuchicken.setTextureRect(IntRect(ChickenMovement * 356, 0, 356, 284));
     if (ChickenMovement == 9)
         checkchickenanimation = false;
@@ -2479,29 +2517,49 @@ void bouncingchicken()
         ChickenMovement--;
     else
         ChickenMovement++;
-    menuchicken.setOrigin(178,142);
+    menuchicken.setOrigin(178, 142);
     menuchicken.rotate(7);
-    
 
-    if (menuchicken.getGlobalBounds().intersects(rightborder.getGlobalBounds()))
+    if (page == 0)
     {
-        menuchickenx *= -1;
+        
+        if (menuchicken.getGlobalBounds().intersects(rightborder.getGlobalBounds()))
+        {
+            menuchickenx = -5;
+        }
+        else if (menuchicken.getGlobalBounds().intersects(bottomborder.getGlobalBounds()))
+        {
+            menuchickeny = -5;
+        }
+        else if (menuchicken.getGlobalBounds().intersects(topborder.getGlobalBounds()))
+        {
+            menuchickeny = 5;
+        }
+        else if (menuchicken.getGlobalBounds().intersects(leftborder.getGlobalBounds()))
+        {
+            menuchickenx = 5;
+        }
     }
-    else if (menuchicken.getGlobalBounds().intersects(bottomborder.getGlobalBounds()))
+    else
     {
-        menuchickeny *= -1;
-    }
-    else if (menuchicken.getGlobalBounds().intersects(topborder.getGlobalBounds()))
-    {
-        menuchickeny *= -1;
-    }
-    else if (menuchicken.getGlobalBounds().intersects(leftborder.getGlobalBounds()))
-    {
-        menuchickenx *= -1;
+        if (menuchicken.getGlobalBounds().intersects(rightborder.getGlobalBounds()))
+        {
+            menuchickenx = -20;
+        }
+        else if (menuchicken.getGlobalBounds().intersects(bottomborder.getGlobalBounds()))
+        {
+            menuchickeny = -20;
+        }
+        else if (menuchicken.getGlobalBounds().intersects(topborder.getGlobalBounds()))
+        {
+            menuchickeny = 20;
+        }
+        else if (menuchicken.getGlobalBounds().intersects(leftborder.getGlobalBounds()))
+        {
+            menuchickenx = 20;
+        }
     }
     
-    
-
     menuchicken.move(menuchickenx, menuchickeny);
 }
 
@@ -2515,7 +2573,7 @@ void movingbackround()
         {
             menubg[i].setPosition(0, menubg[i].getPosition().y - (1080 * 2));
         }
-        
+
         window.draw(menubg[i]);
 
         //ingame bg
@@ -2523,38 +2581,38 @@ void movingbackround()
         if (_GameBackground[i].getPosition().y >= 1080)
         {
             _GameBackground[i].setPosition(0, _GameBackground[i].getPosition().y - (1080 * 2));
-        }       
-    }   
+        }
+    }
 }
 
 
 //meteor behavior
-void meteormove() 
+void meteormove()
 {
     // one time loop for initialization
-    if (meteorx == 0) 
+    if (meteorx == 0)
     {
-        tmp = 100;
-        for (int i = 0; i <= 20; i++) 
+        tmp = 15;
+        for (int i = 0; i <= 50; i++)
         {
-            meteor[i].setPosition(-100 + tmp, -200);
+            meteor[i].setPosition(-400 + tmp, -200);
             meteor[i].setTextureRect(IntRect(62.625 * xmeteor, 62.25 * ymeteor, 62.625f, 62.25f));
-            int randscale = rand() % 2 + 1;
-            meteorhp[i] = 1 * randscale;
-            meteor[i].setScale(randscale, randscale);
-            tmp += 100;
-            meteortimer[i] = rand() % 400 + 100;
-        }
-        tmp = 100;
-        for (int i = 21; i <= 39; i++)
-        {
-            meteor[i].setPosition(-200, 0 + tmp);
-            meteor[i].setTextureRect(IntRect(62.625 * xmeteor, 62.25 * ymeteor, 62.625f, 62.25f));
-            int randscale = rand() % 2 + 1;
+            double randscale = rand() % 2 + 1.5;
             meteorhp[i] = 1 * randscale;
             meteor[i].setScale(randscale, randscale);
             tmp += 50;
-            meteortimer[i] = rand() % 400 + 100;
+            meteortimer[i] = rand() % 350 + 40;
+        }
+        tmp = 15;
+        for (int i = 51; i <= 99; i++)
+        {
+            meteor[i].setPosition(-200, -200 + tmp);
+            meteor[i].setTextureRect(IntRect(62.625 * xmeteor, 62.25 * ymeteor, 62.625f, 62.25f));
+            double randscale = rand() % 2 + 1.5;
+            meteorhp[i] = 1 * randscale;
+            meteor[i].setScale(randscale, randscale);
+            tmp += 50;
+            meteortimer[i] = rand() % 350 + 40;
         }
         meteorx++;
     }
@@ -2562,7 +2620,7 @@ void meteormove()
     meteorx++;
 
     // meteor animation loop
-    for (int i = 0; i <= 39; i++)
+    for (int i = 0; i <= 99; i++)
     {
         meteor[i].setTextureRect(IntRect(62.625 * xmeteor, 62.25 * ymeteor, 62.625f, 62.25f));
         if (xmeteor == 7 && ymeteor < 8)
@@ -2570,43 +2628,45 @@ void meteormove()
             xmeteor = 0;
             ymeteor++;
             if (ymeteor == 7)
-                ymeteor= 0;
+                ymeteor = 0;
         }
     }
 
     // meteor movement loop
-    for (int i = 0; i <= 39; i++) {
+    for (int i = 0; i <= 99; i++) {
         if (meteortimer[i] > 0) {
             meteortimer[i]--;
         }
         if (meteortimer[i] == 0) {
-            meteor[i].move(meteors.meteorspeed, meteors.meteorspeed);
+            meteor[i].move(10, 10);
         }
-        for (int i = 0; i < bullet.numberofbullets; i++)
+
+    }
+
+    for (int i = 0; i < bullet.numberofbullets; i++)
+    {
+        for (int a = 0; a <= 99; a++)
         {
-            for (int a = 0; a <= 39; a++)
+            if (Bullets[i].getGlobalBounds().intersects(meteor[a].getGlobalBounds()))
             {
-                if (Bullets[i].getGlobalBounds().intersects(meteor[a].getGlobalBounds()))
+                if (meteorhp[a] > 0)
                 {
-                    if (meteorhp[a] > 0) 
-                    {
-                        meteorhp[a] -= 1;
-                    }
-                    else if (meteorhp[a] == 0)
-                    {
-                        meteor[a].setPosition(10000, 10000);
-                        cnt += 700;
-                        score.setString(to_string(cnt));
-                    }
-                    Bullets[i].setPosition(-2000, -2000);
+                    meteorhp[a] -= 1;
                 }
+                else if (meteorhp[a] == 0)
+                {
+                    meteor[a].setPosition(10000, 10000);
+                    cnt += 700;
+                    score.setString(to_string(cnt));
+                }
+                Bullets[i].setPosition(-2000, -2000);
             }
         }
     }
 
-    for (int i = 0; i < 40; i++) {
+    for (int i = 0; i <= 99; i++) {
         if (Player.getGlobalBounds().intersects(meteor[i].getGlobalBounds()) && shield_on == false) {
-            if(health>=1)
+            if (health >= 1)
             {
                 health -= 1;
             }
@@ -2645,10 +2705,10 @@ void meteormove()
                         Timer = 2;
                         if (health == 0)
                         {
-                            Player.setPosition(12121,12121);
+                            Player.setPosition(12121, 12121);
                         }
 
-                        if (health == 0 && player_2==0) {
+                        if (health == 0 && player_2 == 0) {
                             gameover = true;
                         }
                         else
@@ -2668,7 +2728,10 @@ void meteormove()
         }
 
         if (Player2ship.getGlobalBounds().intersects(meteor[i].getGlobalBounds()) && shield_on2 == false) {
-            health3 -= 1;
+            if (health3 >= 1)
+            {
+                health3 -= 1;
+            }
             if (soundeffectON)
             {
                 exploding.play();
@@ -2722,34 +2785,33 @@ void meteormove()
 
             }
         }
-             
+
 
     }
 
 }
-
 //vertical meteor
 void meteorfast()
 {
     // one time loop for initialization
     if (meteorx == 0)
     {
-        tmp = 100;
-        for (int i = 0; i <= 20; i++)
+        tmp = 20;
+        for (int i = 0; i <= 99; i++)
         {
             meteor[i].setPosition(-100 + tmp, -200);
             meteor[i].setTextureRect(IntRect(62.625 * xmeteor, 62.25 * ymeteor, 62.625f, 62.25f));
-            int randscale = rand() % 2 + 1;
+            double randscale = rand() % 2 + 1.5;
             meteorhp[i] = 1 * randscale;
             meteor[i].setScale(randscale, randscale);
-            tmp += 100;
-            meteortimer[i] = rand() % 400 + 100;
+            tmp += 45;
+            meteortimer[i] = rand() % 300 + 40;
         }
         meteorx++;
     }
     xmeteor++;
     // meteor animation loop
-    for (int i = 0; i <= 20; i++)
+    for (int i = 0; i <= 99; i++)
     {
         meteor[i].setTextureRect(IntRect(62.625 * xmeteor, 62.25 * ymeteor, 62.625f, 62.25f));
         if (xmeteor == 7 && ymeteor < 8)
@@ -2761,41 +2823,46 @@ void meteorfast()
         }
     }
     // meteor movement loop
-    for (int i = 0; i <= 20; i++) {
+    for (int i = 0; i <= 99; i++) {
         if (meteortimer[i] > 0) {
             meteortimer[i]--;
         }
         if (meteortimer[i] == 0) {
-            meteor[i].move(0, meteors.meteorspeed * 4);
+            meteor[i].move(0, 25);
         }
-        for (int i = 0; i < bullet.numberofbullets; i++)
+
+    }
+    for (int i = 0; i < bullet.numberofbullets; i++)
+    {
+        for (int a = 0; a <= 99; a++)
         {
-            for (int a = 0; a <= 20; a++)
+            if (Bullets[i].getGlobalBounds().intersects(meteor[a].getGlobalBounds()))
             {
-                if (Bullets[i].getGlobalBounds().intersects(meteor[a].getGlobalBounds()))
+                if (meteorhp[a] > 0)
                 {
-                    if (meteorhp[a] > 0)
-                    {
-                        meteorhp[a] -= 1;
-                    }
-                    else if (meteorhp[a] == 0)
-                    {
-                        meteor[a].setPosition(10000, 10000);
-                        cnt += 700;
-                        score.setString("score : " + to_string(cnt));
-                    }
-                    Bullets[i].setPosition(-2000, -2000);
+                    meteorhp[a] -= 1;
                 }
+                else if (meteorhp[a] == 0)
+                {
+                    meteor[a].setPosition(10000, 10000);
+                    cnt += 700;
+                    score.setString("score : " + to_string(cnt));
+                }
+                Bullets[i].setPosition(-2000, -2000);
             }
         }
     }
-    for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < 100; i++) {
         if (Player.getGlobalBounds().intersects(meteor[i].getGlobalBounds()) && shield_on == false) {
-            health -= 1;
+            if (health >= 1)
+            {
+                health -= 1;
+            }
             if (soundeffectON)
             {
                 exploding.play();
             }
+            hp.setString(to_string(health));
             if (health < health2) {
 
                 playeralive = false;
@@ -2852,11 +2919,15 @@ void meteorfast()
         }
 
         if (Player2ship.getGlobalBounds().intersects(meteor[i].getGlobalBounds()) && shield_on2 == false) {
-            health3 -= 1;
+            if (health3 >= 1)
+            {
+                health3 -= 1;
+            }
             if (soundeffectON)
             {
                 exploding.play();
             }
+            hp.setString(to_string(health));
             hp2.setString(to_string(health3));
             if (health3 < health4) {
 
@@ -2915,7 +2986,7 @@ void meteorfast()
 void scorecalc() {
     for (int i = 0; i < bullet.numberofbullets; i++) {
         for (int j = 0; j < 8; j++) {
-            for (int z = 0; z < 4; z++) {
+            for (int z = 0; z < 3; z++) {
 
                 if (Bullets[i].getGlobalBounds().intersects(Chicken[j][z].getGlobalBounds()))
                 {
@@ -3048,6 +3119,9 @@ void scorecalc() {
                     {
                         chicken_legs[j][z].setPosition(4000, -100);
                         foodcnt += 1;
+                        cnt += 100;
+                        score.setString(to_string(cnt));
+                        score2.setString(to_string(cnt));
                         foodscore.setString(to_string(foodcnt));
                         foodscore2.setString(to_string(foodcnt));
                         if (soundeffectON)
@@ -3123,118 +3197,131 @@ void scorecalc() {
 
 
                 }
-                
+
             }
         }
     }
 
     for (int i = 0; i < bullet.numberofbullets; i++) {
         for (int j = 0; j < 40; j++) {
-                if (Bullets[i].getGlobalBounds().intersects(smol[j].getGlobalBounds()))
+            if (Bullets[i].getGlobalBounds().intersects(smol[j].getGlobalBounds()))
+            {
+                if (chicken.smol_hp[j] > 0)
                 {
-                    if (chicken.smol_hp[j] > 0)
+                    Bullets[i].setPosition(-10000, -10000);
+                    chicken.smol_hp[j] = chicken.smol_hp[j] - bullet.bulletdamage;
+                }
+                if (chicken.smol_hp[j] <= 0)
+                {
+                    if (coopon)
                     {
-                        Bullets[i].setPosition(-10000, -10000);
-                        chicken.smol_hp[j] = chicken.smol_hp[j] - (powerlvls * 0.5) - bullet.bulletdamage;
+                        randomizer = 0;
                     }
-                    if (chicken.smol_hp[j] <= 0)
+                    else
                     {
-                        if (coopon)
-                        {
-                            randomizer = 0;
-                        }
-                        else
-                        {
-                            randomizer = 1 + rand() % 160;
-                        }
-
-                        if (randomizer == 1 || randomizer == 2)
-                        {
-                            iongift.setPosition(smol[j].getPosition().x, smol[j].getPosition().y);
-
-                        }
-                        if (randomizer == 3)
-                        {
-
-                            crystalgift.setPosition(smol[j].getPosition().x, smol[j].getPosition().y);
-
-                        }
-                        smol[j].setPosition(10000, 10000);
-                        Bullets[i].setPosition(-10000, -10000);
-                        cnt += 1000;
-                        smol_ded[j] = 1;
-                        score.setString(to_string(cnt));
-                        missileScoreCount += 1000;
+                        randomizer = 1 + rand() % 160;
                     }
 
-                    if (missileScoreCount == 70000)
+                    if (randomizer == 1 || randomizer == 2)
                     {
-                        missileScoreCount = 0;
-                        rockets += 1;
-                        rocket.setString(to_string(rockets));
-                        rocket2.setString(to_string(rockets));
+                        iongift.setPosition(smol[j].getPosition().x, smol[j].getPosition().y);
+
                     }
-                    if (soundeffectON)
+                    if (randomizer == 3)
                     {
-                        chickenhurt[currentchickensfx].play();
-                        currentchickensfx++;
-                        if (currentchickensfx == 2)
-                        {
-                            currentchickensfx = 0;
-                        }
+
+                        crystalgift.setPosition(smol[j].getPosition().x, smol[j].getPosition().y);
+
                     }
+                    chicken_legs[smoly][smolx].setPosition(smol[j].getPosition().x + 100, smol[j].getPosition().y + 100);
+
+                    smolx++;
+
+                    if (smolx >= 4)
+                    {
+                        smolx = 0;
+                        smoly++;
+                    }
+                    if (smoly >= 8)
+                        smoly = 0;
+                    smol[j].setPosition(10000, 10000);
+                    Bullets[i].setPosition(-10000, -10000);
+                    cnt += 1000;
+                    smol_ded[j] = 1;
+                    score.setString(to_string(cnt));
+                    missileScoreCount += 1000;
 
 
+                }
+
+                if (missileScoreCount == 70000)
+                {
+                    missileScoreCount = 0;
+                    rockets += 1;
+                    rocket.setString(to_string(rockets));
+                    rocket2.setString(to_string(rockets));
+                }
+                if (soundeffectON)
+                {
+                    chickenhurt[currentchickensfx].play();
+                    currentchickensfx++;
+                    if (currentchickensfx == 2)
+                    {
+                        currentchickensfx = 0;
+                    }
+                }
+
+
+            }
+            if (checkbullet == 'b')
+            {
+                bullet.bulletdamage = 2;
+            }
+            else if (checkbullet == 'r')
+            {
+                bullet.bulletdamage = 1;
+            }
+
+            if (iongift.getGlobalBounds().intersects(Player.getGlobalBounds()))
+            {
+                if (soundeffectON)
+                {
+                    upgradesound.play();
+                }
+                iongift.setPosition(4000, -100);
+                for (int i = 0; i < 50; i++)
+                {
+                    Bullets[i].setTexture(bulletImage);
                 }
                 if (checkbullet == 'b')
                 {
-                    bullet.bulletdamage = 2;
+                    doublebullets = 0;
+                    checkbullet = 'r';
                 }
-                else if (checkbullet == 'r')
-                {
-                    bullet.bulletdamage = 1;
-                }
+                else if (doublebullets < 2)
+                    doublebullets++;
 
-                if (iongift.getGlobalBounds().intersects(Player.getGlobalBounds()))
+            }
+            if (crystalgift.getGlobalBounds().intersects(Player.getGlobalBounds()))
+            {
+                if (soundeffectON)
                 {
-                    if (soundeffectON)
-                    {
-                        upgradesound.play();
-                    }
-                    iongift.setPosition(4000, -100);
-                    for (int i = 0; i < 50; i++)
-                    {
-                        Bullets[i].setTexture(bulletImage);
-                    }
-                    if (checkbullet == 'b')
-                    {
-                        doublebullets = 0;
-                        checkbullet = 'r';
-                    }
-                    else if (doublebullets < 2)
-                        doublebullets++;
+                    upgradesound.play();
+                }
+                crystalgift.setPosition(4000, -100);
+                for (int i = 0; i < 50; i++)
+                {
+                    Bullets[i].setTexture(crystaltear);
+                }
+                if (checkbullet == 'r')
+                {
+                    doublebullets = 0;
+                    checkbullet = 'b';
+                }
+                else if (doublebullets < 2)
+                    doublebullets++;
+            }
 
-                }
-                if (crystalgift.getGlobalBounds().intersects(Player.getGlobalBounds()))
-                {
-                    if (soundeffectON)
-                    {
-                        upgradesound.play();
-                    }
-                    crystalgift.setPosition(4000, -100);
-                    for (int i = 0; i < 50; i++)
-                    {
-                        Bullets[i].setTexture(crystaltear);
-                    }
-                    if (checkbullet == 'r')
-                    {
-                        doublebullets = 0;
-                        checkbullet = 'b';
-                    }
-                    else if (doublebullets < 2)
-                        doublebullets++;
-                }
-            
         }
     }
 
@@ -3245,7 +3332,7 @@ void mainmenu()
     Vector2i mousepos = Mouse::getPosition(window);
 
     //shop animation
-    if (mousepos.x>=1595 && mousepos.x<=1789 && mousepos.y>=44 && mousepos.y<=115)
+    if (mousepos.x >= 1450 && mousepos.x <= 1800 && mousepos.y >= 880 && mousepos.y <= 950)
     {
         //Buttons in shop
         rectangleshop.setFillColor(Color(0, 128, 255, 40));
@@ -3257,13 +3344,13 @@ void mainmenu()
         rectangleshop.setFillColor(Color(0, 0, 255, 40));
         rectangleshop.setOutlineColor(Color(51, 153, 255, 60));
     }
-    
+
     for (int j = 0; j < 2; j++)
     {
         for (int i = 0; i < 2; i++)
         {
 
-            if (mousepos.x >= shipcolorx + i*350 && mousepos.x <= shipcolorx + i*350 +250 && mousepos.y >= shipcolory + j * 320 && mousepos.y <= shipcolory + 250 + j * 320)
+            if (mousepos.x >= shipcolorx + i * 350 && mousepos.x <= shipcolorx + i * 350 + 250 && mousepos.y >= shipcolory + j * 320 && mousepos.y <= shipcolory + 250 + j * 320)
             {
                 //Buttons in shop
                 shipcolor[i][j].setOutlineColor(Color(192, 192, 192, 192));
@@ -3277,7 +3364,7 @@ void mainmenu()
         }
     }
 
-    if (mousepos.x >= 785 && mousepos.x <= 785 + 350 && mousepos.y >=  820 && mousepos.y <=  820 + 70 )
+    if (mousepos.x >= 785 && mousepos.x <= 785 + 350 && mousepos.y >= 820 && mousepos.y <= 820 + 70)
     {
         //Buttons in shop
         rectangleshopoptions[3].setFillColor(Color(0, 128, 255, 40));
@@ -3664,7 +3751,7 @@ void bossmove() {
         }
         hp.setString(to_string(health));
     }
-    if (Player2ship.getGlobalBounds().intersects(bosssprite.getGlobalBounds())&& coopon && shield_on2 == false)
+    if (Player2ship.getGlobalBounds().intersects(bosssprite.getGlobalBounds()) && coopon && shield_on2 == false)
     {
         if (health3 >= 1)
         {
@@ -3684,17 +3771,17 @@ void reset()
     for (int i = 0; i < 40; i++)
     {
         smol_ded[i] = 0;
-       
-            smol[i].setTexture(chicksy);
-            smol_enter[i] = 0;
-            right_move[i] = true;
-            smol[i].setPosition(-9000, -9000);
+
+        smol[i].setTexture(chicksy);
+        smol_enter[i] = 0;
+        right_move[i] = true;
+        smol[i].setPosition(-9000, -9000);
     }
     initialsmol = 0;
     Player.setTextureRect(IntRect(540, 0, 60, 42));
     triangle.setPosition(600, 200);
     triangle2.setPosition(1320, 200);
-    triangle1health = 15; 
+    triangle1health = 15;
     triangle2health = 15;
     chickentriangleip = 0;
     eggvar = 501;
@@ -3717,10 +3804,11 @@ void reset()
     }
     shipfire.setRotation(0);
     shipfire.setRotation(0);
+    shipfire.setScale(1.45, 1.45);
     crystalgift.setPosition(-10000, -10000);
     iongift.setPosition(-10000, -10000);
     Player.setPosition(900, 850);
-    Player.setScale(2.25, 2.25); 
+    Player.setScale(2.25, 2.25);
     Player2ship.setPosition(1000, 850);
     coopon = false;
     validname = false;
@@ -3778,31 +3866,31 @@ void reset()
     exp_y2 = 0;
     exp_x2 = 0;
     rectangle3.setPosition(770, 400);
-    for (int i = 0; i <= 20; i++)
+    for (int i = 0; i <= 50; i++)
     {
-        meteor[i].setPosition(-100 + tmp, -200);
+        meteor[i].setPosition(-400 + tmp, -200);
         meteor[i].setTextureRect(IntRect(62.625 * xmeteor, 62.25 * ymeteor, 62.625f, 62.25f));
-        int randscale = rand() % 2 + 1;
-        meteorhp[i] = 1 * randscale;
-        meteor[i].setScale(randscale, randscale);
-        tmp += 100;
-        meteortimer[i] = rand() % 400 + 100;
-    }
-    tmp = 100;
-    for (int i = 21; i <= 39; i++)
-    {
-        meteor[i].setPosition(-200, 0 + tmp);
-        meteor[i].setTextureRect(IntRect(62.625 * xmeteor, 62.25 * ymeteor, 62.625f, 62.25f));
-        int randscale = rand() % 2 + 1;
+        double randscale = rand() % 2 + 1.5;
         meteorhp[i] = 1 * randscale;
         meteor[i].setScale(randscale, randscale);
         tmp += 50;
-        meteortimer[i] = rand() % 400 + 100;
+        meteortimer[i] = rand() % 350 + 40;
+    }
+    tmp = 15;
+    for (int i = 51; i <= 99; i++)
+    {
+        meteor[i].setPosition(-200, -200 + tmp);
+        meteor[i].setTextureRect(IntRect(62.625 * xmeteor, 62.25 * ymeteor, 62.625f, 62.25f));
+        double randscale = rand() % 2 + 1.5;
+        meteorhp[i] = 1 * randscale;
+        meteor[i].setScale(randscale, randscale);
+        tmp += 50;
+        meteortimer[i] = rand() % 350 + 40;
     }
     prevwave = '1';
     wave1second.setString("Wave " + to_string(prevwave - 48));
     Wave2 = false, Wave3 = false, Wave4 = false, Wave5 = false, Wave1 = true;
-    for (int j = 0; j < 4; j++)
+    for (int j = 0; j < 3; j++)
     {
         for (int i = 0; i < 8; i++)
         {
@@ -3822,8 +3910,8 @@ void reset()
     }
     for (int i = 0; i < 40; i++)
     {
-        eggs_smol[i].setPosition(10000,10000);
-        eggyolk_smol[i].setPosition(10000,10000);
+        eggs_smol[i].setPosition(10000, 10000);
+        eggyolk_smol[i].setPosition(10000, 10000);
     }
     bosssprite.setPosition(Vector2f(200, 200));
     x = 0;
@@ -3888,8 +3976,8 @@ void trianglewavemove()
             {
                 Chickentriangle[i][j].setTexture(ChickenSkin);
                 Chickentriangle[i][j].setScale(0.3, 0.3);
-                Chickentriangle[i][j].setTextureRect(IntRect(ChickenMovement * 356, 0, 356, 284)); 
-            }          
+                Chickentriangle[i][j].setTextureRect(IntRect(ChickenMovement * 356, 0, 356, 284));
+            }
         }
         Chickentriangle[0][0].setPosition(triangle.getPosition().x + 195, triangle.getPosition().y + 70);
         Chickentriangle[0][1].setPosition(triangle.getPosition().x + 130, triangle.getPosition().y + 170);
@@ -3906,25 +3994,25 @@ void trianglewavemove()
         Chickentriangle[1][5].setPosition(triangle2.getPosition().x + 320, triangle2.getPosition().y + 270);
         for (int i = 0; i < 8; i++)
         {
-            for (int a = 0; a < 4; a++)
+            for (int a = 0; a < 3; a++)
             {
                 Chicken[i][a].setPosition(10000, 10000);
                 eggyolk[i][a].setPosition(10000, 10000);
                 Eggs[i][a].setPosition(10000, 10000);
             }
         }
-            for (int i = 0; i < 2; i++)
+        for (int i = 0; i < 2; i++)
+        {
+            for (int j = 0; j < 6; j++)
             {
-                for (int j = 0; j < 6; j++)
-                {
-                    chicken.HPtriangle[i][j] = chicken.chicken_health + (chicken.chicken_healthvar * 0.5 + 0.5);
-                }
+                chicken.HPtriangle[i][j] = chicken.chicken_health + (chicken.chicken_healthvar * 0.5 + 0.5);
             }
+        }
     }
     chickentriangleip = 1;
-    
-    
-    
+
+
+
     if (triangle.getPosition().x >= 1500)
     {
         triangle1direction = 'L';
@@ -3933,11 +4021,11 @@ void trianglewavemove()
         triangle1direction = 'R';
     if (triangle1direction == 'R')
     {
-            triangle.move(12, 0);
+        triangle.move(12, 0);
     }
     else if (triangle1direction == 'L')
     {
-            triangle.move(-12, 0);
+        triangle.move(-12, 0);
     }
     if (triangle2.getPosition().x >= 1500)
     {
@@ -4074,9 +4162,9 @@ void smolchick()
         for (int i = 0; i < 40; i++)
         {
             smol[i].setTexture(chicksy);
-            smol[i].setTextureRect(IntRect(chickmove*255 , 0, 255, 225));
-            smol[i].setScale(0.5, 0.5);                      
-            smol[i].setPosition(-8000 + (i * 200), 100);   
+            smol[i].setTextureRect(IntRect(chickmove * 255, 0, 255, 225));
+            smol[i].setScale(0.5, 0.5);
+            smol[i].setPosition(-8000 + (i * 200), 100);
 
             chicken.smol_hp[i] = 2;
 
@@ -4107,16 +4195,16 @@ void smolchick()
         {
             smol_enter[i] = 1;
         }
-        if (smol[i].getPosition().x >= 1760 &&right_move[i] == true)
+        if (smol[i].getPosition().x >= 1760 && right_move[i] == true)
         {
-            smol_enter[i] = 1;          
+            smol_enter[i] = 1;
         }
         if (smol_enter[i] == 1)
         {
             smol[i].move(0, 8);
             smol[i].setTextureRect(IntRect(chickmove * 255, 0, 255, 225));
         }
-        if (smol[i].getPosition().y >=400 && smol[i].getPosition().y <= 410)
+        if (smol[i].getPosition().y >= 400 && smol[i].getPosition().y <= 410)
         {
             smol_enter[i] = 0;
             right_move[i] = false;
@@ -4126,7 +4214,7 @@ void smolchick()
             smol_enter[i] = 0;
             right_move[i] = true;
         }
-        
+
 
 
     }
@@ -4134,53 +4222,53 @@ void smolchick()
     {
         chickright = false;
     }
-    else if(chickmove == 0)
+    else if (chickmove == 0)
         chickright = true;
 
-    if (chickright==false)
+    if (chickright == false)
         chickmove--;
     else
         chickmove++;
 
     for (int i = 0; i < 40; i++)
     {
-  
-            if (Player.getGlobalBounds().intersects(smol[i].getGlobalBounds()) && shield_on == false)
-            {
-                if (health >= 1)
-                {
-                    health -= 1;
-                }
-                if (soundeffectON)
-                {
-                    exploding.play();
-                }
-                hp.setString(to_string(health));
-                chicken.smol_hp[i]-=2;
-                if (chicken.smol_hp[i] <= 0)
-                {
-                    smol[i].setPosition(5000, 50000);
-                    smol_ded[i]= 1;
 
-                }
-            }
-            if (Player2ship.getGlobalBounds().intersects(smol[i].getGlobalBounds()) && coopon && shield_on2 == false)
+        if (Player.getGlobalBounds().intersects(smol[i].getGlobalBounds()) && shield_on == false)
+        {
+            if (health >= 1)
             {
-                health3 -= 1;
-                if (soundeffectON)
-                {
-                    exploding.play();
-                }
-                hp2.setString(to_string(health3));
-                chicken.smol_hp[i]-=2;
-                if (chicken.smol_hp[i] <= 0)
-                {
-                    smol[i].setPosition(5000, 50000);
-                    smol_ded[i] = 1;
-
-                }
+                health -= 1;
             }
-    }   
+            if (soundeffectON)
+            {
+                exploding.play();
+            }
+            hp.setString(to_string(health));
+            chicken.smol_hp[i] -= 2;
+            if (chicken.smol_hp[i] <= 0)
+            {
+                smol[i].setPosition(5000, 50000);
+                smol_ded[i] = 1;
+
+            }
+        }
+        if (Player2ship.getGlobalBounds().intersects(smol[i].getGlobalBounds()) && coopon && shield_on2 == false)
+        {
+            health3 -= 1;
+            if (soundeffectON)
+            {
+                exploding.play();
+            }
+            hp2.setString(to_string(health3));
+            chicken.smol_hp[i] -= 2;
+            if (chicken.smol_hp[i] <= 0)
+            {
+                smol[i].setPosition(5000, 50000);
+                smol_ded[i] = 1;
+
+            }
+        }
+    }
 }
 
 void chick_drop()
@@ -4254,12 +4342,12 @@ void chick_drop()
 int main()
 {
     //variable for game pages
-    long long page = 0;
-    
+    long long page = -1;
+
     //sound effect variables
     int temptest = 0, temptest2 = 0, temptest3 = 0;
 
-    //variables for button delays
+    //variables for button delaysframelim
     int checkdelay = 0;
     int delay = 0;
     int backdelay = 0;
@@ -4269,24 +4357,23 @@ int main()
     View fixed = window.getView(); // Create a fixed view  
 
     // Load image and create sprite
-    
-    fork.loadFromFile("Fork.png");  
-    Sprite sprite(fork);   
-    sprite.setScale(1.4, 1); 
+
+    fork.loadFromFile("Fork.png");
+    Sprite sprite(fork);
+    sprite.setScale(1.4, 1);
     // add functions
     cnt = 0;
     boss.eggcooldownvar = 301;
     IngameImages();
-    
+
     MenuMusic.play();
 beginning: {};
-    
+
     // main game loop
-    
+
 
     while (window.isOpen())
     {
-        
 
         // set framelimit
         window.setFramerateLimit(30);
@@ -4301,11 +4388,11 @@ beginning: {};
             {
                 window.close();
             }
-           
+
             if (page == 10)
             {
-                
-                if (event.type == Event::TextEntered && !Keyboard::isKeyPressed(Keyboard::Enter) && Name.size()<=20) {
+
+                if (event.type == Event::TextEntered && !Keyboard::isKeyPressed(Keyboard::Enter) && Name.size() <= 20) {
 
                     Name += static_cast<char>(event.text.unicode);
 
@@ -4314,9 +4401,8 @@ beginning: {};
                     Name.resize(Name.size() - 1);
                 }
             }
-            
         }
-        
+
         //clear window
         window.clear();
 
@@ -4325,15 +4411,40 @@ beginning: {};
         //background
         movingbackround();
 
-        
+
 
         //draw window
         // main menu
+        if (page == -1)
+        {
+            
+            window.draw(menulogo);
+            window.draw(vignette);
+            vignette.setFillColor(Color(0, 0, 0, vignettealpha));
+
+            if (Mouse::isButtonPressed(Mouse::Left))
+            {
+                vignettebool = true;
+            }
+            if (vignettebool == true)
+            {
+                vignettetransition(page);
+            }
+            else
+            {
+                if (vignettealpha > 0)
+                {
+                    vignettealpha = vignettealpha - 1;
+                }
+            }       
+        }
+
         if (page == 0)
         {
+            vignettetransition(page);
             if (searchl == 0)
             {
-                
+
                 mapfirst.clear();
                 mapsecond.clear();
                 mapthird.clear();
@@ -4366,7 +4477,7 @@ beginning: {};
                     }
                     for (int i = 0; i < nm.length(); i++)
                     {
-                        if(nm[i]=='\n')
+                        if (nm[i] == '\n')
                             nm.erase(nm.begin() + i);
                     }
                     mapfirst[nm] = scr;
@@ -4374,7 +4485,7 @@ beginning: {};
                 }
                 for (auto it : mapfirst)
                 {
-                    lvl1score.push_back({ it.second,it.first});
+                    lvl1score.push_back({ it.second,it.first });
                 }
                 sort(lvl1score.begin(), lvl1score.end());
                 lvl1score.erase(unique(lvl1score.begin(), lvl1score.end()), lvl1score.end());
@@ -4566,31 +4677,36 @@ beginning: {};
             window.draw(bottomborder);
             window.draw(leftborder);
             window.draw(rightborder);*/
-            bouncingchicken();
-            
-            
+            bouncingchicken(page);
+
+            if (sprite.getGlobalBounds().intersects(menuchicken.getGlobalBounds()) && Mouse::isButtonPressed(Mouse::Left) && soundeffectON && menuchickendelay.getElapsedTime().asSeconds() >= 0.15) {
+
+                bouncingchickenhurt.play();
+                menuchickendelay.restart();
+            }
+
             window.draw(rectangleshop);
             for (int i = 0; i < 5; i++)
             {
                 window.draw(rectanglemainmenu[i]);
             }
-            if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 1595 && mousepos.x <= 1789 && mousepos.y >= 44 && mousepos.y <= 114)
+            if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 1450 && mousepos.x <= 1800 && mousepos.y >= 880 && mousepos.y <= 950)
             {
                 if (soundeffectON)
                     MenuClick.play();
                 page = 11;
                 goto pagecode;
             }
-            if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550 )
+            if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550)
             {
                 if (soundeffectON)
                     MenuClick.play();
-                
+
                 c4.restart();
                 page = 1;
                 goto pagecode;
             }
-            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 580 && mousepos.y <= 650 )
+            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 580 && mousepos.y <= 650)
             {
                 if (soundeffectON)
                     MenuClick.play();
@@ -4604,17 +4720,19 @@ beginning: {};
                 page = 3;
                 goto pagecode;
             }
-            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 780 && mousepos.y <= 850 )
+            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 780 && mousepos.y <= 850)
             {
                 if (soundeffectON)
                     MenuClick.play();
                 page = 4;
                 goto pagecode;
             }
-            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 880 && mousepos.y <= 950 )
+            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 880 && mousepos.y <= 950)
             {
                 window.close();
             }
+            vignette.setFillColor(Color(0, 0, 0, vignettealpha));
+            window.draw(vignette);
         }
     pagecode: {};
         // select level page ==1;
@@ -4634,17 +4752,17 @@ beginning: {};
             checkdelay = 0;
             mainmenu();
             //back
-            if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left) && backdelay>=5 )
+            if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left) && backdelay >= 5)
             {
                 if (soundeffectON)
                     MenuClick.play();
                 backdelay = 0;
-                    page = 0;
+                page = 0;
             }
-            
+
             window.draw(rectangleback);
             window.draw(back);
-           
+
             for (int i = 0; i < 5; i++)
             {
                 window.draw(rectanglelevels[i]);
@@ -4658,7 +4776,7 @@ beginning: {};
                 lvl = '1';
                 c4.restart();
                 page = 9;
- 
+
             }
             if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 301 && mousepos.y <= 367 && Mouse::isButtonPressed(Mouse::Left) && c4.getElapsedTime().asSeconds() >= 0.2)
             {
@@ -4764,17 +4882,17 @@ beginning: {};
                     page = 5;
             }
             mainmenu();
-           
+
 
             for (int i = 0; i < 5; i++)
             {
                 if (i == 0 && ldbcheck[i] == 1)
-                {             
+                {
                     for (int a = lvl1score.size() - 1, x = 0; x < 5; a--, x++)
                     {
                         if (lvl1score[a].second != " ")
                         {
-                            leadername[x].setString(lvl1score[a].second);        
+                            leadername[x].setString(lvl1score[a].second);
                             leaderscore[x].setString(to_string(lvl1score[a].first));
                         }
                     }
@@ -4783,16 +4901,16 @@ beginning: {};
                 {
                     for (int a = lvl2score.size() - 1, x = 0; x < 5; a--, x++)
                     {
-                            leadername[x].setString(lvl2score[a].second);        
-                            leaderscore[x].setString(to_string(lvl2score[a].first));
+                        leadername[x].setString(lvl2score[a].second);
+                        leaderscore[x].setString(to_string(lvl2score[a].first));
                     }
                 }
                 if (i == 2 && ldbcheck[i] == 1)
                 {
                     for (int a = lvl3score.size() - 1, x = 0; x < 5; a--, x++)
                     {
-                            leadername[x].setString(lvl3score[a].second);     
-                            leaderscore[x].setString(to_string(lvl3score[a].first));
+                        leadername[x].setString(lvl3score[a].second);
+                        leaderscore[x].setString(to_string(lvl3score[a].first));
                     }
                 }
                 if (i == 3 && ldbcheck[i] == 1)
@@ -4816,7 +4934,7 @@ beginning: {};
                     ldbcheck[lastlevel - 1] = 0;
                     ldbcheck[i] = 1;
                     lastlevel = i + 1;
-                    if (soundeffectON && temptest3>=5)
+                    if (soundeffectON && temptest3 >= 5)
                     {
                         MenuClick.play();
                         temptest3 = 0;
@@ -4829,7 +4947,7 @@ beginning: {};
                 }
                 else
                 {
-                    
+
                     rectangleldbs[i].setFillColor(Color(0, 0, 255, 40));
                     rectangleldbs[i].setOutlineColor(Color(51, 153, 255, 60));
                 }
@@ -4844,10 +4962,10 @@ beginning: {};
             }
             window.draw(rectangleback);
             window.draw(back);
-            window.draw(sprite);  
+            window.draw(sprite);
             window.draw(nametext);
             window.draw(numbertext);
-            for (int i = 0; i < 5; i++) 
+            for (int i = 0; i < 5; i++)
             {
                 window.draw(leaderscore[i]);
                 window.draw(leadername[i]);
@@ -4866,38 +4984,38 @@ beginning: {};
             {
                 if (soundeffectON)
                     MenuClick.play();
-               if (frommenu)
-               {
-                   page = 0;
+                if (frommenu)
+                {
+                    page = 0;
 
-                   
-                   for (int i = 0; i < 7;i++)
-                   {
-                       Cred[i].setPosition(900, 1400 + i * 150);
-                       curscale[i] = 1;
-                   }        
-               }
-               
-               else
-               {
-                   if (soundeffectON)
-                       MenuClick.play();
-                   page = 5;
-                   for (int i = 0; i < 7; i++)
-                   {
-                       Cred[i].setPosition(900, 1400 + i * 150);
-                       curscale[i] = 1;
-                   }
 
-               }
+                    for (int i = 0; i < 7; i++)
+                    {
+                        Cred[i].setPosition(900, 1400 + i * 150);
+                        curscale[i] = 1;
+                    }
+                }
+
+                else
+                {
+                    if (soundeffectON)
+                        MenuClick.play();
+                    page = 5;
+                    for (int i = 0; i < 7; i++)
+                    {
+                        Cred[i].setPosition(900, 1400 + i * 150);
+                        curscale[i] = 1;
+                    }
+
+                }
             }
             mainmenu();
-            
+
             window.draw(rectangleback);
             window.draw(back);
 
             //credit scrolling
-            for(int i =0 ; i < 7;i++)
+            for (int i = 0; i < 7; i++)
                 Cred[i].move(0, -7);
 
             //credit scaling
@@ -4908,14 +5026,14 @@ beginning: {};
                     curscale[i] -= 0.01;
                 }
             }
-            
+
             for (int i = 0; i < 7; i++)
             {
 
                 Cred[i].setScale(curscale[i], curscale[i]);
                 window.draw(Cred[i]);
             }
-            window.draw(sprite);  
+            window.draw(sprite);
             if (Cred[6].getScale().x <= 0.15)
             {
                 if (frommenu)
@@ -4947,60 +5065,60 @@ beginning: {};
             checkdelay = 0;
             delay = 0;
             mainmenu();
-          if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550)
-          {
-              if (soundeffectON)
-                  MenuClick.play();
-              pausecooldown = 0;
-              page = 6;
-              goto pagecode;
-          }
-          else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 580 && mousepos.y <= 650)
-          {
-              if (soundeffectON)
-                  MenuClick.play();
-             page = 2;
-             goto pagecode;
-          }
-          else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 680 && mousepos.y <= 750)
-          {
-              if (soundeffectON)
-                  MenuClick.play();
-             page = 3;
+            if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550)
+            {
+                if (soundeffectON)
+                    MenuClick.play();
+                pausecooldown = 0;
+                page = 6;
+                goto pagecode;
+            }
+            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 580 && mousepos.y <= 650)
+            {
+                if (soundeffectON)
+                    MenuClick.play();
+                page = 2;
+                goto pagecode;
+            }
+            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 680 && mousepos.y <= 750)
+            {
+                if (soundeffectON)
+                    MenuClick.play();
+                page = 3;
 
-             
 
-             goto pagecode;
-          }
-          else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 780 && mousepos.y <= 850)
-          {
-              if (soundeffectON)
-                  MenuClick.play();
-              page = 4;
-              goto pagecode;
-          }
-          else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 880 && mousepos.y <= 950)
-          {
-              gameover = false;
-              
-              temptest = 1;
-              page = 1;
-              IngameMusicPlaying = false;
-              MainMusicPlaying = true;
-              
-              if (musicON)
-              {
-                  ingamemusic.stop();
-                  MenuMusic.play();
-              }
-              
 
-              coopon = false;
-              reset();
-              goto beginning;
+                goto pagecode;
+            }
+            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 780 && mousepos.y <= 850)
+            {
+                if (soundeffectON)
+                    MenuClick.play();
+                page = 4;
+                goto pagecode;
+            }
+            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 880 && mousepos.y <= 950)
+            {
+                gameover = false;
 
-          }
-            
+                temptest = 1;
+                page = 1;
+                IngameMusicPlaying = false;
+                MainMusicPlaying = true;
+
+                if (musicON)
+                {
+                    ingamemusic.stop();
+                    MenuMusic.play();
+                }
+
+
+                coopon = false;
+                reset();
+                goto beginning;
+
+            }
+
             window.draw(Logo);
             for (int i = 1; i < 4; i++)
             {
@@ -5008,14 +5126,14 @@ beginning: {};
             }
             window.draw(rectanglecont);
             window.draw(rectanglereturn);
-            window.draw(cont); 
-            window.draw(Options); 
-            window.draw(leadernameboard); 
-            window.draw(Credits); 
-            window.draw(ret); 
-            window.draw(sprite); 
-        } 
-        
+            window.draw(cont);
+            window.draw(Options);
+            window.draw(leadernameboard);
+            window.draw(Credits);
+            window.draw(ret);
+            window.draw(sprite);
+        }
+
         // ingame
         if (page == 6)
         {
@@ -5035,33 +5153,37 @@ beginning: {};
             delay = 0;
             checkdelay = 0;
             frommenu = false;
-            
+
+
             if (Wave1 == true)
             {
                 chicken.chicken_healthvar = 1;
                 prevwave = '1';
                 alivechicken = 0;
-                smolalive = 0;
                 if (clock4.getElapsedTime().asSeconds() >= 9)
                 {
                     backgroundspeed = 3;
                     foodmovespeed = 10;
                     PlayerShooting();
                     rocketshooting();
+                    ChickenMove();
+                    eggmovement(1);
+                    spark_fog();
                     scorecalc();
-                    
+                    FoodMovment();
+
                     window.draw(rectangle1);
                     window.draw(rectangle2);
-               
+
                     if (gameover == true) {
                         searchl = 0;
-                        if(lvl=='1')
+                        if (lvl == '1')
                         {
                             ofstream offile;
-                            offile.open("firstlvl.txt",ios::app);
-                            offile << Name <<" "<< cnt << "*" << endl;
+                            offile.open("firstlvl.txt", ios::app);
+                            offile << Name << " " << cnt << "*" << endl;
                             offile.close();
-                            
+
                         }
                         if (lvl == '2')
                         {
@@ -5098,7 +5220,23 @@ beginning: {};
                         goto beginning;
 
                     }
-                    window.draw(crystalgift); 
+
+
+                    for (int j = 0; j < 3; j++)
+                    {
+                        for (int i = 0; i < 8; i++)
+                        {
+
+                            window.draw(eggyolk[i][j]);
+                            window.draw(Chicken[i][j]);
+                            window.draw(Eggs[i][j]);
+                            window.draw(chicken_legs[i][j]);
+
+                        }
+                    }
+
+
+                    window.draw(crystalgift);
                     window.draw(iongift);
                     window.draw(health_bar);
                     window.draw(Gamebar);
@@ -5113,7 +5251,6 @@ beginning: {};
                         window.draw(powerlvl2);
                         window.draw(explosion2);
                     }
-                   
                     window.draw(foodscore);
                     window.draw(hp);
                     window.draw(rocket);
@@ -5127,38 +5264,16 @@ beginning: {};
                             Bullets[i].setPosition(4000, 4000);
                         }
                     }
-
-                    for (int i = 0; i < 40; i++)
+                    for (int i = 0; i < 8; i++)
                     {
-                        if (smol[i].getPosition().y < 1100 && smol[i].getPosition().x < 1920)
+                        for (int j = 0; j < 3; j++)
                         {
-                            smolalive++;
-                        }
-                    }
-                    if (smolalive == 0)
-                    {
-                        Wave1 = false;
-                        Wave2 = true;
-                        clock4.restart();
-                        clock3.restart();
-                        for (int i = 0; i < bullet.numberofbullets; i++)
-                        {
-                            Bullets[i].setPosition(9000, 9000);
-                            spark[i].setPosition(9000, 9000);
-                            fog[i].setPosition(9000, 9000);
-                        }
-                    }
-                    /*for (int i = 0; i < 2; i++)
-                    {
-                        for (int j = 0; j < 6; j++)
-                        {
-                            if (chickendeadtriangle[i][j] == 0)
+                            if (chickendead[i][j] == 0)
                                 alivechicken++;
                         }
                     }
-                    camerashake();*/
-
-                    /*if (alivechicken == 0)
+                    camerashake();
+                    if (alivechicken == 0)
                     {
                         Wave1 = false;
                         Wave2 = true;
@@ -5169,54 +5284,20 @@ beginning: {};
                             Bullets[i].setPosition(9000, 9000);
                             spark[i].setPosition(9000, 9000);
                             fog[i].setPosition(9000, 9000);
-
                         }
-                        for (int i = 0; i < 2; i++)
-                        {
-                            for (int a = 0; a < 6; a++)
-                            {
-                                Chickentriangle[i][a].setPosition(-2000, 2000);
-                            }
-                        }
-                    }*/
-
+                    }
                     shield_move();
-                    smolchick();
-                    FoodMovment();
-                    chick_drop();
-                    //trianglewavemove();
                     window.draw(Shield);
                     window.draw(Shield2);
 
-                    for (int i = 0; i < 40; i++)
-                    {
-                        window.draw(smol[i]);
-                        window.draw(eggs_smol[i]);
-                        window.draw(eggyolk_smol[i]);
-                        window.draw(meteor[i]);
-                    }
 
-                    //window.draw(triangle);
-                   // window.draw(triangle2);
-                    for (int i = 0; i < 2; i++)
-                    {
-                        for (int j = 0; j < 6; j++)
-                        {
-                            window.draw(Chickentriangle[i][j]);
-                        }
-                    }
-                    for (int j = 0; j < 4; j++)
-                    {
-                        for (int i = 0; i < 8; i++)
-                        {
-
-                            window.draw(eggyolk[i][j]);
-                            window.draw(Eggs[i][j]);
-                            window.draw(chicken_legs[i][j]);
-                            window.draw(Chicken[i][j]);
-                        }
-                    } 
                     //drawing missile
+                    window.draw(missile);
+                    for (int i = 0; i < 50; i++) {
+                        window.draw(spark[i]);
+                        window.draw(fog[i]);
+                    }
+
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
                         page = 5;
@@ -5225,39 +5306,39 @@ beginning: {};
                 }
                 else
                 {
-                    
-                        backgroundspeed = 20;
-                        foodmovespeed = 20;
-                        window.draw(health_bar);
-                        window.draw(Gamebar);
-                        window.draw(score);
-                        window.draw(Bottombar);
 
-                        if (coopon)
-                        {
-                            window.draw(Bottombar2);
-                            window.draw(foodscore2);
-                            window.draw(hp2);
-                            window.draw(rocket2);
-                            window.draw(powerlvl2);
-                            window.draw(explosion2);
-                        }
+                    backgroundspeed = 20;
+                    foodmovespeed = 20;
+                    window.draw(health_bar);
+                    window.draw(Gamebar);
+                    window.draw(score);
+                    window.draw(Bottombar);
 
-                        window.draw(foodscore);
-                        window.draw(hp);
-                        window.draw(rocket);
-                        window.draw(powerlvl);
-                        if (clock3.getElapsedTime().asSeconds() <= 8)
-                        {
-                            if (clock3.getElapsedTime().asSeconds() <= 5)
-                            {
-                                window.draw(wave1second);
-                            }
-                            window.draw(wave1first);
-                        }
+                    if (coopon)
+                    {
+                        window.draw(Bottombar2);
+                        window.draw(foodscore2);
+                        window.draw(hp2);
+                        window.draw(rocket2);
+                        window.draw(powerlvl2);
+                        window.draw(explosion2);
                     }
-                
+
+                    window.draw(foodscore);
+                    window.draw(hp);
+                    window.draw(rocket);
+                    window.draw(powerlvl);
+                    if (clock3.getElapsedTime().asSeconds() <= 8)
+                    {
+                        if (clock3.getElapsedTime().asSeconds() <= 5)
+                        {
+                            window.draw(wave1second);
+                        }
+                        window.draw(wave1first);
+                    }
+                }
             }
+
             else if (Wave2 == true)
             {
                 powerlvls = 1;
@@ -5272,7 +5353,7 @@ beginning: {};
                     clock4.restart();
                     for (int i = 0; i < 8; i++)
                     {
-                        for (int a = 0; a < 4; a++)
+                        for (int a = 0; a < 3; a++)
                         {
                             Chicken[i][a].setPosition(10000, 10000);
                             eggyolk[i][a].setPosition(10000, 10000);
@@ -5296,7 +5377,7 @@ beginning: {};
                     spark_fog();
                     scorecalc();
                     FoodMovment();
-                    
+
                     window.draw(rectangle1);
                     window.draw(rectangle2);
 
@@ -5345,11 +5426,11 @@ beginning: {};
                         goto beginning;
 
                     }
-                    for (int i = 0; i <= 39; i++)
+                    for (int i = 0; i <= 99; i++)
                     {
                         window.draw(meteor[i]);
                     }
-                    for (int i = 0; i < 40; i++)
+                    for (int i = 0; i < 100; i++)
                     {
                         if (meteor[i].getPosition().y < 1100 && meteor[i].getPosition().x < 1920)
                         {
@@ -5368,8 +5449,8 @@ beginning: {};
                         {
                             Bullets[i].setPosition(9000, 9000);
 
-                                spark[i].setPosition(9000, 9000);
-                                fog[i].setPosition(9000, 9000);
+                            spark[i].setPosition(9000, 9000);
+                            fog[i].setPosition(9000, 9000);
 
                         }
 
@@ -5390,9 +5471,9 @@ beginning: {};
                     window.draw(foodscore);
                     window.draw(hp);
                     window.draw(rocket);
-                    window.draw(powerlvl);                  
+                    window.draw(powerlvl);
                     window.draw(explosion);
-                    
+
                     for (int i = 0; i < bullet.numberofbullets; i++)
                     {
                         window.draw(Bullets[i]);
@@ -5408,7 +5489,7 @@ beginning: {};
                     window.draw(missile);
                     for (int i = 0; i < 50; i++) {
                         window.draw(spark[i]);
-                    window.draw(fog[i]);
+                        window.draw(fog[i]);
                     }
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
@@ -5420,7 +5501,7 @@ beginning: {};
                 {
                     backgroundspeed = 20;
                     foodmovespeed = 20;
-                    for (int j = 0; j < 4; j++)
+                    for (int j = 0; j < 3; j++)
                     {
                         for (int i = 0; i < 8; i++)
                         {
@@ -5463,15 +5544,14 @@ beginning: {};
                         window.draw(wave1second);
                     }
                 }
-
             }
             else if (Wave3 == true)
             {
-                chicken.chicken_healthvar = 3;
                 powerlvls = 2;
                 powerlvl2.setString(to_string(powerlvls));
                 powerlvl.setString(to_string(powerlvls));
                 alivechicken = 0;
+                smolalive = 0;
                 wave1second.setString("Wave " + to_string(prevwave - 48));
                 if (prevwave == '2')
                 {
@@ -5479,7 +5559,7 @@ beginning: {};
                     clock3.restart();
                     clock4.restart();
                     meteorx = 0;
-                    for (int i = 0; i < 40; i++)
+                    for (int i = 0; i < 100; i++)
                     {
                         meteor[i].setPosition(10000, 10000);
                     }
@@ -5492,12 +5572,8 @@ beginning: {};
                     foodmovespeed = 10;
                     PlayerShooting();
                     rocketshooting();
-                    ChickenMove();
-                    eggmovement(0);
-                    spark_fog();
                     scorecalc();
-                    FoodMovment();
-                    
+
                     window.draw(rectangle1);
                     window.draw(rectangle2);
 
@@ -5546,22 +5622,8 @@ beginning: {};
                         goto beginning;
 
                     }
-
-
-                    for (int j = 0; j < 4; j++)
-                    {
-
-                        for (int i = 0; i < 8; i++)
-                        {
-
-                            window.draw(eggyolk[i][j]);
-                            window.draw(Chicken[i][j]);
-                            window.draw(Eggs[i][j]);
-                            window.draw(chicken_legs[i][j]);
-                        }
-                    }
-                    window.draw(iongift);
                     window.draw(crystalgift);
+                    window.draw(iongift);
                     window.draw(health_bar);
                     window.draw(Gamebar);
                     window.draw(score);
@@ -5575,6 +5637,7 @@ beginning: {};
                         window.draw(powerlvl2);
                         window.draw(explosion2);
                     }
+
                     window.draw(foodscore);
                     window.draw(hp);
                     window.draw(rocket);
@@ -5589,16 +5652,14 @@ beginning: {};
                         }
                     }
 
-                    for (int i = 0; i < 8; i++)
+                    for (int i = 0; i < 40; i++)
                     {
-                        for (int j = 0; j < 4; j++)
+                        if (smol[i].getPosition().y < 1100 && smol[i].getPosition().x < 1920)
                         {
-                            if (chickendead[i][j] == 0)
-                                alivechicken++;
+                            smolalive++;
                         }
                     }
-                    camerashake();
-                    if (alivechicken == 0)
+                    if (smolalive == 0)
                     {
                         Wave3 = false;
                         Wave4 = true;
@@ -5607,28 +5668,24 @@ beginning: {};
                         for (int i = 0; i < bullet.numberofbullets; i++)
                         {
                             Bullets[i].setPosition(9000, 9000);
-
-                                spark[i].setPosition(9000, 9000);
-                                fog[i].setPosition(9000, 9000);
-
-                        }
-                        for (int i = 0; i < 8; i++)
-                        {
-                            for (int a = 0; a < 4; a++)
-                            {
-                                Chicken[i][a].setPosition(-2000, 2000);
-                            }
+                            spark[i].setPosition(9000, 9000);
+                            fog[i].setPosition(9000, 9000);
                         }
                     }
                     shield_move();
+                    smolchick();
+                    FoodMovment();
+                    chick_drop();
                     window.draw(Shield);
                     window.draw(Shield2);
-                    //drawing missile
-                    window.draw(missile);
-                    for (int i = 0; i < 50; i++) {
-                        window.draw(spark[i]);
-                    window.draw(fog[i]);
+
+                    for (int i = 0; i < 40; i++)
+                    {
+                        window.draw(smol[i]);
+                        window.draw(eggs_smol[i]);
+                        window.draw(eggyolk_smol[i]);
                     }
+                    //drawing missile
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
                         page = 5;
@@ -5637,13 +5694,14 @@ beginning: {};
                 }
                 else
                 {
+
                     backgroundspeed = 20;
                     foodmovespeed = 20;
                     window.draw(health_bar);
                     window.draw(Gamebar);
                     window.draw(score);
                     window.draw(Bottombar);
-                   
+
                     if (coopon)
                     {
                         window.draw(Bottombar2);
@@ -5653,6 +5711,7 @@ beginning: {};
                         window.draw(powerlvl2);
                         window.draw(explosion2);
                     }
+
                     window.draw(foodscore);
                     window.draw(hp);
                     window.draw(rocket);
@@ -5661,11 +5720,12 @@ beginning: {};
                     {
                         if (clock3.getElapsedTime().asSeconds() <= 5)
                         {
-                            window.draw(endofwave1);
+                            window.draw(wave1second);
                         }
-                        window.draw(wave1second);
+                        window.draw(wave1first);
                     }
                 }
+
             }
             else if (Wave4 == true)
             {
@@ -5682,7 +5742,7 @@ beginning: {};
                     clock4.restart();
                     for (int i = 0; i < 8; i++)
                     {
-                        for (int a = 0; a < 4; a++)
+                        for (int a = 0; a < 3; a++)
                         {
                             Chicken[i][a].setPosition(10000, 10000);
                             eggyolk[i][a].setPosition(10000, 10000);
@@ -5703,7 +5763,7 @@ beginning: {};
                     spark_fog();
                     scorecalc();
                     FoodMovment();
-                    
+
                     window.draw(rectangle1);
                     window.draw(rectangle2);
 
@@ -5752,11 +5812,11 @@ beginning: {};
                         goto beginning;
 
                     }
-                    for (int i = 0; i <= 39; i++)
+                    for (int i = 0; i <= 99; i++)
                     {
                         window.draw(meteor[i]);
                     }
-                    for (int i = 0; i < 40; i++)
+                    for (int i = 0; i < 100; i++)
                     {
                         if (meteor[i].getPosition().y < 1100 && meteor[i].getPosition().x < 1920)
                         {
@@ -5774,10 +5834,10 @@ beginning: {};
                         for (int i = 0; i < bullet.numberofbullets; i++)
                         {
                             Bullets[i].setPosition(9000, 9000);
-                            
-                                spark[i].setPosition(9000, 9000);
-                                fog[i].setPosition(9000, 9000);
-                            
+
+                            spark[i].setPosition(9000, 9000);
+                            fog[i].setPosition(9000, 9000);
+
                         }
 
                     }
@@ -5794,6 +5854,7 @@ beginning: {};
                         window.draw(powerlvl2);
                         window.draw(explosion2);
                     }
+
                     window.draw(foodscore);
                     window.draw(hp);
                     window.draw(rocket);
@@ -5810,7 +5871,17 @@ beginning: {};
                     shield_move();
                     window.draw(Shield);
                     window.draw(Shield2);
+                    for (int j = 0; j < 3; j++)
+                    {
+                        for (int i = 0; i < 8; i++)
+                        {
 
+                            window.draw(eggyolk[i][j]);
+                            window.draw(Eggs[i][j]);
+                            window.draw(chicken_legs[i][j]);
+
+                        }
+                    }
                     //drawing missile
                     window.draw(missile);
                     for (int i = 0; i < 50; i++) {
@@ -5827,7 +5898,7 @@ beginning: {};
                 {
                     backgroundspeed = 20;
                     foodmovespeed = 20;
-                    for (int j = 0; j < 4; j++)
+                    for (int j = 0; j < 3; j++)
                     {
                         for (int i = 0; i < 8; i++)
                         {
@@ -5869,7 +5940,6 @@ beginning: {};
                         window.draw(wave1second);
                     }
                 }
-
             }
             else if (Wave5 == true)
             {
@@ -5902,7 +5972,7 @@ beginning: {};
                     spark_fog();
                     scorecalc();
 
-                    
+
                     window.draw(rectangle1);
                     window.draw(rectangle2);
 
@@ -5992,11 +6062,11 @@ beginning: {};
                     }
                     if (boss.bosshp <= 0)
                         aliveboss = 0;
-                    
+
                     camerashake();
                     if (aliveboss <= 0)
                     {
-                        
+
                         searchl = 0;
                         if (lvl == '1')
                         {
@@ -6048,16 +6118,16 @@ beginning: {};
                         }
                         for (int i = 0; i < 8; i++)
                         {
-                            for (int a = 0; a < 4; a++)
+                            for (int a = 0; a < 3; a++)
                             {
                                 Chicken[i][a].setPosition(10000, 10000);
                             }
                         }
-                        
+
                         IngameMusicPlaying = false;
                         if (musicON)
                         {
-                            
+
                             ingamemusic.stop();
                         }
                         if (soundeffectON)
@@ -6074,7 +6144,7 @@ beginning: {};
                     window.draw(missile);
                     for (int i = 0; i < 50; i++) {
                         window.draw(spark[i]);
-                    window.draw(fog[i]);
+                        window.draw(fog[i]);
                     }
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
@@ -6175,7 +6245,7 @@ beginning: {};
 
             playerdamage();
             PlayerMove();
-            
+
             window.draw(Player);
             window.draw(shipfire);
 
@@ -6205,7 +6275,7 @@ beginning: {};
             checkdelay = 0;
             backdelay++;
             mainmenu();
-            
+
             window.draw(Logo);
             for (int j = 0; j < 2; j++)
             {
@@ -6235,9 +6305,9 @@ beginning: {};
             window.draw(W);
             window.draw(Fire2);
             window.draw(Shift);
-            if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left) &&backdelay>=5)
+            if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left) && backdelay >= 5)
             {
-                if(soundeffectON)
+                if (soundeffectON)
                     MenuClick.play();
                 backdelay = 0;
                 page = 2;
@@ -6245,7 +6315,7 @@ beginning: {};
             window.draw(rectangleback);
             window.draw(back);
             window.draw(sprite);
-            
+
         }
         // sound
         if (page == 8)
@@ -6255,7 +6325,7 @@ beginning: {};
             backdelay = 0;
             checkdelay++;
             mainmenu();
-            
+
             window.draw(Logo);
             window.draw(rectangleback);
             window.draw(back);
@@ -6272,31 +6342,31 @@ beginning: {};
             window.draw(musiccheck);
             window.draw(soundeffectcheck);
 
-            if (mousepos.x >= 985 && mousepos.x <= 1055 && mousepos.y >= 480  && mousepos.y <= 550 && Mouse::isButtonPressed(Mouse::Left) && checkdelay>=5)
+            if (mousepos.x >= 985 && mousepos.x <= 1055 && mousepos.y >= 480 && mousepos.y <= 550 && Mouse::isButtonPressed(Mouse::Left) && checkdelay >= 5)
             {
-                
-                    if (soundeffectON)
-                    {
-                        MenuClick.play();
-                    }
-                    musicON = !musicON;
-                    if (musicON == false)
-                    {
-                        MenuMusic.stop();
-                        ingamemusic.stop();
-                    }
-                    if (musicON && IngameMusicPlaying && MainMusicPlaying == false)
-                    {
-                        ingamemusic.play();
-                    }
-                    if (musicON && MainMusicPlaying && IngameMusicPlaying == false)
-                    {
-                        MenuMusic.play();
-                    }
-                    checkdelay = 0;
 
-                    
-                
+                if (soundeffectON)
+                {
+                    MenuClick.play();
+                }
+                musicON = !musicON;
+                if (musicON == false)
+                {
+                    MenuMusic.stop();
+                    ingamemusic.stop();
+                }
+                if (musicON && IngameMusicPlaying && MainMusicPlaying == false)
+                {
+                    ingamemusic.play();
+                }
+                if (musicON && MainMusicPlaying && IngameMusicPlaying == false)
+                {
+                    MenuMusic.play();
+                }
+                checkdelay = 0;
+
+
+
             }
             if (mousepos.x >= 985 && mousepos.x <= 1055 && mousepos.y >= 580 && mousepos.y <= 650 && Mouse::isButtonPressed(Mouse::Left) && checkdelay >= 5)
             {
@@ -6306,7 +6376,7 @@ beginning: {};
                 checkdelay = 0;
             }
 
-            if (musicON == true) 
+            if (musicON == true)
             {
                 window.draw(checkbox[0]);
             }
@@ -6323,8 +6393,8 @@ beginning: {};
             mainmenu();
             modeselectdelay++;
             coopclick++;
-            backdelay=0;
-            
+            backdelay = 0;
+
             window.draw(Logo);
             for (int i = 0; i < 2; i++)
             {
@@ -6334,13 +6404,13 @@ beginning: {};
             if (mousepos.x >= 585 && mousepos.x <= 935 && mousepos.y >= 480 && mousepos.y <= 550 && Mouse::isButtonPressed(Mouse::Left) && modeselectdelay >= 5)
             {
                 page = 10;
-                
-                
+
+
             }
             //coop
             if (mousepos.x >= 985 && mousepos.x <= 1335 && mousepos.y >= 480 && mousepos.y <= 550 && Mouse::isButtonPressed(Mouse::Left) && modeselectdelay >= 5)
             {
-                
+
                 coopon = true;
                 temptest2 = 1;
                 MainMusicPlaying = false;
@@ -6359,116 +6429,120 @@ beginning: {};
                 page = 6;
                 pausecooldown = 0;
                 modeselectdelay = 0;
-               
+
                 goto beginning;
             }
             //back
-            if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left) )
+            if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left))
             {
                 if (soundeffectON)
                     MenuClick.play();
                 page = 1;
-               
+
             }
             window.draw(rectangleback);
             window.draw(back);
             window.draw(single);
             window.draw(coop);
             window.draw(sprite);
-         
+
         }
-            if (page == 10) {
-                
-    
-                    if (Keyboard::isKeyPressed(Keyboard::Enter) && Name.size() >= 1)
-                    {
-                        for (int i = 0; i < Name.size();i++)
-                        {
-                            for (char v = 'a'; v <= 'z';v++)
-                            {
-                                if (Name[i] == v || Name[i] == toupper(v))
-                                {
-                                    temptest2 = 1;
-                                    MainMusicPlaying = false;
-                                    IngameMusicPlaying = true;
-                                    clock3.restart();
-                                    clock4.restart();
-                                    if (musicON)
-                                    {
-                                        ingamemusic.play();
-                                        MenuMusic.stop();
-                                    }
-                                    if (soundeffectON)
-                                    {
-                                        shipin.play();
-                                    }
-                                    
-                                    page = 6;
-                                    pausecooldown = 0;
-                                    modeselectdelay = 0;
-                                    MainMusicPlaying = false;
-                                    IngameMusicPlaying = true;
-                                    if (musicON)
-                                    {
-                                        ingamemusic.play();
-                                        MenuMusic.stop();
-                                    }
-                                    goto beginning;
-                                }
-                            }
-                        }
-                        
+        if (page == 10) {
 
 
-                    }
-                    if (Keyboard::isKeyPressed(Keyboard::Escape)) {
-                        page = 9;
-                        Name = "";
-                        shipin.stop();
-                    }
-                    t2.setString(Name);
-
-                    window.draw(t1);
-                    window.draw(t2);
-
-            }
-            //shop
-            if (page == 11)
+            if (Keyboard::isKeyPressed(Keyboard::Enter) && Name.size() >= 1)
             {
-
-                Player.setPosition(800, 400);
-                Player.setScale(5, 5);
-      
-                mainmenu();
-               
-                if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left))
+                for (int i = 0; i < Name.size(); i++)
                 {
-                   /* if (soundeffectON)
-                        MenuClick.play();*/
-                    backdelay = 0;
-                    page = 0;
+                    for (char v = 'a'; v <= 'z'; v++)
+                    {
+                        if (Name[i] == v || Name[i] == toupper(v))
+                        {
+                            temptest2 = 1;
+                            MainMusicPlaying = false;
+                            IngameMusicPlaying = true;
+                            clock3.restart();
+                            clock4.restart();
+                            if (musicON)
+                            {
+                                ingamemusic.play();
+                                MenuMusic.stop();
+                            }
+                            if (soundeffectON)
+                            {
+                                shipin.play();
+                            }
+
+                            page = 6;
+                            pausecooldown = 0;
+                            modeselectdelay = 0;
+                            MainMusicPlaying = false;
+                            IngameMusicPlaying = true;
+                            if (musicON)
+                            {
+                                ingamemusic.play();
+                                MenuMusic.stop();
+                            }
+                            goto beginning;
+                        }
+                    }
                 }
 
-               /* if (mousepos.x >= 785 && mousepos.x <= 785 + 350 && mousepos.y >= 820 && mousepos.y <= 820 + 70 && Mouse::isButtonPressed(Mouse::Left))
-                {
-                    if (soundeffectON)
-                        MenuClick.play();
-                }*/
 
-                for (int i = 0; i < 3; i++)
+
+            }
+            if (Keyboard::isKeyPressed(Keyboard::Escape)) {
+                page = 9;
+                Name = "";
+                shipin.stop();
+            }
+            t2.setString(Name);
+
+            window.draw(t1);
+            window.draw(t2);
+
+        }
+        //shop
+         //shop
+        if (page == 11)
+        {
+
+            Player.setPosition(800, 400);
+            Player.setScale(5, 5);
+            if (shopcheck[2] == 1)
+            {
+                window.draw(shipfire);
+                shipfire.setPosition(Player.getPosition().x + 146, Player.getPosition().y + 190);
+                shipfire.setScale(3.1, 3.1);
+
+            }
+            mainmenu();
+
+            if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left))
+            {
+                if (soundeffectON && shopdelay.getElapsedTime().asSeconds() >= 0.015)
                 {
-                    if (mousepos.x >= rectangleshopx && mousepos.x <= rectangleshopx + 350 && mousepos.y >= rectangleshopy + i * 180 && mousepos.y <= rectangleshopy + 70 + i * 180 && Mouse::isButtonPressed(Mouse::Left))
+                    MenuClick.play();
+                    shopdelay.restart();
+                }
+                backdelay = 0;
+                page = 0;
+            }
+            for (int i = 0; i < 3; i++)
+            {
+                if (mousepos.x >= rectangleshopx && mousepos.x <= rectangleshopx + 350 && mousepos.y >= rectangleshopy + i * 180 && mousepos.y <= rectangleshopy + 70 + i * 180 && Mouse::isButtonPressed(Mouse::Left))
                 {
                     shopcheck[shopbutton - 1] = 0;
                     shopcheck[i] = 1;
                     shopbutton = i + 1;
-                  /*  if (soundeffectON)
+                    if (soundeffectON && shopdelay.getElapsedTime().asSeconds() >= 0.15)
                     {
                         MenuClick.play();
-                    }*/
+                        shopdelay.restart();
+                    }
                 }
 
-                    
+
                 if (shopcheck[i] == 1)
                 {
                     rectangleshopoptions[i].setFillColor(Color(0, 128, 255, 40));
@@ -6476,7 +6550,7 @@ beginning: {};
                 }
                 else
                 {
-                    
+
                     rectangleshopoptions[i].setFillColor(Color(0, 0, 255, 40));
                     rectangleshopoptions[i].setOutlineColor(Color(51, 153, 255, 60));
                 }
@@ -6486,193 +6560,247 @@ beginning: {};
                     shipcolor[0][1].setFillColor(Color(0, 0, 0, 255));
                 }
 
-                if ((i == 1 || i==2) && shopcheck[i] == 1)
+                if ((i == 1 || i == 2) && shopcheck[i] == 1)
                 {
                     shipcolor[0][1].setFillColor(Color(127, 0, 255, 255));
                 }
 
-                }
-                for (int k = 0; k < 3; k++) 
-                {
-                    for (int j = 0; j < 2; j++)
-                    {
-                        for (int i = 0; i < 2; i++)
-                        {
-
-                            if (mousepos.x >= shipcolorx + i * 350 && mousepos.x <= shipcolorx + i * 350 + 250 && mousepos.y >= shipcolory + j * 320 && mousepos.y <= shipcolory + 250 + j * 320 && Mouse::isButtonPressed(Mouse::Left))
-                            {
-                                // if (soundeffectON)
-                                    // MenuClick.play();
-                                if (k == 0 && shopcheck[k] == 1)
-                                {
-                                    if (i == 0 && j == 0)
-                                        customship.first = 1;
-                                    if (i == 1 && j == 0)
-                                        customship.first = 2;
-                                    if (i == 0 && j == 1)
-                                        customship.first = 3;
-                                    if (i == 1 && j == 1)
-                                        customship.first = 4;
-
-                                }
-
-                                if (k == 1 && shopcheck[k] == 1)
-                                {
-                                    if (i == 0 && j == 0)
-                                        customship.second = 1;
-                                    if (i == 1 && j == 0)
-                                        customship.second = 2;
-                                    if (i == 0 && j == 1)
-                                        customship.second = 3;
-                                    if (i == 1 && j == 1)
-                                        customship.second = 4;
-                                }
-                            }
-                                if (mousepos.x >= 785 && mousepos.x <= 785 + 350 && mousepos.y >= 820 && mousepos.y <= 820 + 70 && Mouse::isButtonPressed(Mouse::Left)) 
-                                {
-                                    if (k == 0 && shopcheck[k] == 1)
-                                    {
-                                        customship.first = 0;
-                                    }
-                                    if (k == 1 && shopcheck[k] == 1)
-                                    {
-                                        customship.second = 0;
-                                    }
-                                }
-                               
-                            
-
-                        }
-                    }
-                }
-                if (customship.first == 0 && customship.second == 0)
-                {
-                    PlayerSkin.loadFromFile("playerr.png");
-                }
-                if (customship.first == 0 && customship.second == 1)
-                {
-                    PlayerSkin.loadFromFile("playerdefaultblue.png");
-                }
-                if (customship.first == 0 && customship.second == 2)
-                {
-                    PlayerSkin.loadFromFile("playerdefaultred.png");
-                }
-                if (customship.first == 0 && customship.second == 3)
-                {
-                    PlayerSkin.loadFromFile("playerdefaultpurple.png");
-                }
-                if (customship.first == 0 && customship.second == 4)
-                {
-                    PlayerSkin.loadFromFile("playerdefaultgreen.png");
-                }
-                if (customship.first == 1 && customship.second == 0)
-                {
-                    PlayerSkin.loadFromFile("playerbluedefault.png");
-                }
-                if (customship.first == 1 && customship.second == 1)
-                {
-                    PlayerSkin.loadFromFile("playerblueblue.png");
-                }
-                if (customship.first == 1 && customship.second == 2)
-                {
-                    PlayerSkin.loadFromFile("playerbluered.png");
-                }
-                if (customship.first == 1 && customship.second == 3)
-                {
-                    PlayerSkin.loadFromFile("playerbluepurple.png");
-                }
-                if (customship.first == 1 && customship.second == 4)
-                {
-                    PlayerSkin.loadFromFile("playerbluegreen.png");
-                }
-                if (customship.first == 2 && customship.second == 0)
-                {
-                    PlayerSkin.loadFromFile("playerreddefault.png");
-                }
-                 if (customship.first == 2 && customship.second == 1)
-                 {
-                     PlayerSkin.loadFromFile("playerredblue.png");
-                 }
-                 if (customship.first == 2 && customship.second == 2)
-                 {
-                     PlayerSkin.loadFromFile("playerredred.png");
-                 }
-                if (customship.first == 2 && customship.second == 3)
-                {
-                    PlayerSkin.loadFromFile("playerredpurple.png");
-                }
-                if (customship.first == 2 && customship.second == 4)
-                {
-                    PlayerSkin.loadFromFile("playerredgreen.png");
-                }
-                if (customship.first == 3 && customship.second == 0)
-                {
-                    PlayerSkin.loadFromFile("playerblackdefault.png");
-                }
-                if (customship.first == 3 && customship.second == 1)
-                {
-                    PlayerSkin.loadFromFile("playerblackblue.png");
-                }
-                if (customship.first == 3 && customship.second == 2)
-                {
-                    PlayerSkin.loadFromFile("playerblackred.png");
-                }
-                if (customship.first == 3 && customship.second == 3)
-                {
-                    PlayerSkin.loadFromFile("playerblackpurple.png");
-                }
-                if (customship.first == 3 && customship.second == 4)
-                {
-                    PlayerSkin.loadFromFile("playerblackgreen.png");
-                }
-                if (customship.first == 4 && customship.second == 0)
-                {
-                    PlayerSkin.loadFromFile("playergreendefault.png");
-                }
-                if (customship.first == 4 && customship.second == 1)
-                {
-                    PlayerSkin.loadFromFile("playergreenblue.png");
-                }
-                if (customship.first == 4 && customship.second == 2)
-                {
-                    PlayerSkin.loadFromFile("playergreenred.png");
-                }
-                if (customship.first == 4 && customship.second == 3)
-                {
-                    PlayerSkin.loadFromFile("playergreenpurple.png");
-                }
-                if (customship.first == 4 && customship.second == 4)
-                {
-                    PlayerSkin.loadFromFile("playergreengreen.png");
-                }
-
-                window.draw(rectangleback);
-                window.draw(back);
-                window.draw(shopcustomize);
-                window.draw(Base);
-                window.draw(Cockpit);
-                window.draw(Engine);
-                window.draw(Default);
-                window.draw(Player);
-                for (int i = 0; i < 4; i++)
-                {
-                 window.draw(rectangleshopoptions[i]);
-                }
+            }
+            for (int k = 0; k < 3; k++)
+            {
                 for (int j = 0; j < 2; j++)
                 {
                     for (int i = 0; i < 2; i++)
                     {
-                        window.draw(shipcolor[i][j]);
+
+                        if (mousepos.x >= shipcolorx + i * 350 && mousepos.x <= shipcolorx + i * 350 + 250 && mousepos.y >= shipcolory + j * 320 && mousepos.y <= shipcolory + 250 + j * 320 && Mouse::isButtonPressed(Mouse::Left))
+                        {
+                            if (soundeffectON && shopdelay.getElapsedTime().asSeconds() >= 0.15)
+                            {
+                                MenuClick.play();
+                                shopdelay.restart();
+                            }
+                            if (k == 0 && shopcheck[k] == 1)
+                            {
+                                if (i == 0 && j == 0)
+                                    customship.first = 1;
+                                if (i == 1 && j == 0)
+                                    customship.first = 2;
+                                if (i == 0 && j == 1)
+                                    customship.first = 3;
+                                if (i == 1 && j == 1)
+                                    customship.first = 4;
+
+                            }
+
+                            if (k == 1 && shopcheck[k] == 1)
+                            {
+                                if (i == 0 && j == 0)
+                                    customship.second = 1;
+                                if (i == 1 && j == 0)
+                                    customship.second = 2;
+                                if (i == 0 && j == 1)
+                                    customship.second = 3;
+                                if (i == 1 && j == 1)
+                                    customship.second = 4;
+                            }
+
+                            if (k == 2 && shopcheck[k] == 1)
+                            {
+                                if (i == 0 && j == 0)
+                                    customengine = 1;
+                                if (i == 1 && j == 0)
+                                    customengine = 2;
+                                if (i == 0 && j == 1)
+                                    customengine = 3;
+                                if (i == 1 && j == 1)
+                                    customengine = 4;
+
+
+                            }
+                        }
+                        if (mousepos.x >= 785 && mousepos.x <= 785 + 350 && mousepos.y >= 820 && mousepos.y <= 820 + 70 && Mouse::isButtonPressed(Mouse::Left))
+                        {
+                            if (soundeffectON && shopdelay.getElapsedTime().asSeconds() >= 0.15)
+                            {
+                                MenuClick.play();
+                                shopdelay.restart();
+                            }
+                            if (k == 0 && shopcheck[k] == 1)
+                            {
+                                customship.first = 0;
+                            }
+                            if (k == 1 && shopcheck[k] == 1)
+                            {
+                                customship.second = 0;
+                            }
+                            if (k == 2 && shopcheck[k] == 1)
+                            {
+                                customengine = 0;
+                            }
+                        }
+
+
+
                     }
                 }
-                window.draw(sprite);
-                
+
             }
+
+            if (customship.first == 0 && customship.second == 0)
+            {
+                PlayerSkin.loadFromFile("playerr.png");
+            }
+            if (customship.first == 0 && customship.second == 1)
+            {
+                PlayerSkin.loadFromFile("playerdefaultblue.png");
+            }
+            if (customship.first == 0 && customship.second == 2)
+            {
+                PlayerSkin.loadFromFile("playerdefaultred.png");
+            }
+            if (customship.first == 0 && customship.second == 3)
+            {
+                PlayerSkin.loadFromFile("playerdefaultpurple.png");
+            }
+            if (customship.first == 0 && customship.second == 4)
+            {
+                PlayerSkin.loadFromFile("playerdefaultgreen.png");
+            }
+            if (customship.first == 1 && customship.second == 0)
+            {
+                PlayerSkin.loadFromFile("playerbluedefault.png");
+            }
+            if (customship.first == 1 && customship.second == 1)
+            {
+                PlayerSkin.loadFromFile("playerblueblue.png");
+            }
+            if (customship.first == 1 && customship.second == 2)
+            {
+                PlayerSkin.loadFromFile("playerbluered.png");
+            }
+            if (customship.first == 1 && customship.second == 3)
+            {
+                PlayerSkin.loadFromFile("playerbluepurple.png");
+            }
+            if (customship.first == 1 && customship.second == 4)
+            {
+                PlayerSkin.loadFromFile("playerbluegreen.png");
+            }
+            if (customship.first == 2 && customship.second == 0)
+            {
+                PlayerSkin.loadFromFile("playerreddefault.png");
+            }
+            if (customship.first == 2 && customship.second == 1)
+            {
+                PlayerSkin.loadFromFile("playerredblue.png");
+            }
+            if (customship.first == 2 && customship.second == 2)
+            {
+                PlayerSkin.loadFromFile("playerredred.png");
+            }
+            if (customship.first == 2 && customship.second == 3)
+            {
+                PlayerSkin.loadFromFile("playerredpurple.png");
+            }
+            if (customship.first == 2 && customship.second == 4)
+            {
+                PlayerSkin.loadFromFile("playerredgreen.png");
+            }
+            if (customship.first == 3 && customship.second == 0)
+            {
+                PlayerSkin.loadFromFile("playerblackdefault.png");
+            }
+            if (customship.first == 3 && customship.second == 1)
+            {
+                PlayerSkin.loadFromFile("playerblackblue.png");
+            }
+            if (customship.first == 3 && customship.second == 2)
+            {
+                PlayerSkin.loadFromFile("playerblackred.png");
+            }
+            if (customship.first == 3 && customship.second == 3)
+            {
+                PlayerSkin.loadFromFile("playerblackpurple.png");
+            }
+            if (customship.first == 3 && customship.second == 4)
+            {
+                PlayerSkin.loadFromFile("playerblackgreen.png");
+            }
+            if (customship.first == 4 && customship.second == 0)
+            {
+                PlayerSkin.loadFromFile("playergreendefault.png");
+            }
+            if (customship.first == 4 && customship.second == 1)
+            {
+                PlayerSkin.loadFromFile("playergreenblue.png");
+            }
+            if (customship.first == 4 && customship.second == 2)
+            {
+                PlayerSkin.loadFromFile("playergreenred.png");
+            }
+            if (customship.first == 4 && customship.second == 3)
+            {
+                PlayerSkin.loadFromFile("playergreenpurple.png");
+            }
+            if (customship.first == 4 && customship.second == 4)
+            {
+                PlayerSkin.loadFromFile("playergreengreen.png");
+            }
+            if (customengine == 0)
+            {
+                shipfiretx.loadFromFile("shipfire.png");
+                shipfiretx.setSmooth(1);
+            }
+            else if (customengine == 1)
+            {
+                shipfiretx.loadFromFile("BlueFire.png");
+                shipfiretx.setSmooth(1);
+            }
+            else if (customengine == 2)
+            {
+                shipfiretx.loadFromFile("RedFire.png");
+                shipfiretx.setSmooth(1);
+            }
+            else if (customengine == 3)
+            {
+                shipfiretx.loadFromFile("PurpleFire.png");
+                shipfiretx.setSmooth(1);
+            }
+            else if (customengine == 4)
+            {
+                shipfiretx.loadFromFile("GreenFire.png");
+                shipfiretx.setSmooth(1);
+            }
+
+
+            window.draw(rectangleback);
+            window.draw(back);
+            window.draw(shopcustomize);
+            window.draw(Base);
+            window.draw(Cockpit);
+            window.draw(Engine);
+            window.draw(Default);
+            window.draw(Player);
+            for (int i = 0; i < 4; i++)
+            {
+                window.draw(rectangleshopoptions[i]);
+            }
+            for (int j = 0; j < 2; j++)
+            {
+                for (int i = 0; i < 2; i++)
+                {
+                    window.draw(shipcolor[i][j]);
+                }
+            }
+            window.draw(sprite);
+
+        }
         sprite.setPosition(static_cast<Vector2f>(Mouse::getPosition(window))); // Set position 
-        
+
         // window display
         window.setView(view1);
-     
+
         window.display();
     }
     return 0;
