@@ -30,22 +30,6 @@ struct bulletstruct
     const int numberofbullets = 50;
 };
 
-//spark struct
-struct spark_struct {
-    int currentspark = 0;
-    float sparkcooldownvar = 8;
-    float sparkcooldown = 0;
-
-};
-
-//fog struct
-struct fogstruct {
-    int currentfog = 0;
-    float fogcooldownvar = 8;
-    float fogcooldown = 0;
-
-};
-
 //Meteor Struct
 struct meteorstruct {
     int meteorspeed = 100;
@@ -121,16 +105,6 @@ Sprite eggyolk[8][4];
 int foodmovespeed = 10;
 Texture Chickenlegs;
 Sprite chicken_legs[8][4];
-
-//spark and fog variables
-int sparkx = 0, fogx = 0, fogy = 0;
-int sparkbool = 0;
-spark_struct Spark;
-fogstruct Fog;
-Texture sparkimage;
-Texture fogimage;
-Sprite spark[50];
-Sprite fog[50];
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -591,22 +565,10 @@ void IngameImages()
     explosionimage.loadFromFile("PlayerDeath.png");
     explosion.setTexture(explosionimage);
     explosion.setPosition(7000, 7000);
-    sparkimage.loadFromFile("sparkspink.png");
 
     explosionimage2.loadFromFile("PlayerDeath.png");
     explosion2.setTexture(explosionimage2);
     explosion2.setPosition(8000, 8000);
-    sparkimage.loadFromFile("sparkswhite.png");
-
-    for (int i = 0; i < 50; i++) {
-        spark[i].setTexture(sparkimage);
-        spark[i].setPosition(8000, 8000);
-        fogimage.loadFromFile("fogwhite.png");
-        fog[i].setTexture(fogimage);
-        fog[i].setPosition(9000, 9000);
-    }
-
-
     //Shield
     Shield.setFillColor(Color(0, 102, 204, 140));
     Shield.setPosition(10000, 10000);
@@ -1594,48 +1556,6 @@ void PlayerMove()
         }
     }
 }
-//spark and fog
-void spark_fog() {
-
-
-    for (int i = 0; i < 50; i++) {
-        for (int j = 0; j < 8; j++) {
-            for (int z = 0; z < 4; z++) {
-                if (Bullets[i].getGlobalBounds().intersects(Chicken[j][z].getGlobalBounds())) {
-                    chickenalive = false;
-                    spark[i].setPosition(Chicken[j][z].getPosition() - Vector2f(50, 50));
-                }
-            }
-        }
-    }
-    if (chickenalive == false) {
-        for (int i = 0; i < 50; i++) {
-            spark[i].setTextureRect(IntRect(266 * sparkx, 0, 266, 266));
-            fog[i].setTextureRect(IntRect(64 * fogx, 0, 64, 62));
-        }
-        fogx++;
-        sparkx++;
-        if (sparkx == 5)
-        {
-            sparkx = 0;
-            spark[Spark.currentspark].setPosition(10000, 10000);
-        }
-        if (fogx == 10) {
-            fogx = 0;
-
-            chickenalive = true;
-            if (chickenalive == true)
-                for (int i = 0; i < 50; i++) {
-                    spark[i].setPosition(4000, 5000);
-                    fog[i].setPosition(6000, 5000);
-                }
-        }
-
-    }
-
-
-}
-
 //shooting function
 void PlayerShooting() {
 
@@ -3084,7 +3004,6 @@ void scorecalc() {
                             crystalgift.setPosition(Chicken[j][z].getPosition().x, Chicken[j][z].getPosition().y);
 
                         }
-                        fog[i].setPosition(Chicken[j][z].getPosition() - Vector2f(-50, -20));
                         chicken_legs[j][z].setPosition(Chicken[j][z].getPosition().x, Chicken[j][z].getPosition().y);
                         Chicken[j][z].setPosition(10000, 10000);
                         Bullets[i].setPosition(-10000, -10000);
@@ -3292,7 +3211,6 @@ void scorecalc() {
                             crystalgift.setPosition(Chickentriangle[j][z].getPosition().x, Chickentriangle[j][z].getPosition().y);
 
                         }
-                        fog[i].setPosition(Chickentriangle[j][z].getPosition() - Vector2f(-50, -20));
                         chicken_legs[z][j].setPosition(Chickentriangle[j][z].getPosition().x, Chickentriangle[j][z].getPosition().y);
                         Chickentriangle[j][z].setPosition(10000, 10000);
                         Bullets[i].setPosition(-10000, -10000);
@@ -4088,8 +4006,6 @@ void reset()
     {
         Bullets[i].setTexture(bulletImage);
         Bullets[i].setPosition(-10000, -10000);
-        spark[i].setPosition(100000, 100000);
-        fog[i].setPosition(100000, 100000);
     }
     chicken_enter = 0;
     randomizer = 0;
@@ -5466,7 +5382,6 @@ beginning: {};
                     rocketshooting();
                     ChickenMove();
                     eggmovement(1);
-                    spark_fog();
                     scorecalc();
                     FoodMovment();
 
@@ -5580,8 +5495,6 @@ beginning: {};
                         for (int i = 0; i < bullet.numberofbullets; i++)
                         {
                             Bullets[i].setPosition(9000, 9000);
-                            spark[i].setPosition(9000, 9000);
-                            fog[i].setPosition(9000, 9000);
                         }
                     }
                     shield_move();
@@ -5589,10 +5502,6 @@ beginning: {};
                     window.draw(Shield2);
                     //drawing missile
                     window.draw(missile);
-                    for (int i = 0; i < 50; i++) {
-                        window.draw(spark[i]);
-                        window.draw(fog[i]);
-                    }
 
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
@@ -5671,7 +5580,6 @@ beginning: {};
                     meteormove();
                     PlayerShooting();
                     rocketshooting();
-                    spark_fog();
                     scorecalc();
                     FoodMovment();
 
@@ -5747,9 +5655,6 @@ beginning: {};
                         {
                             Bullets[i].setPosition(9000, 9000);
 
-                            spark[i].setPosition(9000, 9000);
-                            fog[i].setPosition(9000, 9000);
-
                         }
 
                     }
@@ -5785,10 +5690,6 @@ beginning: {};
                     window.draw(Shield2);
                     //drawing missile
                     window.draw(missile);
-                    for (int i = 0; i < 50; i++) {
-                        window.draw(spark[i]);
-                        window.draw(fog[i]);
-                    }
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
                         vignettestart = true;
@@ -5978,8 +5879,6 @@ beginning: {};
                         for (int i = 0; i < bullet.numberofbullets; i++)
                         {
                             Bullets[i].setPosition(9000, 9000);
-                            spark[i].setPosition(9000, 9000);
-                            fog[i].setPosition(9000, 9000);
                         }
                     }
                     shield_move();
@@ -6071,7 +5970,6 @@ beginning: {};
                     meteorfast();
                     PlayerShooting();
                     rocketshooting();
-                    spark_fog();
                     scorecalc();
                     FoodMovment();
 
@@ -6147,9 +6045,6 @@ beginning: {};
                         {
                             Bullets[i].setPosition(9000, 9000);
 
-                            spark[i].setPosition(9000, 9000);
-                            fog[i].setPosition(9000, 9000);
-
                         }
 
                     }
@@ -6196,10 +6091,6 @@ beginning: {};
                     }
                     //drawing missile
                     window.draw(missile);
-                    for (int i = 0; i < 50; i++) {
-                        window.draw(spark[i]);
-                        window.draw(fog[i]);
-                    }
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
                         vignettestart = true;
@@ -6282,10 +6173,7 @@ beginning: {};
                     PlayerShooting();
                     rocketshooting();
                     bossmove();
-                    spark_fog();
                     scorecalc();
-
-
                     window.draw(rectangle1);
                     window.draw(rectangle2);
 
@@ -6433,9 +6321,6 @@ beginning: {};
                         for (int i = 0; i < bullet.numberofbullets; i++)
                         {
                             Bullets[i].setPosition(9000, 9000);
-                            {
-                                spark[i].setPosition(9000, 9000);
-                            }
                         }
                         for (int i = 0; i < 8; i++)
                         {
@@ -6463,10 +6348,6 @@ beginning: {};
 
                     //drawing missile
                     window.draw(missile);
-                    for (int i = 0; i < 50; i++) {
-                        window.draw(spark[i]);
-                        window.draw(fog[i]);
-                    }
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
                         vignettestart = true;
