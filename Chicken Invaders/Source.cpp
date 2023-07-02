@@ -6440,11 +6440,22 @@ beginning: {};
                 checkdelay = 0;
                 if (volumelvl1 <= 10)
                 {
-                    musicON = true;
-                    MainMusicPlaying = true;
+                    if (!musicON) 
+                    {
+                        musicON = true;
+                    if (musicON && IngameMusicPlaying && MainMusicPlaying == false)
+                    {
+                        ingamemusic.play();
+                    }
+                    if (musicON && MainMusicPlaying && IngameMusicPlaying == false)
+                    {
+                      MenuMusic.play();
+                    }
+                    }
                     if(volumelvl1!=10)
                     volumelvl1 += 1;
                 }
+               
                 if (soundeffectON)
                     MenuClick.play();
             }
@@ -6464,9 +6475,22 @@ beginning: {};
             //minus 
             if (mousepos.x >= 455 && mousepos.x <= 515 && mousepos.y >= 490 && mousepos.y <= 550 && Mouse::isButtonPressed(Mouse::Left) && checkdelay >= 5)
             {
+                if (!musicON)
+                {
+                    musicON = true;
+                    if (musicON && IngameMusicPlaying && MainMusicPlaying == false)
+                    {
+                        ingamemusic.play();
+                    }
+                    if (musicON && MainMusicPlaying && IngameMusicPlaying == false)
+                    {
+                        MenuMusic.play();
+                    }
+                }
                 if (soundeffectON)
                     MenuClick.play();
                 checkdelay = 0;
+                
                 if (volumelvl1 > 0) 
                 {
                     volumelvl1 -= 1;
@@ -6474,6 +6498,8 @@ beginning: {};
             }
             if (mousepos.x >= 455 && mousepos.x <= 515 && mousepos.y >= 690 && mousepos.y <= 750 && Mouse::isButtonPressed(Mouse::Left) && checkdelay >= 5)
             {
+                 if (!soundeffectON)
+                    soundeffectON = true;
                 if (soundeffectON)
                     MenuClick.play();
                 checkdelay = 0;
@@ -6482,6 +6508,41 @@ beginning: {};
                     volumelvl2 -= 1;
                 }
             }
+            for (int j = 0; j < 10; j++)
+            {
+               if (mousepos.x >= 565 + j * 75 && mousepos.x <= 635 + j * 75 && mousepos.y >= 480  && mousepos.y <= 550  && Mouse::isButtonPressed(Mouse::Left) && checkdelay >= 5)
+                {
+                   if (!musicON)
+                   {
+                       musicON = true;
+                       if (musicON && IngameMusicPlaying && MainMusicPlaying == false)
+                       {
+                           ingamemusic.play();
+                       }
+                       if (musicON && MainMusicPlaying && IngameMusicPlaying == false)
+                       {
+                           MenuMusic.play();
+                       }
+                   }
+                   if (soundeffectON)
+                       MenuClick.play();
+                   checkdelay = 0;
+                   volumelvl1 = j + 1;
+                }
+            }
+            for (int j = 0; j < 10; j++)
+            {
+               if (mousepos.x >= 565 + j * 75 && mousepos.x <= 635 + j * 75 && mousepos.y >= 680 && mousepos.y <= 750 && Mouse::isButtonPressed(Mouse::Left) && checkdelay >= 5)
+                {
+                   if (!soundeffectON)
+                       soundeffectON = true;
+                   if (soundeffectON)
+                       MenuClick.play();
+                   checkdelay = 0;
+                    volumelvl2 = j + 1;
+                }
+            }
+           
             if (volumelvl1 == 0)
             {
                 musicON = false;
@@ -6544,8 +6605,6 @@ beginning: {};
             if (mousepos.x >= 585 && mousepos.x <= 935 && mousepos.y >= 480 && mousepos.y <= 550 && Mouse::isButtonPressed(Mouse::Left) && modeselectdelay >= 5)
             {
                 page = 10;
-
-
             }
             //coop
             if (mousepos.x >= 985 && mousepos.x <= 1335 && mousepos.y >= 480 && mousepos.y <= 550 && Mouse::isButtonPressed(Mouse::Left) && modeselectdelay >= 5)
