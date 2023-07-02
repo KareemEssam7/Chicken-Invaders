@@ -6461,7 +6461,13 @@ beginning: {};
                 if (volumelvl1 == 0)
                 {
                     volumelvl1 = 10;
+                    MenuMusic.setVolume(volumelvl1 * 10);
+                    ingamemusic.setVolume(volumelvl1 * 10);
                 }
+
+
+
+
                 checkdelay = 0;
 
 
@@ -6478,6 +6484,22 @@ beginning: {};
                 if (volumelvl2 == 0)
                 {
                     volumelvl2 = 10;
+                    for (int i = 0; i < 2; i++)
+                    {
+                        chickenhurt[i].setVolume(volumelvl2 * 10);
+                        eggshoot[i].setVolume(volumelvl2 * 10);
+                        shoot1[i].setVolume(volumelvl2 * 10);
+                    }
+                    shoot1[2].setVolume(volumelvl2 * 10);
+                    bouncingchickenhurt.setVolume(volumelvl2 * 10);
+                    exploding.setVolume(volumelvl2 * 10);
+                    rocketshoot.setVolume(volumelvl2 * 10);
+                    eating.setVolume(volumelvl2 * 10);
+                    upgradesound.setVolume(volumelvl2 * 10);
+                    shipin.setVolume(volumelvl2 * 10);
+                    gamewin.setVolume(volumelvl2 * 10);
+                    MenuClick.setVolume(volumelvl2 * 10);
+
                 }
                 
                 checkdelay = 0;
@@ -6498,11 +6520,16 @@ beginning: {};
                     }
                     if (musicON && MainMusicPlaying && IngameMusicPlaying == false)
                     {
-                      MenuMusic.play();
+                         MenuMusic.play();
                     }
                     }
-                    if(volumelvl1!=10)
-                    volumelvl1 += 1;
+                    if (volumelvl1 != 10)
+                    {
+                        volumelvl1 += 1;
+                        MenuMusic.setVolume(volumelvl1 * 10);
+                        ingamemusic.setVolume(volumelvl1 * 10);
+                    }
+                    
                 }
                
                 if (soundeffectON)
@@ -6516,7 +6543,25 @@ beginning: {};
                 {
                     soundeffectON = true;
                     if (volumelvl2 != 10)
-                    volumelvl2 += 1;
+                    {
+                        volumelvl2 += 1;
+                        for (int i = 0; i < 2; i++)
+                        {
+                            chickenhurt[i].setVolume(volumelvl2 * 10);
+                            eggshoot[i].setVolume(volumelvl2 * 10);
+                            shoot1[i].setVolume(volumelvl2 * 10);
+                        }
+                        shoot1[2].setVolume(volumelvl2 * 10);
+                        bouncingchickenhurt.setVolume(volumelvl2 * 10);
+                        exploding.setVolume(volumelvl2 * 10);
+                        rocketshoot.setVolume(volumelvl2 * 10);
+                        eating.setVolume(volumelvl2 * 10);
+                        upgradesound.setVolume(volumelvl2 * 10);
+                        shipin.setVolume(volumelvl2 * 10);
+                        gamewin.setVolume(volumelvl2 * 10);
+                        MenuClick.setVolume(volumelvl2 * 10);
+                    }
+                    
                 }
                 if (soundeffectON)
                     MenuClick.play(); 
@@ -6543,6 +6588,8 @@ beginning: {};
                 if (volumelvl1 > 0) 
                 {
                     volumelvl1 -= 1;
+                    MenuMusic.setVolume(volumelvl1 * 10);
+                    ingamemusic.setVolume(volumelvl1 * 10);
                 }
             }
             if (mousepos.x >= 455 && mousepos.x <= 515 && mousepos.y >= 690 && mousepos.y <= 750 && Mouse::isButtonPressed(Mouse::Left) && checkdelay >= 5)
@@ -6555,6 +6602,21 @@ beginning: {};
                 if (volumelvl2 > 0) 
                 {
                     volumelvl2 -= 1;
+                    for (int i = 0; i < 2; i++)
+                    {
+                        chickenhurt[i].setVolume(volumelvl2 * 10);
+                        eggshoot[i].setVolume(volumelvl2 * 10);
+                        shoot1[i].setVolume(volumelvl2 * 10);
+                    }
+                    shoot1[2].setVolume(volumelvl2 * 10);
+                    bouncingchickenhurt.setVolume(volumelvl2 * 10);
+                    exploding.setVolume(volumelvl2 * 10);
+                    rocketshoot.setVolume(volumelvl2 * 10);
+                    eating.setVolume(volumelvl2 * 10);
+                    upgradesound.setVolume(volumelvl2 * 10);
+                    shipin.setVolume(volumelvl2 * 10);
+                    gamewin.setVolume(volumelvl2 * 10);
+                    MenuClick.setVolume(volumelvl2 * 10);
                 }
             }
             for (int j = 0; j < 10; j++)
@@ -6577,6 +6639,8 @@ beginning: {};
                        MenuClick.play();
                    checkdelay = 0;
                    volumelvl1 = j + 1;
+                   MenuMusic.setVolume(volumelvl1 * 10);
+                   ingamemusic.setVolume(volumelvl1 * 10);
                 }
             }
             for (int j = 0; j < 10; j++)
@@ -6589,7 +6653,22 @@ beginning: {};
                        MenuClick.play();
                    checkdelay = 0;
                     volumelvl2 = j + 1;
-                }
+                    for (int i = 0; i < 2; i++)
+                    {
+                        chickenhurt[i].setVolume(volumelvl2 * 10);
+                        eggshoot[i].setVolume(volumelvl2 * 10);
+                        shoot1[i].setVolume(volumelvl2 * 10);
+                    }
+                    shoot1[2].setVolume(volumelvl2 * 10);
+                    bouncingchickenhurt.setVolume(volumelvl2 * 10);
+                    exploding.setVolume(volumelvl2 * 10);
+                    rocketshoot.setVolume(volumelvl2 * 10);
+                    eating.setVolume(volumelvl2 * 10);
+                    upgradesound.setVolume(volumelvl2 * 10);
+                    shipin.setVolume(volumelvl2 * 10);
+                    gamewin.setVolume(volumelvl2 * 10);
+                    MenuClick.setVolume(volumelvl2 * 10);
+               }
             }
            
             if (volumelvl1 == 0)
@@ -6629,11 +6708,8 @@ beginning: {};
                 if (soundeffectON)
                 {
                     window.draw(audio[1][j]);
-                }
-                   
-            }
-           
-            
+                }                  
+            }    
             window.draw(sprite);
             vignettetransition(page, topage);
         }
