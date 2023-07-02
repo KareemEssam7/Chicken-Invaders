@@ -80,6 +80,11 @@ Sprite Chickentriangle[2][6];
 int chickentriangleip = 0;
 Sound bouncingchickenhurt;
 Clock intro;
+SoundBuffer bosshurtsfx;
+Sound bosshurts;
+SoundBuffer screambosssfx;
+Sound screamboss;
+int screambossdone = 0;
 
 // adding chicken border
 RectangleShape rectangle1(Vector2f(60, 1080));
@@ -105,6 +110,11 @@ Sprite eggyolk[8][4];
 int foodmovespeed = 10;
 Texture Chickenlegs;
 Sprite chicken_legs[8][4];
+
+//chicken feather sprite
+int featheramount = 20, featheranim = 0, feathercur = 0, feathermove = 5;
+Texture feathertex;
+Sprite feather[20];
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -388,8 +398,8 @@ Clock clock4;
 Clock clock3;
 Music ingamemusic;
 bool gameover = false;
-bool Wave1 = 1, Wave2 = 0, Wave3 = 0, Wave4 = 0, Wave5 = 0;
-char prevwave = '0';
+bool Wave1 = 0, Wave2 = 0, Wave3 = 0, Wave4 = 1, Wave5 = 0;
+char prevwave = '3';
 char lvl = '1';
 Text levels[5];
 Text wave1first;
@@ -507,6 +517,10 @@ void IngameImages()
     shipin.setBuffer(shipinsfx);
     gamewinsfx.loadFromFile("game win.wav");
     gamewin.setBuffer(gamewinsfx);
+    bosshurtsfx.loadFromFile("bosshurt.wav");
+    bosshurts.setBuffer(bosshurtsfx);
+    screambosssfx.loadFromFile("screamboss.wav");
+    screamboss.setBuffer(screambosssfx);
     // music
     MenuMusic.openFromFile("IntroMenu.wav");
     ingamemusic.openFromFile("ingame.wav");
@@ -1131,8 +1145,6 @@ void IngameImages()
     Player2ship.setPosition(960, 850);
     Player2ship.setScale(1.5, 1.5);
 
-
-
     // Border Image
     rectangle1.setPosition(0, 0);
     rectangle1.setFillColor(Color::Transparent);
@@ -1141,7 +1153,6 @@ void IngameImages()
     rectangle3.setOrigin(1300 / 2, 200);
     rectangle3.setPosition(770, 400);
     rectangle3.setFillColor(Color::Transparent);
-
 
     //boss borders
     rectangle4.setPosition((window.getSize().x / 2), (window.getSize().y / 2) + 200);
@@ -1157,21 +1168,24 @@ void IngameImages()
     menuchicken.setTexture(ChickenSkin);
     menuchicken.setPosition(200, 200);
     menuchicken.setScale(0.19761235955, 0.20070422535);
+
     //Egg image
     eggTex.loadFromFile("egg.png");
     eggbreak.loadFromFile("eggBreak.png");
 
-
-
     // chicken leg
     Chickenlegs.loadFromFile("chicken leg.png");
+
+    //feather tex
+    feathertex.loadFromFile("feathersheet.png");
 
     //boss image
     bossimage.loadFromFile("bossRed (2).png");
 
     //bullet image
     bulletImage.loadFromFile("Bullet1Image.png");
-    crystaltear.loadFromFile("crystaltear.png");
+    crystaltear.loadFromFile("greenbullet.png");
+    crystaltear.setSmooth(1);
 
     //health
     hp.setFont(font1);
@@ -1259,7 +1273,6 @@ void IngameImages()
         Bullets[i].setTexture(bulletImage);
         Bullets[i].setScale(2.7, 2.7);
         Bullets[i].setPosition(-1000, -1000);
-
     }
 
     //Eggs textures
@@ -1305,6 +1318,17 @@ void IngameImages()
             chicken_legs[i][j].setOrigin(57, 70);
         }
     }
+
+    //setting feather texture
+    for (int i = 0; i < featheramount; i++)
+    {
+        feather[i].setTexture(feathertex);
+        feather[i].setPosition(-10000, 10000);
+        feather[i].setTextureRect(IntRect(122 * featheranim, 0, 128, 78));
+        feather[i].setScale(0.2, 0.2);
+    }
+    
+
 
     //ion gift image
     GiftIon.loadFromFile("GIFTIonBlaster.png");
@@ -2447,7 +2471,7 @@ void eggmovement(int wavetype = 0)
 
 
 }
-//Food Movment Function
+//Food Movment and feather behavior Function
 void FoodMovment() {
 
     for (int i = 0; i < 8; i++) {
@@ -2461,6 +2485,14 @@ void FoodMovment() {
         iongift.move(0, 1);
         crystalgift.move(0, 1);
     }
+
+    for (int i = 0; i < featheramount; i++)
+    {
+        feather[i].move(0, 5);
+        feather[i].setTextureRect(IntRect(122 * featheranim, 0, 128, 78));       
+    }
+    featheranim++;
+    featheranim %= 23;
 }
 
 void vignettetransition(long long& page, long long topage)
@@ -3004,7 +3036,13 @@ void scorecalc() {
                             crystalgift.setPosition(Chicken[j][z].getPosition().x, Chicken[j][z].getPosition().y);
 
                         }
-                        chicken_legs[j][z].setPosition(Chicken[j][z].getPosition().x, Chicken[j][z].getPosition().y);
+                        chicken_legs[j][z].setPosition(Chicken[j][z].getPosition().x, Chicken[j][z].getPosition().y);                      
+                        feather[feathercur].setPosition(Chicken[j][z].getPosition().x, Chicken[j][z].getPosition().y);
+                        feathercur++;
+                        if (feathercur > 9)
+                        {
+                            feathercur = 0;
+                        }
                         Chicken[j][z].setPosition(10000, 10000);
                         Bullets[i].setPosition(-10000, -10000);
                         cnt += 1000;
@@ -3084,6 +3122,11 @@ void scorecalc() {
 
                 if (Bullets[i].getGlobalBounds().intersects(bosssprite.getGlobalBounds()))
                 {
+                    if (soundeffectON)
+                    {
+                        bosshurts.play();
+                    }
+                    
                     if (boss.bosshp >= (0.9 * sigmaboss))
                     {
                         damagedtext.loadFromFile("bossbar1.png");
@@ -3104,6 +3147,11 @@ void scorecalc() {
                     {
                         boss.eggcooldownvar = 40;
                         damagedtext.loadFromFile("bossbar5.png");
+                        if (soundeffectON && screambossdone == 0)
+                        {
+                            screamboss.play();
+                            screambossdone = 1;
+                        }
                     }
                     else if (boss.bosshp >= (0.25 * sigmaboss) && boss.bosshp < (0.35 * sigmaboss))
                     {
@@ -3923,6 +3971,7 @@ void reset()
             Chicken4[i][j].setPosition(9000, 9000);
         }
     }*/
+    screambossdone = 0;
     bosssprite.setPosition(5000, 5000);
     for (int j = 0; j < 4; j++)
     {
@@ -4072,9 +4121,9 @@ void reset()
         tmp += 50;
         meteortimer[i] = rand() % 350 + 40;
     }
-    prevwave = '1';
+    prevwave = '3';
     wave1second.setString("Wave " + to_string(prevwave - 48));
-    Wave2 = false, Wave3 = false, Wave4 = false, Wave5 = false, Wave1 = true;
+    Wave2 = false, Wave3 = false, Wave4 = true, Wave5 = false, Wave1 = false;
     for (int j = 0; j < 3; j++)
     {
         for (int i = 0; i < 8; i++)
@@ -5378,6 +5427,7 @@ beginning: {};
                 {
                     backgroundspeed = 3;
                     foodmovespeed = 10;
+                    feathermove = 5;
                     PlayerShooting();
                     rocketshooting();
                     ChickenMove();
@@ -5448,6 +5498,11 @@ beginning: {};
                         }
                     }
 
+                    for (int i = 0; i < featheramount; i++)
+                    {
+                        window.draw(feather[i]);
+                    }
+
 
                     window.draw(crystalgift);
                     window.draw(iongift);
@@ -5515,6 +5570,7 @@ beginning: {};
 
                     backgroundspeed = 20;
                     foodmovespeed = 20;
+                    feathermove = 10;
                     window.draw(health_bar);
                     window.draw(Gamebar);
                     window.draw(score);
@@ -5577,6 +5633,7 @@ beginning: {};
                 {
                     backgroundspeed = 3;
                     foodmovespeed = 10;
+                    feathermove = 5;
                     meteormove();
                     PlayerShooting();
                     rocketshooting();
@@ -5701,6 +5758,7 @@ beginning: {};
                 {
                     backgroundspeed = 20;
                     foodmovespeed = 20;
+                    feathermove = 10;
                     for (int j = 0; j < 3; j++)
                     {
                         for (int i = 0; i < 8; i++)
@@ -5711,6 +5769,10 @@ beginning: {};
                             window.draw(chicken_legs[i][j]);
 
                         }
+                    }
+                    for (int i = 0; i < featheramount; i++)
+                    {
+                        window.draw(feather[i]);
                     }
                     eggmovement(1);
                     scorecalc();
@@ -5770,6 +5832,7 @@ beginning: {};
                 {
                     backgroundspeed = 3;
                     foodmovespeed = 10;
+                    feathermove = 5;
                     PlayerShooting();
                     rocketshooting();
                     scorecalc();
@@ -5839,6 +5902,10 @@ beginning: {};
 
                         }
                     }
+                    for (int i = 0; i < featheramount; i++)
+                    {
+                        window.draw(feather[i]);
+                    }
                     if (coopon)
                     {
                         window.draw(Bottombar2);
@@ -5907,6 +5974,7 @@ beginning: {};
 
                     backgroundspeed = 20;
                     foodmovespeed = 20;
+                    feathermove = 10;
                     window.draw(health_bar);
                     window.draw(Gamebar);
                     window.draw(score);
@@ -5967,6 +6035,7 @@ beginning: {};
                 {
                     backgroundspeed = 3;
                     foodmovespeed = 10;
+                    feathermove = 5;
                     meteorfast();
                     PlayerShooting();
                     rocketshooting();
@@ -6089,6 +6158,10 @@ beginning: {};
 
                         }
                     }
+                    for (int i = 0; i < featheramount; i++)
+                    {
+                        window.draw(feather[i]);
+                    }
                     //drawing missile
                     window.draw(missile);
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
@@ -6102,6 +6175,7 @@ beginning: {};
                 {
                     backgroundspeed = 20;
                     foodmovespeed = 20;
+                    feathermove = 10;
                     for (int j = 0; j < 3; j++)
                     {
                         for (int i = 0; i < 8; i++)
@@ -6112,6 +6186,10 @@ beginning: {};
                             window.draw(chicken_legs[i][j]);
 
                         }
+                    }
+                    for (int i = 0; i < featheramount; i++)
+                    {
+                        window.draw(feather[i]);
                     }
                     window.draw(crystalgift);
                     window.draw(iongift);
@@ -6170,6 +6248,7 @@ beginning: {};
                 {
                     backgroundspeed = 3;
                     foodmovespeed = 10;
+                    feathermove = 5;
                     PlayerShooting();
                     rocketshooting();
                     bossmove();
@@ -6272,6 +6351,10 @@ beginning: {};
                             window.draw(Chicken4[i][j]);
                         }
                     }
+                    for (int i = 0; i < featheramount; i++)
+                    {
+                        window.draw(feather[i]);
+                    }
                     camerashake();
                     if (aliveboss <= 0)
                     {
@@ -6360,6 +6443,7 @@ beginning: {};
                 {
                     backgroundspeed = 20;
                     foodmovespeed = 20;
+                    feathermove = 10;
                     window.draw(health_bar);
                     window.draw(Gamebar);
                     window.draw(score);
@@ -6612,7 +6696,8 @@ beginning: {};
                     shipin.setVolume(volumelvl2 * 10);
                     gamewin.setVolume(volumelvl2 * 10);
                     MenuClick.setVolume(volumelvl2 * 10);
-
+                    bosshurts.setVolume(volumelvl2 * 10);
+                    screamboss.setVolume(volumelvl2 * 10);
                 }
                 
                 checkdelay = 0;
@@ -6673,6 +6758,8 @@ beginning: {};
                         shipin.setVolume(volumelvl2 * 10);
                         gamewin.setVolume(volumelvl2 * 10);
                         MenuClick.setVolume(volumelvl2 * 10);
+                        bosshurts.setVolume(volumelvl2 * 10);
+                        screamboss.setVolume(volumelvl2 * 10);
                     }
                     
                 }
@@ -6730,6 +6817,8 @@ beginning: {};
                     shipin.setVolume(volumelvl2 * 10);
                     gamewin.setVolume(volumelvl2 * 10);
                     MenuClick.setVolume(volumelvl2 * 10);
+                    bosshurts.setVolume(volumelvl2 * 10);
+                    screamboss.setVolume(volumelvl2 * 10);
                 }
             }
             for (int j = 0; j < 10; j++)
@@ -6781,6 +6870,8 @@ beginning: {};
                     shipin.setVolume(volumelvl2 * 10);
                     gamewin.setVolume(volumelvl2 * 10);
                     MenuClick.setVolume(volumelvl2 * 10);
+                    bosshurts.setVolume(volumelvl2 * 10);
+                    screamboss.setVolume(volumelvl2 * 10);
                }
             }
            
@@ -6895,7 +6986,7 @@ beginning: {};
         if (page == 10) {
 
 
-            if (Keyboard::isKeyPressed(Keyboard::Enter) && Name.size() >= 1)
+            if (Keyboard::isKeyPressed(Keyboard::Enter) && Name.size() >= 1 && vignettestart == false)
             {
                 for (int i = 0; i < Name.size(); i++)
                 {
