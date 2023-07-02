@@ -4435,7 +4435,7 @@ void smolchick()
             smol[i].setScale(0.5, 0.5);
             smol[i].setPosition(-8000 + (i * 200), 100);
 
-            chicken.smol_hp[i] = 3;
+            chicken.smol_hp[i] = 5;
 
             eggs_smol[i].setTexture(eggTex);
             eggs_smol[i].setPosition(10000, -10000);
@@ -4452,12 +4452,12 @@ void smolchick()
     {
         if (smol_enter[i] == 0 && right_move[i] == true)
         {
-            smol[i].move(10, 0);
+            smol[i].move(13, 0);
             smol[i].setTextureRect(IntRect(chickmove * 255, 0, 255, 225));
         }
         if (smol_enter[i] == 0 && right_move[i] == false)
         {
-            smol[i].move(-10, 0);
+            smol[i].move(-13, 0);
             smol[i].setTextureRect(IntRect(chickmove * 255, 0, 255, 225));
         }
         if (smol[i].getPosition().x <= 55 && right_move[i] == false)
@@ -4483,9 +4483,6 @@ void smolchick()
             smol_enter[i] = 0;
             right_move[i] = true;
         }
-
-
-
     }
     if (chickmove == 25)
     {
@@ -4513,7 +4510,7 @@ void smolchick()
                 exploding.play();
             }
             hp.setString(to_string(health));
-            chicken.smol_hp[i] -= 3;
+            chicken.smol_hp[i] -= 5;
             if (chicken.smol_hp[i] <= 0)
             {
                 smol[i].setPosition(5000, 50000);
@@ -4529,7 +4526,7 @@ void smolchick()
                 exploding.play();
             }
             hp2.setString(to_string(health3));
-            chicken.smol_hp[i] -= 3;
+            chicken.smol_hp[i] -= 5;
             if (chicken.smol_hp[i] <= 0)
             {
                 smol[i].setPosition(5000, 50000);
@@ -5521,23 +5518,7 @@ beginning: {};
                         goto beginning;
 
                     }
-                    for (int i = 0; i < 5; i++)
-                    {
-                        window.draw(bossegg[i]);
-                        window.draw(bossegg1[i]);
-                        window.draw(bossegg2[i]);
-                    }
-                    for (int i = 0; i < 40; i++)
-                    {
-                        window.draw(smol[i]);
-                        window.draw(eggs_smol[i]);
-                        window.draw(eggyolk_smol[i]);
-                    }
-                    window.draw(bosssprite);
-                    for (int i = 0; i <= 99; i++)
-                    {
-                        window.draw(meteor[i]);
-                    }
+                    
                     for (int j = 0; j < 3; j++)
                     {
                         for (int i = 0; i < 8; i++)
@@ -5946,6 +5927,16 @@ beginning: {};
                     window.draw(Gamebar);
                     window.draw(score);
                     window.draw(Bottombar);
+                    for (int j = 0; j < 3; j++)
+                    {
+                        for (int i = 0; i < 8; i++)
+                        {
+
+                            window.draw(eggyolk[i][j]);
+                            window.draw(chicken_legs[i][j]);
+
+                        }
+                    }
                     if (coopon)
                     {
                         window.draw(Bottombar2);

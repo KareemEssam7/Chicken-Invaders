@@ -97,3 +97,6 @@ test 5000*
 test 45900*
 test 46100*
 test 6400*
+parly 44100*
+goofer 46800*
+goofer 56100*
