@@ -398,8 +398,8 @@ Clock clock4;
 Clock clock3;
 Music ingamemusic;
 bool gameover = false;
-bool Wave1 = 0, Wave2 = 0, Wave3 = 0, Wave4 = 1, Wave5 = 0;
-char prevwave = '3';
+bool Wave1 = 1, Wave2 = 0, Wave3 = 0, Wave4 = 0, Wave5 = 0;
+char prevwave = '1';
 char lvl = '1';
 Text levels[5];
 Text wave1first;
@@ -4121,9 +4121,9 @@ void reset()
         tmp += 50;
         meteortimer[i] = rand() % 350 + 40;
     }
-    prevwave = '3';
+    prevwave = '1';
     wave1second.setString("Wave " + to_string(prevwave - 48));
-    Wave2 = false, Wave3 = false, Wave4 = true, Wave5 = false, Wave1 = false;
+    Wave2 = false, Wave3 = false, Wave4 = false, Wave5 = false, Wave1 = true;
     for (int j = 0; j < 3; j++)
     {
         for (int i = 0; i < 8; i++)
