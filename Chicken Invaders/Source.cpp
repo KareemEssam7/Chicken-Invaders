@@ -312,7 +312,7 @@ RectangleShape rectangleback(Vector2f(200, 70));
 RectangleShape rectangleshop(Vector2f(350, 70));
 SoundBuffer Select;
 Clock menuchickendelay;
-
+Clock blindedbythelights;
 //borders for interactive background
 RectangleShape topborder(Vector2f(1920, 100));
 RectangleShape bottomborder(Vector2f(1920, 100));
@@ -4702,6 +4702,7 @@ beginning: {};
             if (Mouse::isButtonPressed(Mouse::Left))
             {
                 vignettestart = true;
+                blindedbythelights.restart();
             }
 
             vignettetransition(page, 0);
@@ -4962,7 +4963,7 @@ beginning: {};
             {
                 window.draw(rectanglemainmenu[i]);
             }
-            if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 1450 && mousepos.x <= 1800 && mousepos.y >= 880 && mousepos.y <= 950 && vignettestart == false)
+            if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 1450 && mousepos.x <= 1800 && mousepos.y >= 880 && mousepos.y <= 950 && vignettestart == false && blindedbythelights.getElapsedTime().asSeconds() >= 0.3)
             {
                 if (soundeffectON)
                     MenuClick.play();
@@ -4970,7 +4971,7 @@ beginning: {};
                 topage = 11;
                 goto pagecode;
             }
-            if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550 && vignettestart == false)
+            if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550 && vignettestart == false && blindedbythelights.getElapsedTime().asSeconds() >= 0.3)
             {
                 if (soundeffectON)
                     MenuClick.play();
@@ -4979,7 +4980,7 @@ beginning: {};
                 topage = 1;
                 goto pagecode;
             }
-            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 580 && mousepos.y <= 650 && vignettestart == false)
+            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 580 && mousepos.y <= 650 && vignettestart == false && blindedbythelights.getElapsedTime().asSeconds() >= 0.3)
             {
                 if (soundeffectON)
                     MenuClick.play();
@@ -4987,7 +4988,7 @@ beginning: {};
                 topage = 2;
                 goto pagecode;
             }
-            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 680 && mousepos.y <= 750 && vignettestart == false)
+            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 680 && mousepos.y <= 750 && vignettestart == false && blindedbythelights.getElapsedTime().asSeconds() >= 0.3)
             {
                 if (soundeffectON)
                     MenuClick.play();
@@ -4995,7 +4996,7 @@ beginning: {};
                 topage = 3;
                 goto pagecode;
             }
-            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 780 && mousepos.y <= 850 && vignettestart == false)
+            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 780 && mousepos.y <= 850 && vignettestart == false && blindedbythelights.getElapsedTime().asSeconds() >= 0.3)
             {
                 if (soundeffectON)
                     MenuClick.play();
@@ -5003,7 +5004,7 @@ beginning: {};
                 topage = 4;
                 goto pagecode;
             }
-            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 880 && mousepos.y <= 950)
+            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 880 && mousepos.y <= 950 && blindedbythelights.getElapsedTime().asSeconds() >= 0.3)
             {
                 window.close();
             }
