@@ -66,7 +66,7 @@ struct bossstruct {
 //camera
 sf::View view1(sf::Vector2f(960.f, 540.f), sf::Vector2f(1920.f, 1080.f));
 RectangleShape vignette(Vector2f(1920, 1080));
-int vignettealpha = 250;
+int vignettealpha = 255;
 bool vignettestart = false;
 int vignettereset = 0, topage = 0;
 // Creating Game Window
@@ -2536,9 +2536,18 @@ void vignettetransition(long long& page, long long topage)
     {
         if (vignettealpha < 255)
         {
-            vignettealpha += 85;
+            if (vignettealpha += 85 > 255)
+            {
+                vignettestart = false;
+                vignettealpha = 255;
+                page = topage;
+            }
+            else
+            {
+                vignettealpha += 85;
+            }
         }
-        if (vignettealpha >= 255)
+        if (vignettealpha >= 250)
         {
             vignettestart = false;
             vignettealpha = 255;
@@ -4460,7 +4469,14 @@ beginning: {};
         {
             if (vignettestart == false && vignettealpha > 0)
             {
-                vignettealpha -= 85;
+                if (vignettealpha - 85 < 0)
+                {
+                    vignettealpha = 0;
+                }
+                else
+                {
+                    vignettealpha -= 85;
+                }
             }
         }
 
@@ -4468,7 +4484,7 @@ beginning: {};
         // main menu
         if (page == -1)
         {
-            
+
             window.draw(menulogo);
 
             if (Mouse::isButtonPressed(Mouse::Left))
@@ -4477,11 +4493,11 @@ beginning: {};
             }
 
             vignettetransition(page, 0);
-            
+
             if (vignettealpha > 0 && vignettestart == false)
             {
                 vignettealpha = vignettealpha - 1;
-            }     
+            }
         }
 
         if (page == 0)
@@ -7047,4 +7063,5 @@ beginning: {};
 
         window.display();
     }
+    return 0;
 }   
