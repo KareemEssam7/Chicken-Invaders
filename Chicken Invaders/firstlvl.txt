@@ -78,3 +78,22 @@ asdaa 0*
 asdadaaaaaaaaaaaa 16000*
 ada 12000*
  0*
+test 0*
+testtes 0*
+test 1000*
+test 5000*
+test 5000*
+test 5000*
+test 5000*
+test 5000*
+test 5000*
+test 0*
+test 5000*
+test 5000*
+test 5000*
+testtest 5000*
+test 5000*
+test 5000*
+test 45900*
+test 46100*
+test 6400*

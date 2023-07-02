@@ -59,7 +59,7 @@ struct bossstruct {
     double bossspeed = 5;
     int bosshp = 50;
     int eggcooldown[5];
-    int eggcooldownvar = 301;
+    int eggcooldownvar = 201;
 
 };
 
@@ -91,6 +91,7 @@ Texture ChickenSkin;
 SoundBuffer chickensfx;
 Sprite Chicken[8][4];
 Sprite Chicken2[8][4];
+Sprite Chicken4[60][60];
 Sprite Chickentriangle[2][6];
 int chickentriangleip = 0;
 Sound bouncingchickenhurt;
@@ -102,7 +103,7 @@ RectangleShape rectangle2(Vector2f(60, 1080));
 RectangleShape rectangle3(Vector2f(1300, 200));
 
 //egg variables
-int eggvar = 601;
+int eggvar = 420;
 int timer[8][4];
 int yolkcnt = 0;
 int yolkanime = 0;
@@ -391,7 +392,10 @@ string Name;
 Font font3;
 
 /////////////////////////////////////////////////////////////////////////////////////////
-
+// boss wave upgrades
+Texture damagedtext;
+Sprite damaged;
+int sigmaboss = 0;
 //save the world vars
 Text play;
 int modeselectdelay = 0;
@@ -402,7 +406,7 @@ Clock clock3;
 Music ingamemusic;
 bool gameover = false;
 bool Wave1 = 1, Wave2 = 0, Wave3 = 0, Wave4 = 0, Wave5 = 0;
-char prevwave = '1';
+char prevwave = '0';
 char lvl = '1';
 Text levels[5];
 Text wave1first;
@@ -791,7 +795,11 @@ void IngameImages()
     shopcustomize.setPosition(650, 90);
     shopcustomize.setString("Spaceship Customization");
     shopcustomize.setFillColor(Color(204, 229, 255, 225));
-
+    // boss damage
+    damagedtext.loadFromFile("bossbar1.png");
+    damaged.setTexture(damagedtext);
+    damaged.setPosition(700, 20);
+    damaged.setScale(2.5, 2);
     //Base text
     Base.setFont(font1);
     Base.setCharacterSize(40);
@@ -1235,7 +1243,7 @@ void IngameImages()
     //boss texture and position
     bosssprite.setTexture(bossimage);
     bosssprite.setPosition(Vector2f(200, 200));
-    bosssprite.setScale(0.3436, 0.385);
+    bosssprite.setScale(0.5436, 0.585);
     bosssprite.setTextureRect(IntRect(982 * animation, 0, 982, 794));
     //setting bullet textures
     for (int i = 0; i < bullet.numberofbullets; i++)
@@ -1253,24 +1261,25 @@ void IngameImages()
         {
             Eggs[i][j].setTexture(eggTex);
             Eggs[i][j].setPosition(10000, -10000);
-            Eggs[i][j].setScale(0.13, 0.13);
+            // 0.13
+            Eggs[i][j].setScale(0.19, 0.19);
 
 
             bossegg[j].setTexture(eggTex);
-            bossegg[j].setScale(0.25, 0.25);
+            bossegg[j].setScale(0.34, 0.34);
             bossegg[j].setPosition(10000, 10000);
 
             bossegg1[j].setTexture(eggTex);
-            bossegg1[j].setScale(0.25, 0.25);
+            bossegg1[j].setScale(0.34, 0.34);
             bossegg1[j].setPosition(10000, 10000);
 
             bossegg2[j].setTexture(eggTex);
-            bossegg2[j].setScale(0.25, 0.25);
+            bossegg2[j].setScale(0.34, 0.34);
             bossegg2[j].setPosition(10000, 10000);
-
+            // 2 2
             eggyolk[i][j].setTexture(eggbreak);
             eggyolk[i][j].setTextureRect(IntRect(28 * 5, 0, 28, 24));
-            eggyolk[i][j].setScale(2, 2);
+            eggyolk[i][j].setScale(3, 3);
 
         }
 
@@ -2317,7 +2326,7 @@ void eggmovement(int wavetype = 0)
 
                 }
             }
-            eggvar = 601 - chicken.chicken_health * 50;
+            eggvar = 420 - chicken.chicken_health * 50;
             for (int j = 0; j < 3; j++)
             {
                 for (int i = 0; i < 8; i++)
@@ -2342,8 +2351,9 @@ void eggmovement(int wavetype = 0)
 
                 if (timer[i][j] == 0)
                 {
+                    // 0.25
                     eggyolk[i][j].setScale(0, 0);
-                    Eggs[i][j].setScale(0.13, 0.13);
+                    Eggs[i][j].setScale(0.19, 0.19);
                     Eggs[i][j].setPosition(Chicken[i][j].getPosition().x + 53.45, Chicken[i][j].getPosition().y + 75);
 
 
@@ -2360,7 +2370,7 @@ void eggmovement(int wavetype = 0)
                 }
                 if (timer[i][j] == -1)
                 {
-                    Eggs[i][j].move(0, 9.8f);
+                    Eggs[i][j].move(0, 6.5);
                 }
                 if (Eggs[i][j].getPosition().y >= 1000)
                 {
@@ -2368,7 +2378,8 @@ void eggmovement(int wavetype = 0)
                     timer[i][j] = rand() % eggvar;
                     timer[i][j]--;
                     Eggs[i][j].setScale(0, 0);
-                    eggyolk[i][j].setScale(2, 2);
+                    // 2 2
+                    eggyolk[i][j].setScale(3, 3);
 
                 }
                 if (Eggs[i][j].getGlobalBounds().intersects(Shield.getGlobalBounds()))
@@ -2423,8 +2434,9 @@ void eggmovement(int wavetype = 0)
 
                 if (timer[i][j] == 0)
                 {
+                    //0.11
                     eggyolk[i][j].setScale(0, 0);
-                    Eggs[i][j].setScale(0.11, 0.11);
+                    Eggs[i][j].setScale(0.18, 0.18);
                     Eggs[i][j].setPosition(Chickentriangle[i][j].getPosition().x + 52.45, Chickentriangle[i][j].getPosition().y + 65);
 
 
@@ -2441,7 +2453,7 @@ void eggmovement(int wavetype = 0)
                 }
                 if (timer[i][j] == -1)
                 {
-                    Eggs[i][j].move(0, 15);
+                    Eggs[i][j].move(0, 7);
                 }
                 if (Eggs[i][j].getPosition().y >= 1000)
                 {
@@ -2449,7 +2461,8 @@ void eggmovement(int wavetype = 0)
                     timer[i][j] = rand() % eggvar;
                     timer[i][j]--;
                     Eggs[i][j].setScale(0, 0);
-                    eggyolk[i][j].setScale(2, 2);
+                    // 4 4
+                    eggyolk[i][j].setScale(3,3);
 
                 }
                 if (Eggs[i][j].getGlobalBounds().intersects(Shield.getGlobalBounds()))
@@ -3096,8 +3109,65 @@ void scorecalc() {
                 }
 
 
-
-
+                if (Bullets[i].getGlobalBounds().intersects(bosssprite.getGlobalBounds()))
+                {
+                    if (boss.bosshp >= (0.9 * sigmaboss))
+                    {
+                        damagedtext.loadFromFile("bossbar1.png");
+                    }
+                    else if (boss.bosshp >= (0.75 * sigmaboss) && boss.bosshp < (0.9 * sigmaboss))
+                    {
+                        damagedtext.loadFromFile("bossbar2.png");
+                    }
+                    else if (boss.bosshp >= (0.6 * sigmaboss) && boss.bosshp < (0.75 * sigmaboss))
+                    {
+                        damagedtext.loadFromFile("bossbar3.png");
+                    }
+                    else if (boss.bosshp >= (0.45 * sigmaboss) && boss.bosshp < (0.6 * sigmaboss))
+                    {
+                        damagedtext.loadFromFile("bossbar4.png");
+                    }
+                    else if (boss.bosshp >= (0.35 * sigmaboss) && boss.bosshp < (0.45 * sigmaboss))
+                    {
+                        boss.eggcooldownvar = 40;
+                        damagedtext.loadFromFile("bossbar5.png");
+                    }
+                    else if (boss.bosshp >= (0.25 * sigmaboss) && boss.bosshp < (0.35 * sigmaboss))
+                    {
+                        damagedtext.loadFromFile("bossbar6.png");
+                    }
+                    else if (boss.bosshp >= (0.15 * sigmaboss) && boss.bosshp < (0.25 * sigmaboss))
+                    {
+                        damagedtext.loadFromFile("bossbar7.png");
+                    }
+                    else if (boss.bosshp >= (0.10 * sigmaboss) && boss.bosshp < (0.15 * sigmaboss))
+                    {
+                        damagedtext.loadFromFile("bossbar8.png");
+                    }
+                    else if (boss.bosshp >= (0.15 * sigmaboss) && boss.bosshp < (0.2 * sigmaboss))
+                    {
+                        damagedtext.loadFromFile("bossbar9.png");
+                    }
+                    else if (boss.bosshp >= (0.10 * sigmaboss) && boss.bosshp < (0.15 * sigmaboss))
+                    {
+                        damagedtext.loadFromFile("bossbar10.png");
+                    }
+                    else if (boss.bosshp < (0.10 * sigmaboss))
+                    {
+                        damagedtext.loadFromFile("bossbar11.png");
+                    }
+                    if (boss.bosshp > 0)
+                    {
+                        boss.bosshp = boss.bosshp - (powerlvls * 0.5) - bullet.bulletdamage;
+                    }
+                    if (boss.bosshp <= 0)
+                    {
+                        bosssprite.setPosition(10000, 10000);
+                        cnt += 5000;
+                        score.setString(to_string(cnt));
+                    }
+                    Bullets[i].setPosition(-2000, -2000);
+                }
                 if (chicken_legs[j][z].getGlobalBounds().intersects(Player.getGlobalBounds()))
                 {
                     chicken_legs[j][z].setPosition(4000, -100);
@@ -3670,24 +3740,78 @@ void bossmove() {
     else
         animation++;
 
+    //for (int j = 0; j < 60; j++)
+    //{
+    //    for (int i = 0; i < 60; i++)
+    //    {
+    //        Chicken4[i][j].setTextureRect(IntRect(ChickenMovement * 356, 0, 356, 284));
+    //        Chicken4[i][j].move(0, 5);
+    //    }
+    //}
+    //ChickenMovement++;
+    //ChickenMovement %= 9;
     //Boss getting killed after collision with bullets
-    for (int i = 0; i < bullet.numberofbullets; i++)
-    {
-        if (Bullets[i].getGlobalBounds().intersects(bosssprite.getGlobalBounds()))
-        {
-            if (boss.bosshp > 0)
-            {
-                boss.bosshp = boss.bosshp - (powerlvls * 0.5) - bullet.bulletdamage;
-            }
-            if (boss.bosshp <= 0)
-            {
-                bosssprite.setPosition(10000, 10000);
-                cnt += 5000;
-                score.setString(to_string(cnt));
-            }
-            Bullets[i].setPosition(-2000, -2000);
-        }
-    }
+    //for (int i = 0; i < bullet.numberofbullets; i++)
+    //{
+    //    if (Bullets[i].getGlobalBounds().intersects(bosssprite.getGlobalBounds()))
+    //    {
+    //        if (boss.bosshp >= (0.8 * sigmaboss))
+    //        {
+    //            damagedtext.loadFromFile("bossbar1.png");
+    //        }
+    //        else if (boss.bosshp >= (0.7 * sigmaboss) && boss.bosshp < (0.8 * sigmaboss))
+    //        {
+    //            damagedtext.loadFromFile("bossbar2.png");
+    //        }
+    //        else if (boss.bosshp >= (0.6 * sigmaboss) && boss.bosshp < (0.7 * sigmaboss))
+    //        {
+    //            damagedtext.loadFromFile("bossbar3.png");
+    //        }
+    //        else if (boss.bosshp >= (0.55 * sigmaboss) && boss.bosshp < (0.6 * sigmaboss))
+    //        {
+    //            damagedtext.loadFromFile("bossbar4.png");
+    //        }
+    //        else if (boss.bosshp >= (0.50 * sigmaboss) && boss.bosshp < (0.55 * sigmaboss))
+    //        {
+    //            damagedtext.loadFromFile("bossbar5.png");
+    //        }
+    //        else if (boss.bosshp >= (0.40 * sigmaboss) && boss.bosshp < (0.50 * sigmaboss))
+    //        {
+    //            damagedtext.loadFromFile("bossbar6.png");
+    //        }
+    //        else if (boss.bosshp >= (0.3 * sigmaboss) && boss.bosshp < (0.4 * sigmaboss))
+    //        {
+    //            damagedtext.loadFromFile("bossbar7.png");
+    //        }
+    //        else if (boss.bosshp >= (0.2 * sigmaboss) && boss.bosshp < (0.3 * sigmaboss))
+    //        {
+    //            damagedtext.loadFromFile("bossbar8.png");
+    //        }
+    //        else if (boss.bosshp >= (0.15 * sigmaboss) && boss.bosshp < (0.2 * sigmaboss))
+    //        {
+    //            damagedtext.loadFromFile("bossbar9.png");
+    //        }
+    //        else if (boss.bosshp >= (0.10 * sigmaboss) && boss.bosshp < (0.15 * sigmaboss))
+    //        {
+    //            damagedtext.loadFromFile("bossbar10.png");
+    //        }
+    //        else if (boss.bosshp < (0.10 * sigmaboss))
+    //        {
+    //            damagedtext.loadFromFile("bossbar11.png");
+    //        }
+    //        if (boss.bosshp > 0)
+    //        {
+    //            boss.bosshp = boss.bosshp - (powerlvls * 0.5) - bullet.bulletdamage;
+    //        }
+    //        if (boss.bosshp <= 0)
+    //        {
+    //            bosssprite.setPosition(10000, 10000);
+    //            cnt += 5000;
+    //            score.setString(to_string(cnt));
+    //        }
+    //        Bullets[i].setPosition(-2000, -2000);
+    //    }
+    //}
     if (z == 0)
     {
         for (int i = 0; i < 5; i++)
@@ -3700,43 +3824,92 @@ void bossmove() {
     }
 
 
-
     for (int i = 0; i < 5; i++)
     {
 
-        if (boss.eggcooldown[i] > 0)
-        {
-            boss.eggcooldown[i]--;
-        }
+            if (boss.eggcooldown[i] > 0)
+            {
+                boss.eggcooldown[i]--;
+            }
 
-        if (boss.eggcooldown[i] == 0)
-        {
-            boss.eggcooldown[i]--;
-            bossegg[i].setScale(0.2, 0.2);
-            bossegg[i].setPosition(bosssprite.getPosition().x, bosssprite.getPosition().y + 68);
+            if (boss.eggcooldown[i] == 0)
+            {
+                boss.eggcooldown[i]--;
+                bossegg[i].setScale(0.34, 0.34);
+                bossegg[i].setPosition(bosssprite.getPosition().x, bosssprite.getPosition().y + 68);
 
-            bossegg1[i].setScale(0.2, 0.2);
-            bossegg1[i].setPosition(bosssprite.getPosition().x + 30, bosssprite.getPosition().y + 68);
+                bossegg1[i].setScale(0.34, 0.34);
+                bossegg1[i].setPosition(bosssprite.getPosition().x + 30, bosssprite.getPosition().y + 68);
 
-            bossegg2[i].setScale(0.2, 0.2);
-            bossegg2[i].setPosition(bosssprite.getPosition().x + 70, bosssprite.getPosition().y + 68);
+                bossegg2[i].setScale(0.34, 0.34);
+                bossegg2[i].setPosition(bosssprite.getPosition().x + 70, bosssprite.getPosition().y + 68);
 
-        }
-        if (boss.eggcooldown[i] == -1)
-        {
-            bossegg[i].move(-3, 9.8f);
-            bossegg1[i].move(0, 9.8f);
-            bossegg2[i].move(3, 9.8f);
-        }
-        if (bossegg[i].getPosition().y > Player.getPosition().y + 50)
-        {
-            boss.eggcooldown[i] = rand() % boss.eggcooldownvar;
-            bossegg[i].setScale(0, 0);
-            bossegg1[i].setScale(0, 0);
-            bossegg2[i].setScale(0, 0);
-        }
-
+            }
+            if (boss.eggcooldown[i] == -1)
+            {
+                bossegg[i].move(-3, 9.8f);
+                bossegg1[i].move(0, 9.8f);
+                bossegg2[i].move(3, 9.8f);
+            }
+            if (bossegg[i].getPosition().y > Player.getPosition().y + 50)
+            {
+                boss.eggcooldown[i] = rand() % boss.eggcooldownvar;
+                bossegg[i].setScale(0, 0);
+                bossegg1[i].setScale(0, 0);
+                bossegg2[i].setScale(0, 0);
+            }
     }
+
+    for (int x = 0; x < bullet.numberofbullets; x++)
+    {
+
+        for (int i = 0; i < 5; i++)
+        {
+            if (Bullets[x].getGlobalBounds().intersects(bossegg[i].getGlobalBounds()))
+            {
+                Bullets[x].setPosition(5000, 5000);
+            }
+            if (Bullets[x].getGlobalBounds().intersects(bossegg1[i].getGlobalBounds()))
+            {
+                Bullets[x].setPosition(5000, 5000);
+            }
+            if (Bullets[x].getGlobalBounds().intersects(bossegg2[i].getGlobalBounds()))
+            {
+                Bullets[x].setPosition(5000, 5000);
+            }
+        }
+    }
+    //for (int i = 0; i < 5; i++)
+    //{
+    //    for (int j = 0; j < bullet.numberofbullets; j++)
+    //    {
+    //       /* for (int v = 0; v < 60; v++)
+    //        {
+    //            for (int k = 0; k < 60; k++)
+    //            {
+
+    //                if (Bullets[j].getGlobalBounds().intersects(bossegg[i].getGlobalBounds()))
+    //                {
+    //                    Bullets[j].setPosition(7000, 7000);
+    //                    Chicken4[v][k].setPosition(bossegg[i].getPosition().x, bossegg[i].getPosition().y);
+    //                    bossegg[i].setPosition(9000, 9000);
+    //                }
+    //                else if (Bullets[j].getGlobalBounds().intersects(bossegg1[i].getGlobalBounds()))
+    //                {
+    //                    Bullets[j].setPosition(7000, 7000);
+    //                    Chicken4[v][k].setPosition(bossegg1[i].getPosition().x, bossegg1[i].getPosition().y);
+    //                    bossegg1[i].setPosition(9000, 9000);
+    //                }
+    //                else if (Bullets[j].getGlobalBounds().intersects(bossegg2[i].getGlobalBounds()))
+    //                {
+    //                    Bullets[j].setPosition(7000, 7000);
+    //                    Chicken4[v][k].setPosition(bossegg2[i].getPosition().x, bossegg2[i].getPosition().y);
+    //                    bossegg2[i].setPosition(9000, 9000);
+    //                }
+    //            }
+    //        }*/
+    //    }
+    //}
     if (Player.getGlobalBounds().intersects(bosssprite.getGlobalBounds()) && shield_on == false)
     {
         if (health >= 1)
@@ -3768,6 +3941,48 @@ void bossmove() {
 }
 void reset()
 {
+    /*for (int i = 0; i < 60; i++)
+    {
+        for (int j = 0; j < 60; j++)
+        {
+            Chicken4[i][j].setTexture(ChickenSkin);
+            Chicken4[i][j].setScale(0.5, 0.5);
+            Chicken4[i][j].setTextureRect(IntRect(ChickenMovement * 356, 0, 356, 284));
+            Chicken4[i][j].setPosition(9000, 9000);
+        }
+    }*/
+    bosssprite.setPosition(5000, 5000);
+    for (int j = 0; j < 4; j++)
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            Eggs[i][j].setTexture(eggTex);
+            Eggs[i][j].setPosition(10000, -10000);
+            // 0.13
+            Eggs[i][j].setScale(0.19, 0.19);
+
+
+            bossegg[j].setTexture(eggTex);
+            bossegg[j].setScale(0.34, 0.34);
+            bossegg[j].setPosition(10000, 10000);
+
+            bossegg1[j].setTexture(eggTex);
+            bossegg1[j].setScale(0.34, 0.34);
+            bossegg1[j].setPosition(10000, 10000);
+
+            bossegg2[j].setTexture(eggTex);
+            bossegg2[j].setScale(0.34, 0.34);
+            bossegg2[j].setPosition(10000, 10000);
+            // 2 2
+            eggyolk[i][j].setTexture(eggbreak);
+            eggyolk[i][j].setTextureRect(IntRect(28 * 5, 0, 28, 24));
+            eggyolk[i][j].setScale(3, 3);
+
+        }
+
+    }
+    damagedtext.loadFromFile("bossbar1.png");
+    boss.eggcooldownvar = 200;
     for (int i = 0; i < 40; i++)
     {
         smol_ded[i] = 0;
@@ -3784,7 +3999,7 @@ void reset()
     triangle1health = 15;
     triangle2health = 15;
     chickentriangleip = 0;
-    eggvar = 501;
+    eggvar = 400;
     chicken.chicken_healthvar = 1;
     if (soundeffectON)
     {
@@ -3848,7 +4063,7 @@ void reset()
     cnt = 0;
     score.setString(to_string(cnt));
     boss.bosshp = 50 + (bosslvl * 10);
-    boss.eggcooldownvar = 301;
+    boss.eggcooldownvar = 201;
     tmp = 100;
     meteorx = 0;
     meteoralive = 0;
@@ -3913,7 +4128,7 @@ void reset()
         eggs_smol[i].setPosition(10000, 10000);
         eggyolk_smol[i].setPosition(10000, 10000);
     }
-    bosssprite.setPosition(Vector2f(200, 200));
+    bosssprite.setPosition(Vector2f(5000, 5000));
     x = 0;
     s = 0;
 }
@@ -3925,8 +4140,8 @@ void lvldiff()
         bosslvl = 1;
         chicken.chicken_health = 1;
         chicken.speed = 4;
-        boss.bosshp = 50;
-        boss.bossspeed = 5;
+        boss.bosshp = 200;
+        boss.bossspeed = 9;
         meteors.meteorspeed = 5;
     }
     if (lvl == '2')
@@ -3934,8 +4149,8 @@ void lvldiff()
         bosslvl = 2;
         chicken.chicken_health = 2;
         chicken.speed = 4;
-        boss.bosshp = 60;
-        boss.bossspeed = 6;
+        boss.bosshp = 250;
+        boss.bossspeed = 9;
         meteors.meteorspeed = 10;
     }
     if (lvl == '3')
@@ -3943,8 +4158,8 @@ void lvldiff()
         bosslvl = 3;
         chicken.chicken_health = 3;
         chicken.speed = 3.5;
-        boss.bosshp = 90;
-        boss.bossspeed = 7;
+        boss.bosshp = 300;
+        boss.bossspeed = 9;
         meteors.meteorspeed = 11;
     }
     if (lvl == '4')
@@ -3952,7 +4167,7 @@ void lvldiff()
         bosslvl = 4;
         chicken.chicken_health = 4;
         chicken.speed = 3.2;
-        boss.bosshp = 120;
+        boss.bosshp = 350;
         boss.bossspeed = 9;
         meteors.meteorspeed = 12;
     }
@@ -3961,9 +4176,9 @@ void lvldiff()
         bosslvl = 5;
         chicken.chicken_health = 5;
         chicken.speed = 3;
-        boss.bosshp = 200;
-        boss.bossspeed = 10;
-        meteors.meteorspeed = 13.5;
+        boss.bosshp = 400;
+        boss.bossspeed = 12;
+        meteors.meteorspeed = 7;
     }
 }
 void trianglewavemove()
@@ -4166,15 +4381,15 @@ void smolchick()
             smol[i].setScale(0.5, 0.5);
             smol[i].setPosition(-8000 + (i * 200), 100);
 
-            chicken.smol_hp[i] = 2;
+            chicken.smol_hp[i] = 3;
 
             eggs_smol[i].setTexture(eggTex);
             eggs_smol[i].setPosition(10000, -10000);
-            eggs_smol[i].setScale(0.13, 0.13);
+            eggs_smol[i].setScale(0.18, 0.18);
 
             eggyolk_smol[i].setTexture(eggbreak);
             eggyolk_smol[i].setTextureRect(IntRect(28 * 5, 0, 28, 24));
-            eggyolk_smol[i].setScale(2, 2);
+            eggyolk_smol[i].setScale(3, 32);
         }
     }
     initialsmol = 1;
@@ -4183,12 +4398,12 @@ void smolchick()
     {
         if (smol_enter[i] == 0 && right_move[i] == true)
         {
-            smol[i].move(8, 0);
+            smol[i].move(10, 0);
             smol[i].setTextureRect(IntRect(chickmove * 255, 0, 255, 225));
         }
         if (smol_enter[i] == 0 && right_move[i] == false)
         {
-            smol[i].move(-8, 0);
+            smol[i].move(-10, 0);
             smol[i].setTextureRect(IntRect(chickmove * 255, 0, 255, 225));
         }
         if (smol[i].getPosition().x <= 55 && right_move[i] == false)
@@ -4201,7 +4416,7 @@ void smolchick()
         }
         if (smol_enter[i] == 1)
         {
-            smol[i].move(0, 8);
+            smol[i].move(0, 10);
             smol[i].setTextureRect(IntRect(chickmove * 255, 0, 255, 225));
         }
         if (smol[i].getPosition().y >= 400 && smol[i].getPosition().y <= 410)
@@ -4244,7 +4459,7 @@ void smolchick()
                 exploding.play();
             }
             hp.setString(to_string(health));
-            chicken.smol_hp[i] -= 2;
+            chicken.smol_hp[i] -= 3;
             if (chicken.smol_hp[i] <= 0)
             {
                 smol[i].setPosition(5000, 50000);
@@ -4260,7 +4475,7 @@ void smolchick()
                 exploding.play();
             }
             hp2.setString(to_string(health3));
-            chicken.smol_hp[i] -= 2;
+            chicken.smol_hp[i] -= 3;
             if (chicken.smol_hp[i] <= 0)
             {
                 smol[i].setPosition(5000, 50000);
@@ -4282,10 +4497,10 @@ void chick_drop()
 
 
         }
-        eggvar = 400;
+        eggvar = 390;
         for (int j = 0; j < 40; j++)
         {
-            timer_smol[j] = rand() % eggvar;
+            timer_smol[j] = rand() % (eggvar-10);
         }
         s++;
     }
@@ -4299,7 +4514,7 @@ void chick_drop()
         if (timer_smol[i] == 0)
         {
             eggyolk_smol[i].setScale(0, 0);
-            eggs_smol[i].setScale(0.11, 0.11);
+            eggs_smol[i].setScale(0.18, 0.18);
             eggs_smol[i].setPosition(smol[i].getPosition().x + 127, smol[i].getPosition().y + 112);
 
 
@@ -4316,7 +4531,7 @@ void chick_drop()
         }
         if (timer_smol[i] == -1)
         {
-            eggs_smol[i].move(0, 9.8f);
+            eggs_smol[i].move(0, 7.f);
         }
         if (eggs_smol[i].getPosition().y >= 1000)
         {
@@ -4324,7 +4539,7 @@ void chick_drop()
             timer_smol[i] = rand() % eggvar;
             timer_smol[i]--;
             eggs_smol[i].setScale(0, 0);
-            eggyolk_smol[i].setScale(2, 2);
+            eggyolk_smol[i].setScale(4, 4);
 
         }
         if (eggs_smol[i].getGlobalBounds().intersects(Shield.getGlobalBounds()))
@@ -4363,7 +4578,7 @@ int main()
     sprite.setScale(1.4, 1);
     // add functions
     cnt = 0;
-    boss.eggcooldownvar = 301;
+    boss.eggcooldownvar = 201;
     IngameImages();
 
     MenuMusic.play();
@@ -4773,6 +4988,7 @@ beginning: {};
             {
                 if (soundeffectON)
                     MenuClick.play();
+                sigmaboss = 200;
                 lvl = '1';
                 c4.restart();
                 page = 9;
@@ -4782,6 +4998,7 @@ beginning: {};
             {
                 if (soundeffectON)
                     MenuClick.play();
+                sigmaboss = 250;
                 lvl = '2';
                 c4.restart();
                 page = 9;
@@ -4791,6 +5008,7 @@ beginning: {};
             {
                 if (soundeffectON)
                     MenuClick.play();
+                sigmaboss = 300;
                 lvl = '3';
                 c4.restart();
                 page = 9;
@@ -4800,6 +5018,7 @@ beginning: {};
             {
                 if (soundeffectON)
                     MenuClick.play();
+                sigmaboss = 400;
                 lvl = '4';
                 c4.restart();
                 page = 9;
@@ -4809,6 +5028,7 @@ beginning: {};
             {
                 if (soundeffectON)
                     MenuClick.play();
+                sigmaboss = 500;
                 lvl = '5';
                 c4.restart();
                 page = 9;
@@ -5220,8 +5440,23 @@ beginning: {};
                         goto beginning;
 
                     }
-
-
+                    for (int i = 0; i < 5; i++)
+                    {
+                        window.draw(bossegg[i]);
+                        window.draw(bossegg1[i]);
+                        window.draw(bossegg2[i]);
+                    }
+                    for (int i = 0; i < 40; i++)
+                    {
+                        window.draw(smol[i]);
+                        window.draw(eggs_smol[i]);
+                        window.draw(eggyolk_smol[i]);
+                    }
+                    window.draw(bosssprite);
+                    for (int i = 0; i <= 99; i++)
+                    {
+                        window.draw(meteor[i]);
+                    }
                     for (int j = 0; j < 3; j++)
                     {
                         for (int i = 0; i < 8; i++)
@@ -5289,8 +5524,6 @@ beginning: {};
                     shield_move();
                     window.draw(Shield);
                     window.draw(Shield2);
-
-
                     //drawing missile
                     window.draw(missile);
                     for (int i = 0; i < 50; i++) {
@@ -5828,7 +6061,7 @@ beginning: {};
                     {
                         Wave4 = false;
                         Wave5 = true;
-
+                        bosssprite.setPosition(200, 200);
                         clock4.restart();
                         clock3.restart();
                         for (int i = 0; i < bullet.numberofbullets; i++)
@@ -5950,7 +6183,7 @@ beginning: {};
                 wave1second.setString("Wave " + to_string(prevwave - 48));
                 if (prevwave == '4')
                 {
-                    boss.bosshp = 50 + (bosslvl * 10);
+                    boss.bosshp = 300 + (bosslvl * 10);
                     bossalive = 1;
                     clock3.restart();
                     clock4.restart();
@@ -6048,6 +6281,7 @@ beginning: {};
                     window.draw(rocket);
                     window.draw(powerlvl);
                     window.draw(explosion);
+                    window.draw(damaged);
                     for (int i = 0; i < bullet.numberofbullets; i++)
                     {
                         window.draw(Bullets[i]);
@@ -6062,7 +6296,13 @@ beginning: {};
                     }
                     if (boss.bosshp <= 0)
                         aliveboss = 0;
-
+                    for (int i = 0; i < 60; i++)
+                    {
+                        for (int j = 0; j < 60; j++)
+                        {
+                            window.draw(Chicken4[i][j]);
+                        }
+                    }
                     camerashake();
                     if (aliveboss <= 0)
                     {
