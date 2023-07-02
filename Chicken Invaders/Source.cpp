@@ -66,9 +66,9 @@ struct bossstruct {
 //camera
 sf::View view1(sf::Vector2f(960.f, 540.f), sf::Vector2f(1920.f, 1080.f));
 RectangleShape vignette(Vector2f(1920, 1080));
-int vignettealpha = 250;
-bool vignettestop = false;
-bool vignettebool = false;
+int vignettealpha = 255;
+bool vignettestart = false;
+int vignettereset = 0, topage = 0;
 // Creating Game Window
 RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders", Style::Fullscreen);
 
@@ -353,6 +353,10 @@ RectangleShape rectangleldbs[5];
 Text Options;
 Texture checkmark;
 Texture arrow1;
+Texture pluss;
+Texture minuss;
+Sprite pluh[2];
+Sprite minuh[2];
 Sprite arrow_l[2];
 Sprite arrow_r[2];
 Sprite arrow_up[2];
@@ -377,8 +381,13 @@ Text Fire2;
 Text Shift;
 Text musiccheck;
 Text soundeffectcheck;
+RectangleShape rectanglecheck[2];
 RectangleShape rectangleoption[2];
+RectangleShape audio[2][10];
+RectangleShape audiooutline[2];
 RectangleShape rectanglecontrols[6][2];
+int volumelvl1=10;
+int volumelvl2 = 10;
 /////////////////////////////////////////////////////////////////////////////////////////
 // coordinates
 int shopbuttonx = 1560, shopbuttony = 895;
@@ -417,7 +426,7 @@ Text coop;
 Text endoflevel1;
 Font font2;
 RectangleShape rectanglelevels[5];
-RectangleShape rectanglecheck[2];
+
 RectangleShape rectangleselectmode[2];
 RectangleShape rectanglecont(Vector2f(350, 70));
 RectangleShape rectanglereturn(Vector2f(350, 70));
@@ -488,7 +497,7 @@ void IngameImages()
     bottomborder.setPosition(0, 980);
     leftborder.setPosition(0, 0);
     rightborder.setPosition(1820, 0);
-    
+
     //fonts
     font1.loadFromFile("RobotoCondensed-Bold.ttf");
     font3.loadFromFile("Wedgie_Regular.ttf");
@@ -550,7 +559,7 @@ void IngameImages()
 
     menulogo.setTexture(gamelogo);
     menulogo.setPosition(435, 200);
-    
+
 
     // ingame images
     GameBarSkin.setSmooth(true);
@@ -679,11 +688,48 @@ void IngameImages()
     for (int i = 0; i < 2; i++)
     {
         rectanglecheck[i].setSize(Vector2f(70, 70));
-        rectanglecheck[i].setPosition(985, 480 + i * 100);
+        rectanglecheck[i].setPosition(1500, 480 + i * 200);
         rectanglecheck[i].setFillColor(Color(0, 0, 255, 40));
         rectanglecheck[i].setOutlineColor(Color(51, 153, 255, 60));
         rectanglecheck[i].setOutlineThickness(2.8f);
     }
+
+    //audio outline
+    for (int i = 0; i < 2; i++)
+    {
+        audiooutline[i].setSize(Vector2f(765, 90));
+        audiooutline[i].setPosition(555, 470 + i * 200);
+        audiooutline[i].setFillColor(Color::Transparent);
+        audiooutline[i].setOutlineColor(Color(102, 178, 255, 255));
+        audiooutline[i].setOutlineThickness(1.8f);
+    }
+
+    //audio buttons
+    for (int j = 0; j < 2; j++)
+    {
+        for (int i = 0; i < 10; i++)
+        {
+            audio[j][i].setSize(Vector2f(70, 70));
+            audio[j][i].setPosition(565 + i * 75, 480 + j * 200);
+            audio[j][i].setFillColor(Color(204, 229, 255, 225));
+        }
+    }
+
+    //plus minus signs
+    pluss.loadFromFile("plus.png");
+    minuss.loadFromFile("minus.png");
+    pluss.setSmooth(1);
+    minuss.setSmooth(1);
+    for (int i = 0; i < 2; i++)
+    {
+        pluh[i].setTexture(pluss);
+        minuh[i].setTexture(minuss);
+        pluh[i].setPosition(1375, 490+i*200);
+        minuh[i].setPosition(445, 490+i*200);
+        pluh[i].setScale(0.12, 0.12);
+        minuh[i].setScale(0.12, 0.12);
+    }
+
     //Buttons in control menu
     for (int j = 0; j < 2; j++)
     {
@@ -971,15 +1017,15 @@ void IngameImages()
 
     //music text
     musiccheck.setFont(font1);
-    musiccheck.setCharacterSize(32);
-    musiccheck.setPosition(825, 495);
+    musiccheck.setCharacterSize(60);
+    musiccheck.setPosition(235, 475);
     musiccheck.setString("Music");
     musiccheck.setFillColor(Color(204, 229, 255, 225));
 
     //sound effects text
     soundeffectcheck.setFont(font1);
-    soundeffectcheck.setCharacterSize(32);
-    soundeffectcheck.setPosition(775, 595);
+    soundeffectcheck.setCharacterSize(60);
+    soundeffectcheck.setPosition(50, 675);
     soundeffectcheck.setString("Sound Effects");
     soundeffectcheck.setFillColor(Color(204, 229, 255, 225));
 
@@ -1065,7 +1111,7 @@ void IngameImages()
     {
         checkbox[i].setTexture(checkmark);
         checkbox[i].setScale(0.3, 0.3);
-        checkbox[i].setPosition(985, 480 + i * 100);
+        checkbox[i].setPosition(1500, 480 + i * 200);
         checkbox[i].setColor(Color::Green);
     }
 
@@ -2497,22 +2543,30 @@ void FoodMovment() {
     }
 }
 
-void vignettetransition(long long& page)
+void vignettetransition(long long& page, long long topage)
 {
-    if (vignettealpha < 250 && vignettestop == false)
+    if (vignettestart)
     {
-        vignettealpha += 5;
+        if (vignettealpha < 255)
+        {
+            if (vignettealpha += 85 > 255)
+            {
+                vignettestart = false;
+                vignettealpha = 255;
+                page = topage;
+            }
+            else
+            {
+                vignettealpha += 85;
+            }
+        }
+        if (vignettealpha >= 250)
+        {
+            vignettestart = false;
+            vignettealpha = 255;
+            page = topage;
+        }
     }
-    if (vignettealpha >= 245)
-    {
-        vignettestop = true;
-        page = 0;
-    }
-    if (vignettealpha >= 10 && vignettestop == true)
-    {
-        vignettealpha -= 5;
-    }
-
 }
 
 
@@ -3502,7 +3556,7 @@ void mainmenu()
 
     for (int i = 0; i < 2; i++)
     {
-        if (mousepos.x >= 985 && mousepos.x <= 1055 && mousepos.y >= 480 + i * 100 && mousepos.y <= 550 + i * 100)
+        if (mousepos.x >= 1500 && mousepos.x <= 1570 && mousepos.y >= 480 + i * 200 && mousepos.y <= 550 + i * 200)
         {
             //check boxes on
             rectanglecheck[i].setFillColor(Color(0, 128, 255, 40));
@@ -4626,37 +4680,43 @@ beginning: {};
         //background
         movingbackround();
 
-
+        if (page != -1)
+        {
+            if (vignettestart == false && vignettealpha > 0)
+            {
+                if (vignettealpha - 85 < 0)
+                {
+                    vignettealpha = 0;
+                }
+                else
+                {
+                    vignettealpha -= 85;
+                }
+            }
+        }
 
         //draw window
         // main menu
         if (page == -1)
         {
-            
+
             window.draw(menulogo);
-            window.draw(vignette);
-            vignette.setFillColor(Color(0, 0, 0, vignettealpha));
 
             if (Mouse::isButtonPressed(Mouse::Left))
             {
-                vignettebool = true;
+                vignettestart = true;
             }
-            if (vignettebool == true)
+
+            vignettetransition(page, 0);
+
+            if (vignettealpha > 0 && vignettestart == false)
             {
-                vignettetransition(page);
+                vignettealpha = vignettealpha - 1;
             }
-            else
-            {
-                if (vignettealpha > 0)
-                {
-                    vignettealpha = vignettealpha - 1;
-                }
-            }       
         }
 
         if (page == 0)
         {
-            vignettetransition(page);
             if (searchl == 0)
             {
 
@@ -4905,49 +4965,52 @@ beginning: {};
             {
                 window.draw(rectanglemainmenu[i]);
             }
-            if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 1450 && mousepos.x <= 1800 && mousepos.y >= 880 && mousepos.y <= 950)
+            if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 1450 && mousepos.x <= 1800 && mousepos.y >= 880 && mousepos.y <= 950 && vignettestart == false)
             {
                 if (soundeffectON)
                     MenuClick.play();
-                page = 11;
+                vignettestart = true;
+                topage = 11;
                 goto pagecode;
             }
-            if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550)
+            if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550 && vignettestart == false)
             {
                 if (soundeffectON)
                     MenuClick.play();
-
                 c4.restart();
-                page = 1;
+                vignettestart = true;
+                topage = 1;
                 goto pagecode;
             }
-            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 580 && mousepos.y <= 650)
+            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 580 && mousepos.y <= 650 && vignettestart == false)
             {
                 if (soundeffectON)
                     MenuClick.play();
-                page = 2;
+                vignettestart = true;
+                topage = 2;
                 goto pagecode;
             }
-            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 680 && mousepos.y <= 750)
+            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 680 && mousepos.y <= 750 && vignettestart == false)
             {
                 if (soundeffectON)
                     MenuClick.play();
-                page = 3;
+                vignettestart = true;
+                topage = 3;
                 goto pagecode;
             }
-            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 780 && mousepos.y <= 850)
+            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 780 && mousepos.y <= 850 && vignettestart == false)
             {
                 if (soundeffectON)
                     MenuClick.play();
-                page = 4;
+                vignettestart = true;
+                topage = 4;
                 goto pagecode;
             }
             else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 880 && mousepos.y <= 950)
             {
                 window.close();
             }
-            vignette.setFillColor(Color(0, 0, 0, vignettealpha));
-            window.draw(vignette);
+            vignettetransition(page, topage);
         }
     pagecode: {};
         // select level page ==1;
@@ -4972,7 +5035,8 @@ beginning: {};
                 if (soundeffectON)
                     MenuClick.play();
                 backdelay = 0;
-                page = 0;
+                vignettestart = true;
+                topage = 0;
             }
 
             window.draw(rectangleback);
@@ -4991,7 +5055,8 @@ beginning: {};
                 sigmaboss = 200;
                 lvl = '1';
                 c4.restart();
-                page = 9;
+                vignettestart = true;
+                topage = 9;
 
             }
             if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 301 && mousepos.y <= 367 && Mouse::isButtonPressed(Mouse::Left) && c4.getElapsedTime().asSeconds() >= 0.2)
@@ -5001,7 +5066,8 @@ beginning: {};
                 sigmaboss = 250;
                 lvl = '2';
                 c4.restart();
-                page = 9;
+                vignettestart = true;
+                topage = 9;
 
             }
             if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 421 && mousepos.y <= 482 && Mouse::isButtonPressed(Mouse::Left) && c4.getElapsedTime().asSeconds() >= 0.2)
@@ -5011,7 +5077,8 @@ beginning: {};
                 sigmaboss = 300;
                 lvl = '3';
                 c4.restart();
-                page = 9;
+                vignettestart = true;
+                topage = 9;
 
             }
             if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 541 && mousepos.y <= 606 && Mouse::isButtonPressed(Mouse::Left) && c4.getElapsedTime().asSeconds() >= 0.2)
@@ -5021,7 +5088,8 @@ beginning: {};
                 sigmaboss = 400;
                 lvl = '4';
                 c4.restart();
-                page = 9;
+                vignettestart = true;
+                topage = 9;
 
             }
             if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 662 && mousepos.y <= 727 && Mouse::isButtonPressed(Mouse::Left) && c4.getElapsedTime().asSeconds() >= 0.2)
@@ -5031,9 +5099,11 @@ beginning: {};
                 sigmaboss = 500;
                 lvl = '5';
                 c4.restart();
-                page = 9;
+                vignettestart = true;
+                topage = 9;
 
             }
+            vignettetransition(page, topage);
             window.draw(sprite);
         }
         // options page ==2
@@ -5050,10 +5120,11 @@ beginning: {};
                 if (soundeffectON)
                     MenuClick.play();
                 backdelay = 0;
+                vignettestart = true;
                 if (frommenu)
-                    page = 0;
+                    topage = 0;
                 else
-                    page = 5;
+                    topage = 5;
             }
             mainmenu();
 
@@ -5071,15 +5142,18 @@ beginning: {};
                 if (soundeffectON)
                     MenuClick.play();
                 delay = 0;
-                page = 7;
+                vignettestart = true;
+                topage = 7;
             }
             if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 580 && mousepos.y <= 650 && delay >= 5)
             {
                 if (soundeffectON)
                     MenuClick.play();
                 delay = 0;
-                page = 8;
+                vignettestart = true;
+                topage = 8;
             }
+            vignettetransition(page, topage);
         }
         // hall of fame page ==3
         if (page == 3)
@@ -5092,14 +5166,15 @@ beginning: {};
             backdelay = 0;
             checkdelay = 0;
             delay = 0;
-            if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left))
+            if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left) && vignettestart == false)
             {
                 if (soundeffectON)
                     MenuClick.play();
+                vignettestart = true;
                 if (frommenu)
-                    page = 0;
+                    topage = 0;
                 else
-                    page = 5;
+                    topage = 5;
             }
             mainmenu();
 
@@ -5190,6 +5265,7 @@ beginning: {};
                 window.draw(leaderscore[i]);
                 window.draw(leadername[i]);
             }
+            vignettetransition(page, topage);
         }
         // credits page ==4
         if (page == 4)
@@ -5200,13 +5276,14 @@ beginning: {};
             checkdelay = 0;
             delay = 0;
             //credit positioning
-            if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left))
+            if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left) && vignettestart == false)
             {
                 if (soundeffectON)
                     MenuClick.play();
+                vignettestart = true;
                 if (frommenu)
                 {
-                    page = 0;
+                    topage = 0;
 
 
                     for (int i = 0; i < 7; i++)
@@ -5220,7 +5297,8 @@ beginning: {};
                 {
                     if (soundeffectON)
                         MenuClick.play();
-                    page = 5;
+                    vignettestart = true;
+                    topage = 5;
                     for (int i = 0; i < 7; i++)
                     {
                         Cred[i].setPosition(900, 1400 + i * 150);
@@ -5258,7 +5336,7 @@ beginning: {};
             {
                 if (frommenu)
                 {
-                    page = 0;
+                    topage = 0;
                     for (int i = 0; i < 7; i++)
                     {
                         Cred[i].setPosition(900, 1400 + i * 150);
@@ -5267,7 +5345,7 @@ beginning: {};
                 }
                 else
                 {
-                    page = 5;
+                    topage = 5;
                     for (int i = 0; i < 7; i++)
                     {
                         Cred[i].setPosition(900, 1400 + i * 150);
@@ -5275,6 +5353,7 @@ beginning: {};
                     }
                 }
             }
+            vignettetransition(page, topage);
         }
         //pause menu
         if (page == 5)
@@ -5285,44 +5364,46 @@ beginning: {};
             checkdelay = 0;
             delay = 0;
             mainmenu();
-            if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550)
+            if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550 && vignettestart == false)
             {
                 if (soundeffectON)
                     MenuClick.play();
                 pausecooldown = 0;
-                page = 6;
+                vignettestart = true;
+                topage = 6;
                 goto pagecode;
             }
-            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 580 && mousepos.y <= 650)
+            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 580 && mousepos.y <= 650 && vignettestart == false)
             {
                 if (soundeffectON)
                     MenuClick.play();
-                page = 2;
+                vignettestart = true;
+                topage = 2;
                 goto pagecode;
             }
-            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 680 && mousepos.y <= 750)
+            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 680 && mousepos.y <= 750 && vignettestart == false)
             {
                 if (soundeffectON)
                     MenuClick.play();
-                page = 3;
-
-
-
+                vignettestart = true;
+                topage = 3;
                 goto pagecode;
             }
-            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 780 && mousepos.y <= 850)
+            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 780 && mousepos.y <= 850 && vignettestart == false)
             {
                 if (soundeffectON)
                     MenuClick.play();
-                page = 4;
+                vignettestart = true;
+                topage = 4;
                 goto pagecode;
             }
-            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 880 && mousepos.y <= 950)
+            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 880 && mousepos.y <= 950 && vignettestart == false)
             {
                 gameover = false;
 
                 temptest = 1;
-                page = 1;
+                vignettestart = true;
+                topage = 1;
                 IngameMusicPlaying = false;
                 MainMusicPlaying = true;
 
@@ -5331,8 +5412,6 @@ beginning: {};
                     ingamemusic.stop();
                     MenuMusic.play();
                 }
-
-
                 coopon = false;
                 reset();
                 goto beginning;
@@ -5352,6 +5431,7 @@ beginning: {};
             window.draw(Credits);
             window.draw(ret);
             window.draw(sprite);
+            vignettetransition(page, topage);
         }
 
         // ingame
@@ -5435,7 +5515,8 @@ beginning: {};
                         }
                         gameover = false;
                         temptest = 1;
-                        page = 1;
+                        vignettestart = true;
+                        topage = 1;
                         reset();
                         goto beginning;
 
@@ -5533,7 +5614,8 @@ beginning: {};
 
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
-                        page = 5;
+                        vignettestart = true;
+                        topage = 5;
                         shipin.stop();
                     }
                 }
@@ -5654,7 +5736,8 @@ beginning: {};
                         }
                         gameover = false;
                         temptest = 1;
-                        page = 1;
+                        vignettestart = true;
+                        topage = 1;
                         reset();
                         goto beginning;
 
@@ -5726,7 +5809,8 @@ beginning: {};
                     }
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
-                        page = 5;
+                        vignettestart = true;
+                        topage = 5;
                         shipin.stop();
                     }
                 }
@@ -5850,7 +5934,8 @@ beginning: {};
                         }
                         gameover = false;
                         temptest = 1;
-                        page = 1;
+                        vignettestart = true;
+                        topage = 1;
                         reset();
                         goto beginning;
 
@@ -5921,7 +6006,8 @@ beginning: {};
                     //drawing missile
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
-                        page = 5;
+                        vignettestart = true;
+                        topage = 5;
                         shipin.stop();
                     }
                 }
@@ -6040,7 +6126,8 @@ beginning: {};
                         }
                         gameover = false;
                         temptest = 1;
-                        page = 1;
+                        vignettestart = true;
+                        topage = 1;
                         reset();
                         goto beginning;
 
@@ -6123,7 +6210,8 @@ beginning: {};
                     }
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
-                        page = 5;
+                        vignettestart = true;
+                        topage = 5;
                         shipin.stop();
                     }
                 }
@@ -6249,7 +6337,8 @@ beginning: {};
                         }
                         gameover = false;
                         temptest = 1;
-                        page = 1;
+                        vignettestart = true;
+                        topage = 1;
                         reset();
                         goto beginning;
 
@@ -6388,7 +6477,8 @@ beginning: {};
                     }
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
-                        page = 5;
+                        vignettestart = true;
+                        topage = 5;
                         shipin.stop();
                         gamewin.stop();
                     }
@@ -6476,7 +6566,8 @@ beginning: {};
                         ingamemusic.stop();
                     }
                     temptest = 1;
-                    page = 1;
+                    vignettestart = true;
+                    topage = 1;
                     reset();
                     goto beginning;
                 }
@@ -6501,10 +6592,12 @@ beginning: {};
             }
             if (Keyboard::isKeyPressed(Keyboard::Escape))
             {
-                page = 5;
+                vignettestart = true;
+                topage = 5;
                 shipin.stop();
                 gamewin.stop();
             }
+            vignettetransition(page, topage);
         }
 
         // control
@@ -6550,12 +6643,13 @@ beginning: {};
                 if (soundeffectON)
                     MenuClick.play();
                 backdelay = 0;
-                page = 2;
+                vignettestart = true;
+                topage = 2;
             }
             window.draw(rectangleback);
             window.draw(back);
             window.draw(sprite);
-
+            vignettetransition(page, topage);
         }
         // sound
         if (page == 8)
@@ -6565,15 +6659,16 @@ beginning: {};
             backdelay = 0;
             checkdelay++;
             mainmenu();
-
+           
             window.draw(Logo);
             window.draw(rectangleback);
             window.draw(back);
-            if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left))
+            if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left) && vignettestart == false)
             {
                 if (soundeffectON)
                     MenuClick.play();
-                page = 2;
+                vignettestart = true;
+                topage = 2;
             }
             for (int i = 0; i < 2; i++)
             {
@@ -6582,7 +6677,7 @@ beginning: {};
             window.draw(musiccheck);
             window.draw(soundeffectcheck);
 
-            if (mousepos.x >= 985 && mousepos.x <= 1055 && mousepos.y >= 480 && mousepos.y <= 550 && Mouse::isButtonPressed(Mouse::Left) && checkdelay >= 5)
+            if (mousepos.x >= 1500 && mousepos.x <= 1570 && mousepos.y >= 480 && mousepos.y <= 550 && Mouse::isButtonPressed(Mouse::Left) && checkdelay >= 5)
             {
 
                 if (soundeffectON)
@@ -6603,19 +6698,232 @@ beginning: {};
                 {
                     MenuMusic.play();
                 }
+                if (volumelvl1 == 0)
+                {
+                    volumelvl1 = 10;
+                    MenuMusic.setVolume(volumelvl1 * 10);
+                    ingamemusic.setVolume(volumelvl1 * 10);
+                }
+
+
+
+
                 checkdelay = 0;
 
 
 
             }
-            if (mousepos.x >= 985 && mousepos.x <= 1055 && mousepos.y >= 580 && mousepos.y <= 650 && Mouse::isButtonPressed(Mouse::Left) && checkdelay >= 5)
+
+            if (mousepos.x >= 1500 && mousepos.x <= 1570 && mousepos.y >= 680 && mousepos.y <= 750 && Mouse::isButtonPressed(Mouse::Left) && checkdelay >= 5)
             {
                 if (soundeffectON)
                     MenuClick.play();
                 soundeffectON = !soundeffectON;
+                if (soundeffectON)
+                    MenuClick.play();
+                if (volumelvl2 == 0)
+                {
+                    volumelvl2 = 10;
+                    for (int i = 0; i < 2; i++)
+                    {
+                        chickenhurt[i].setVolume(volumelvl2 * 10);
+                        eggshoot[i].setVolume(volumelvl2 * 10);
+                        shoot1[i].setVolume(volumelvl2 * 10);
+                    }
+                    shoot1[2].setVolume(volumelvl2 * 10);
+                    bouncingchickenhurt.setVolume(volumelvl2 * 10);
+                    exploding.setVolume(volumelvl2 * 10);
+                    rocketshoot.setVolume(volumelvl2 * 10);
+                    eating.setVolume(volumelvl2 * 10);
+                    upgradesound.setVolume(volumelvl2 * 10);
+                    shipin.setVolume(volumelvl2 * 10);
+                    gamewin.setVolume(volumelvl2 * 10);
+                    MenuClick.setVolume(volumelvl2 * 10);
+
+                }
+                
                 checkdelay = 0;
             }
-
+            //plus
+            if (mousepos.x >= 1375 && mousepos.x <= 1435 && mousepos.y >= 490 && mousepos.y <= 550 && Mouse::isButtonPressed(Mouse::Left) && checkdelay >= 5)
+            {
+                
+                checkdelay = 0;
+                if (volumelvl1 <= 10)
+                {
+                    if (!musicON) 
+                    {
+                        musicON = true;
+                    if (musicON && IngameMusicPlaying && MainMusicPlaying == false)
+                    {
+                        ingamemusic.play();
+                    }
+                    if (musicON && MainMusicPlaying && IngameMusicPlaying == false)
+                    {
+                         MenuMusic.play();
+                    }
+                    }
+                    if (volumelvl1 != 10)
+                    {
+                        volumelvl1 += 1;
+                        MenuMusic.setVolume(volumelvl1 * 10);
+                        ingamemusic.setVolume(volumelvl1 * 10);
+                    }
+                    
+                }
+               
+                if (soundeffectON)
+                    MenuClick.play();
+            }
+            if (mousepos.x >= 1375 && mousepos.x <= 1435 && mousepos.y >= 690 && mousepos.y <= 750 && Mouse::isButtonPressed(Mouse::Left) && checkdelay >= 5)
+            {
+                
+                checkdelay = 0;
+                if(volumelvl2<=10)
+                {
+                    soundeffectON = true;
+                    if (volumelvl2 != 10)
+                    {
+                        volumelvl2 += 1;
+                        for (int i = 0; i < 2; i++)
+                        {
+                            chickenhurt[i].setVolume(volumelvl2 * 10);
+                            eggshoot[i].setVolume(volumelvl2 * 10);
+                            shoot1[i].setVolume(volumelvl2 * 10);
+                        }
+                        shoot1[2].setVolume(volumelvl2 * 10);
+                        bouncingchickenhurt.setVolume(volumelvl2 * 10);
+                        exploding.setVolume(volumelvl2 * 10);
+                        rocketshoot.setVolume(volumelvl2 * 10);
+                        eating.setVolume(volumelvl2 * 10);
+                        upgradesound.setVolume(volumelvl2 * 10);
+                        shipin.setVolume(volumelvl2 * 10);
+                        gamewin.setVolume(volumelvl2 * 10);
+                        MenuClick.setVolume(volumelvl2 * 10);
+                    }
+                    
+                }
+                if (soundeffectON)
+                    MenuClick.play(); 
+            }
+            //minus 
+            if (mousepos.x >= 455 && mousepos.x <= 515 && mousepos.y >= 490 && mousepos.y <= 550 && Mouse::isButtonPressed(Mouse::Left) && checkdelay >= 5)
+            {
+                if (!musicON)
+                {
+                    musicON = true;
+                    if (musicON && IngameMusicPlaying && MainMusicPlaying == false)
+                    {
+                        ingamemusic.play();
+                    }
+                    if (musicON && MainMusicPlaying && IngameMusicPlaying == false)
+                    {
+                        MenuMusic.play();
+                    }
+                }
+                if (soundeffectON)
+                    MenuClick.play();
+                checkdelay = 0;
+                
+                if (volumelvl1 > 0) 
+                {
+                    volumelvl1 -= 1;
+                    MenuMusic.setVolume(volumelvl1 * 10);
+                    ingamemusic.setVolume(volumelvl1 * 10);
+                }
+            }
+            if (mousepos.x >= 455 && mousepos.x <= 515 && mousepos.y >= 690 && mousepos.y <= 750 && Mouse::isButtonPressed(Mouse::Left) && checkdelay >= 5)
+            {
+                 if (!soundeffectON)
+                    soundeffectON = true;
+                if (soundeffectON)
+                    MenuClick.play();
+                checkdelay = 0;
+                if (volumelvl2 > 0) 
+                {
+                    volumelvl2 -= 1;
+                    for (int i = 0; i < 2; i++)
+                    {
+                        chickenhurt[i].setVolume(volumelvl2 * 10);
+                        eggshoot[i].setVolume(volumelvl2 * 10);
+                        shoot1[i].setVolume(volumelvl2 * 10);
+                    }
+                    shoot1[2].setVolume(volumelvl2 * 10);
+                    bouncingchickenhurt.setVolume(volumelvl2 * 10);
+                    exploding.setVolume(volumelvl2 * 10);
+                    rocketshoot.setVolume(volumelvl2 * 10);
+                    eating.setVolume(volumelvl2 * 10);
+                    upgradesound.setVolume(volumelvl2 * 10);
+                    shipin.setVolume(volumelvl2 * 10);
+                    gamewin.setVolume(volumelvl2 * 10);
+                    MenuClick.setVolume(volumelvl2 * 10);
+                }
+            }
+            for (int j = 0; j < 10; j++)
+            {
+               if (mousepos.x >= 565 + j * 75 && mousepos.x <= 635 + j * 75 && mousepos.y >= 480  && mousepos.y <= 550  && Mouse::isButtonPressed(Mouse::Left) && checkdelay >= 5)
+                {
+                   if (!musicON)
+                   {
+                       musicON = true;
+                       if (musicON && IngameMusicPlaying && MainMusicPlaying == false)
+                       {
+                           ingamemusic.play();
+                       }
+                       if (musicON && MainMusicPlaying && IngameMusicPlaying == false)
+                       {
+                           MenuMusic.play();
+                       }
+                   }
+                   if (soundeffectON)
+                       MenuClick.play();
+                   checkdelay = 0;
+                   volumelvl1 = j + 1;
+                   MenuMusic.setVolume(volumelvl1 * 10);
+                   ingamemusic.setVolume(volumelvl1 * 10);
+                }
+            }
+            for (int j = 0; j < 10; j++)
+            {
+               if (mousepos.x >= 565 + j * 75 && mousepos.x <= 635 + j * 75 && mousepos.y >= 680 && mousepos.y <= 750 && Mouse::isButtonPressed(Mouse::Left) && checkdelay >= 5)
+                {
+                   if (!soundeffectON)
+                       soundeffectON = true;
+                   if (soundeffectON)
+                       MenuClick.play();
+                   checkdelay = 0;
+                    volumelvl2 = j + 1;
+                    for (int i = 0; i < 2; i++)
+                    {
+                        chickenhurt[i].setVolume(volumelvl2 * 10);
+                        eggshoot[i].setVolume(volumelvl2 * 10);
+                        shoot1[i].setVolume(volumelvl2 * 10);
+                    }
+                    shoot1[2].setVolume(volumelvl2 * 10);
+                    bouncingchickenhurt.setVolume(volumelvl2 * 10);
+                    exploding.setVolume(volumelvl2 * 10);
+                    rocketshoot.setVolume(volumelvl2 * 10);
+                    eating.setVolume(volumelvl2 * 10);
+                    upgradesound.setVolume(volumelvl2 * 10);
+                    shipin.setVolume(volumelvl2 * 10);
+                    gamewin.setVolume(volumelvl2 * 10);
+                    MenuClick.setVolume(volumelvl2 * 10);
+               }
+            }
+           
+            if (volumelvl1 == 0)
+            {
+                musicON = false;
+            }
+            if (volumelvl2 == 0)
+            {
+                soundeffectON = false;
+            }
+            if (musicON == false)
+            {
+                MenuMusic.stop();
+                ingamemusic.stop();
+            }
             if (musicON == true)
             {
                 window.draw(checkbox[0]);
@@ -6624,7 +6932,26 @@ beginning: {};
             {
                 window.draw(checkbox[1]);
             }
+            for (int i = 0; i < 2; i++)
+            {
+                window.draw(audiooutline[i]);
+                window.draw(pluh[i]);
+                window.draw(minuh[i]);
+            }
+            for (int j = 0; j < volumelvl1; j++)
+            {
+                if (musicON)
+                    window.draw(audio[0][j]);
+            }
+            for (int j = 0; j < volumelvl2; j++)
+            {
+                if (soundeffectON)
+                {
+                    window.draw(audio[1][j]);
+                }                  
+            }    
             window.draw(sprite);
+            vignettetransition(page, topage);
         }
         // coop or single menu
         if (page == 9)
@@ -6643,7 +6970,11 @@ beginning: {};
             //single
             if (mousepos.x >= 585 && mousepos.x <= 935 && mousepos.y >= 480 && mousepos.y <= 550 && Mouse::isButtonPressed(Mouse::Left) && modeselectdelay >= 5)
             {
-                page = 10;
+                vignettestart = true;
+                topage = 10;
+
+
+
 
 
             }
@@ -6666,26 +6997,27 @@ beginning: {};
                 }
                 clock4.restart();
                 clock3.restart();
-                page = 6;
+                vignettestart = true;
+                topage = 6;
                 pausecooldown = 0;
                 modeselectdelay = 0;
 
                 goto beginning;
             }
             //back
-            if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left))
+            if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left) && vignettestart == false)
             {
                 if (soundeffectON)
                     MenuClick.play();
-                page = 1;
-
+                vignettestart = true;
+                topage = 1;
             }
             window.draw(rectangleback);
             window.draw(back);
             window.draw(single);
             window.draw(coop);
             window.draw(sprite);
-
+            vignettetransition(page, topage);
         }
         if (page == 10) {
 
@@ -6712,8 +7044,8 @@ beginning: {};
                             {
                                 shipin.play();
                             }
-
-                            page = 6;
+                            vignettestart = true;
+                            topage = 6;
                             pausecooldown = 0;
                             modeselectdelay = 0;
                             MainMusicPlaying = false;
@@ -6732,7 +7064,8 @@ beginning: {};
 
             }
             if (Keyboard::isKeyPressed(Keyboard::Escape)) {
-                page = 9;
+                vignettestart = true;
+                topage = 9;
                 Name = "";
                 shipin.stop();
             }
@@ -6740,10 +7073,10 @@ beginning: {};
 
             window.draw(t1);
             window.draw(t2);
-
+            vignettetransition(page, topage);
         }
+
         //shop
-         //shop
         if (page == 11)
         {
 
@@ -6758,7 +7091,7 @@ beginning: {};
             }
             mainmenu();
 
-            if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left))
+            if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left) && vignettestart == false)
             {
                 if (soundeffectON && shopdelay.getElapsedTime().asSeconds() >= 0.015)
                 {
@@ -6766,7 +7099,8 @@ beginning: {};
                     shopdelay.restart();
                 }
                 backdelay = 0;
-                page = 0;
+                vignettestart = true;
+                topage = 0;
             }
             for (int i = 0; i < 3; i++)
             {
@@ -7034,8 +7368,10 @@ beginning: {};
                 }
             }
             window.draw(sprite);
-
+            vignettetransition(page, topage);
         }
+        vignette.setFillColor(Color(0, 0, 0, vignettealpha));
+        window.draw(vignette);
         sprite.setPosition(static_cast<Vector2f>(Mouse::getPosition(window))); // Set position 
 
         // window display
@@ -7044,4 +7380,4 @@ beginning: {};
         window.display();
     }
     return 0;
-}
+}   
