@@ -7043,4 +7043,8 @@ beginning: {};
         sprite.setPosition(static_cast<Vector2f>(Mouse::getPosition(window))); // Set position 
 
         // window display
-}}
+        window.setView(view1);
+
+        window.display();
+    }
+}   
