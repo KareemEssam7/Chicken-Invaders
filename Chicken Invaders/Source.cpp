@@ -67,8 +67,8 @@ struct bossstruct {
 sf::View view1(sf::Vector2f(960.f, 540.f), sf::Vector2f(1920.f, 1080.f));
 RectangleShape vignette(Vector2f(1920, 1080));
 int vignettealpha = 250;
-bool vignettestop = false;
-bool vignettebool = false;
+bool vignettestart = false;
+int vignettereset = 0, topage = 0;
 // Creating Game Window
 RenderWindow window(VideoMode(1920, 1080), "Chicken Invaders", Style::Fullscreen);
 
@@ -2484,22 +2484,21 @@ void FoodMovment() {
     }
 }
 
-void vignettetransition(long long& page)
+void vignettetransition(long long& page, long long topage)
 {
-    if (vignettealpha < 250 && vignettestop == false)
+    if (vignettestart)
     {
-        vignettealpha += 5;
+        if (vignettealpha < 255)
+        {
+            vignettealpha += 85;
+        }
+        if (vignettealpha >= 255)
+        {
+            vignettestart = false;
+            vignettealpha = 255;
+            page = topage;
+        }
     }
-    if (vignettealpha >= 245)
-    {
-        vignettestop = true;
-        page = 0;
-    }
-    if (vignettealpha >= 10 && vignettestop == true)
-    {
-        vignettealpha -= 5;
-    }
-
 }
 
 
@@ -4411,7 +4410,13 @@ beginning: {};
         //background
         movingbackround();
 
-
+        if (page != -1)
+        {
+            if (vignettestart == false && vignettealpha > 0)
+            {
+                vignettealpha -= 85;
+            }
+        }
 
         //draw window
         // main menu
@@ -4419,29 +4424,22 @@ beginning: {};
         {
             
             window.draw(menulogo);
-            window.draw(vignette);
-            vignette.setFillColor(Color(0, 0, 0, vignettealpha));
 
             if (Mouse::isButtonPressed(Mouse::Left))
             {
-                vignettebool = true;
+                vignettestart = true;
             }
-            if (vignettebool == true)
+
+            vignettetransition(page, 0);
+            
+            if (vignettealpha > 0 && vignettestart == false)
             {
-                vignettetransition(page);
-            }
-            else
-            {
-                if (vignettealpha > 0)
-                {
-                    vignettealpha = vignettealpha - 1;
-                }
-            }       
+                vignettealpha = vignettealpha - 1;
+            }     
         }
 
         if (page == 0)
         {
-            vignettetransition(page);
             if (searchl == 0)
             {
 
@@ -4690,49 +4688,52 @@ beginning: {};
             {
                 window.draw(rectanglemainmenu[i]);
             }
-            if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 1450 && mousepos.x <= 1800 && mousepos.y >= 880 && mousepos.y <= 950)
+            if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 1450 && mousepos.x <= 1800 && mousepos.y >= 880 && mousepos.y <= 950 && vignettestart == false)
             {
                 if (soundeffectON)
                     MenuClick.play();
-                page = 11;
+                vignettestart = true;
+                topage = 11;
                 goto pagecode;
             }
-            if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550)
+            if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550 && vignettestart == false)
             {
                 if (soundeffectON)
                     MenuClick.play();
-
                 c4.restart();
-                page = 1;
+                vignettestart = true;
+                topage = 1;
                 goto pagecode;
             }
-            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 580 && mousepos.y <= 650)
+            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 580 && mousepos.y <= 650 && vignettestart == false)
             {
                 if (soundeffectON)
                     MenuClick.play();
-                page = 2;
+                vignettestart = true;
+                topage = 2;
                 goto pagecode;
             }
-            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 680 && mousepos.y <= 750)
+            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 680 && mousepos.y <= 750 && vignettestart == false)
             {
                 if (soundeffectON)
                     MenuClick.play();
-                page = 3;
+                vignettestart = true;
+                topage = 3;
                 goto pagecode;
             }
-            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 780 && mousepos.y <= 850)
+            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 780 && mousepos.y <= 850 && vignettestart == false)
             {
                 if (soundeffectON)
                     MenuClick.play();
-                page = 4;
+                vignettestart = true;
+                topage = 4;
                 goto pagecode;
             }
             else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 880 && mousepos.y <= 950)
             {
                 window.close();
             }
-            vignette.setFillColor(Color(0, 0, 0, vignettealpha));
-            window.draw(vignette);
+            vignettetransition(page, topage);
         }
     pagecode: {};
         // select level page ==1;
@@ -4757,7 +4758,8 @@ beginning: {};
                 if (soundeffectON)
                     MenuClick.play();
                 backdelay = 0;
-                page = 0;
+                vignettestart = true;
+                topage = 0;
             }
 
             window.draw(rectangleback);
@@ -4775,7 +4777,8 @@ beginning: {};
                     MenuClick.play();
                 lvl = '1';
                 c4.restart();
-                page = 9;
+                vignettestart = true;
+                topage = 9;
 
             }
             if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 301 && mousepos.y <= 367 && Mouse::isButtonPressed(Mouse::Left) && c4.getElapsedTime().asSeconds() >= 0.2)
@@ -4784,7 +4787,8 @@ beginning: {};
                     MenuClick.play();
                 lvl = '2';
                 c4.restart();
-                page = 9;
+                vignettestart = true;
+                topage = 9;
 
             }
             if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 421 && mousepos.y <= 482 && Mouse::isButtonPressed(Mouse::Left) && c4.getElapsedTime().asSeconds() >= 0.2)
@@ -4793,7 +4797,8 @@ beginning: {};
                     MenuClick.play();
                 lvl = '3';
                 c4.restart();
-                page = 9;
+                vignettestart = true;
+                topage = 9;
 
             }
             if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 541 && mousepos.y <= 606 && Mouse::isButtonPressed(Mouse::Left) && c4.getElapsedTime().asSeconds() >= 0.2)
@@ -4802,7 +4807,8 @@ beginning: {};
                     MenuClick.play();
                 lvl = '4';
                 c4.restart();
-                page = 9;
+                vignettestart = true;
+                topage = 9;
 
             }
             if (mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 662 && mousepos.y <= 727 && Mouse::isButtonPressed(Mouse::Left) && c4.getElapsedTime().asSeconds() >= 0.2)
@@ -4811,9 +4817,11 @@ beginning: {};
                     MenuClick.play();
                 lvl = '5';
                 c4.restart();
-                page = 9;
+                vignettestart = true;
+                topage = 9;
 
             }
+            vignettetransition(page, topage);
             window.draw(sprite);
         }
         // options page ==2
@@ -4830,10 +4838,11 @@ beginning: {};
                 if (soundeffectON)
                     MenuClick.play();
                 backdelay = 0;
+                vignettestart = true;
                 if (frommenu)
-                    page = 0;
+                    topage = 0;
                 else
-                    page = 5;
+                    topage = 5;
             }
             mainmenu();
 
@@ -4851,15 +4860,18 @@ beginning: {};
                 if (soundeffectON)
                     MenuClick.play();
                 delay = 0;
-                page = 7;
+                vignettestart = true;
+                topage = 7;
             }
             if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 580 && mousepos.y <= 650 && delay >= 5)
             {
                 if (soundeffectON)
                     MenuClick.play();
                 delay = 0;
-                page = 8;
+                vignettestart = true;
+                topage = 8;
             }
+            vignettetransition(page, topage);
         }
         // hall of fame page ==3
         if (page == 3)
@@ -4872,14 +4884,15 @@ beginning: {};
             backdelay = 0;
             checkdelay = 0;
             delay = 0;
-            if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left))
+            if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left) && vignettestart == false)
             {
                 if (soundeffectON)
                     MenuClick.play();
+                vignettestart = true;
                 if (frommenu)
-                    page = 0;
+                    topage = 0;
                 else
-                    page = 5;
+                    topage = 5;
             }
             mainmenu();
 
@@ -4970,6 +4983,7 @@ beginning: {};
                 window.draw(leaderscore[i]);
                 window.draw(leadername[i]);
             }
+            vignettetransition(page, topage);
         }
         // credits page ==4
         if (page == 4)
@@ -4980,13 +4994,14 @@ beginning: {};
             checkdelay = 0;
             delay = 0;
             //credit positioning
-            if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left))
+            if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left) && vignettestart == false)
             {
                 if (soundeffectON)
                     MenuClick.play();
+                vignettestart = true;
                 if (frommenu)
                 {
-                    page = 0;
+                    topage = 0;
 
 
                     for (int i = 0; i < 7; i++)
@@ -5000,7 +5015,8 @@ beginning: {};
                 {
                     if (soundeffectON)
                         MenuClick.play();
-                    page = 5;
+                    vignettestart = true;
+                    topage = 5;
                     for (int i = 0; i < 7; i++)
                     {
                         Cred[i].setPosition(900, 1400 + i * 150);
@@ -5038,7 +5054,7 @@ beginning: {};
             {
                 if (frommenu)
                 {
-                    page = 0;
+                    topage = 0;
                     for (int i = 0; i < 7; i++)
                     {
                         Cred[i].setPosition(900, 1400 + i * 150);
@@ -5047,7 +5063,7 @@ beginning: {};
                 }
                 else
                 {
-                    page = 5;
+                    topage = 5;
                     for (int i = 0; i < 7; i++)
                     {
                         Cred[i].setPosition(900, 1400 + i * 150);
@@ -5055,6 +5071,7 @@ beginning: {};
                     }
                 }
             }
+            vignettetransition(page, topage);
         }
         //pause menu
         if (page == 5)
@@ -5065,44 +5082,46 @@ beginning: {};
             checkdelay = 0;
             delay = 0;
             mainmenu();
-            if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550)
+            if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 480 && mousepos.y <= 550 && vignettestart == false)
             {
                 if (soundeffectON)
                     MenuClick.play();
                 pausecooldown = 0;
-                page = 6;
+                vignettestart = true;
+                topage = 6;
                 goto pagecode;
             }
-            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 580 && mousepos.y <= 650)
+            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 580 && mousepos.y <= 650 && vignettestart == false)
             {
                 if (soundeffectON)
                     MenuClick.play();
-                page = 2;
+                vignettestart = true;
+                topage = 2;
                 goto pagecode;
             }
-            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 680 && mousepos.y <= 750)
+            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 680 && mousepos.y <= 750 && vignettestart == false)
             {
                 if (soundeffectON)
                     MenuClick.play();
-                page = 3;
-
-
-
+                vignettestart = true;
+                topage = 3;
                 goto pagecode;
             }
-            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 780 && mousepos.y <= 850)
+            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 780 && mousepos.y <= 850 && vignettestart == false)
             {
                 if (soundeffectON)
                     MenuClick.play();
-                page = 4;
+                vignettestart = true;
+                topage = 4;
                 goto pagecode;
             }
-            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 880 && mousepos.y <= 950)
+            else if (Mouse::isButtonPressed(Mouse::Left) && mousepos.x >= 785 && mousepos.x <= 1135 && mousepos.y >= 880 && mousepos.y <= 950 && vignettestart == false)
             {
                 gameover = false;
 
                 temptest = 1;
-                page = 1;
+                vignettestart = true;
+                topage = 1;
                 IngameMusicPlaying = false;
                 MainMusicPlaying = true;
 
@@ -5111,8 +5130,6 @@ beginning: {};
                     ingamemusic.stop();
                     MenuMusic.play();
                 }
-
-
                 coopon = false;
                 reset();
                 goto beginning;
@@ -5132,6 +5149,7 @@ beginning: {};
             window.draw(Credits);
             window.draw(ret);
             window.draw(sprite);
+            vignettetransition(page, topage);
         }
 
         // ingame
@@ -5215,7 +5233,8 @@ beginning: {};
                         }
                         gameover = false;
                         temptest = 1;
-                        page = 1;
+                        vignettestart = true;
+                        topage = 1;
                         reset();
                         goto beginning;
 
@@ -5300,7 +5319,8 @@ beginning: {};
 
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
-                        page = 5;
+                        vignettestart = true;
+                        topage = 5;
                         shipin.stop();
                     }
                 }
@@ -5421,7 +5441,8 @@ beginning: {};
                         }
                         gameover = false;
                         temptest = 1;
-                        page = 1;
+                        vignettestart = true;
+                        topage = 1;
                         reset();
                         goto beginning;
 
@@ -5493,7 +5514,8 @@ beginning: {};
                     }
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
-                        page = 5;
+                        vignettestart = true;
+                        topage = 5;
                         shipin.stop();
                     }
                 }
@@ -5617,7 +5639,8 @@ beginning: {};
                         }
                         gameover = false;
                         temptest = 1;
-                        page = 1;
+                        vignettestart = true;
+                        topage = 1;
                         reset();
                         goto beginning;
 
@@ -5688,7 +5711,8 @@ beginning: {};
                     //drawing missile
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
-                        page = 5;
+                        vignettestart = true;
+                        topage = 5;
                         shipin.stop();
                     }
                 }
@@ -5807,7 +5831,8 @@ beginning: {};
                         }
                         gameover = false;
                         temptest = 1;
-                        page = 1;
+                        vignettestart = true;
+                        topage = 1;
                         reset();
                         goto beginning;
 
@@ -5890,7 +5915,8 @@ beginning: {};
                     }
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
-                        page = 5;
+                        vignettestart = true;
+                        topage = 5;
                         shipin.stop();
                     }
                 }
@@ -6016,7 +6042,8 @@ beginning: {};
                         }
                         gameover = false;
                         temptest = 1;
-                        page = 1;
+                        vignettestart = true;
+                        topage = 1;
                         reset();
                         goto beginning;
 
@@ -6148,7 +6175,8 @@ beginning: {};
                     }
                     if (Keyboard::isKeyPressed(Keyboard::Escape))
                     {
-                        page = 5;
+                        vignettestart = true;
+                        topage = 5;
                         shipin.stop();
                         gamewin.stop();
                     }
@@ -6236,7 +6264,8 @@ beginning: {};
                         ingamemusic.stop();
                     }
                     temptest = 1;
-                    page = 1;
+                    vignettestart = true;
+                    topage = 1;
                     reset();
                     goto beginning;
                 }
@@ -6261,10 +6290,12 @@ beginning: {};
             }
             if (Keyboard::isKeyPressed(Keyboard::Escape))
             {
-                page = 5;
+                vignettestart = true;
+                topage = 5;
                 shipin.stop();
                 gamewin.stop();
             }
+            vignettetransition(page, topage);
         }
 
         // control
@@ -6310,12 +6341,13 @@ beginning: {};
                 if (soundeffectON)
                     MenuClick.play();
                 backdelay = 0;
-                page = 2;
+                vignettestart = true;
+                topage = 2;
             }
             window.draw(rectangleback);
             window.draw(back);
             window.draw(sprite);
-
+            vignettetransition(page, topage);
         }
         // sound
         if (page == 8)
@@ -6329,11 +6361,12 @@ beginning: {};
             window.draw(Logo);
             window.draw(rectangleback);
             window.draw(back);
-            if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left))
+            if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left) && vignettestart == false)
             {
                 if (soundeffectON)
                     MenuClick.play();
-                page = 2;
+                vignettestart = true;
+                topage = 2;
             }
             for (int i = 0; i < 2; i++)
             {
@@ -6385,6 +6418,7 @@ beginning: {};
                 window.draw(checkbox[1]);
             }
             window.draw(sprite);
+            vignettetransition(page, topage);
         }
         // coop or single menu
         if (page == 9)
@@ -6403,9 +6437,8 @@ beginning: {};
             //single
             if (mousepos.x >= 585 && mousepos.x <= 935 && mousepos.y >= 480 && mousepos.y <= 550 && Mouse::isButtonPressed(Mouse::Left) && modeselectdelay >= 5)
             {
-                page = 10;
-
-
+                vignettestart = true;
+                topage = 10;
             }
             //coop
             if (mousepos.x >= 985 && mousepos.x <= 1335 && mousepos.y >= 480 && mousepos.y <= 550 && Mouse::isButtonPressed(Mouse::Left) && modeselectdelay >= 5)
@@ -6426,26 +6459,27 @@ beginning: {};
                 }
                 clock4.restart();
                 clock3.restart();
-                page = 6;
+                vignettestart = true;
+                topage = 6;
                 pausecooldown = 0;
                 modeselectdelay = 0;
 
                 goto beginning;
             }
             //back
-            if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left))
+            if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left) && vignettestart == false)
             {
                 if (soundeffectON)
                     MenuClick.play();
-                page = 1;
-
+                vignettestart = true;
+                topage = 1;
             }
             window.draw(rectangleback);
             window.draw(back);
             window.draw(single);
             window.draw(coop);
             window.draw(sprite);
-
+            vignettetransition(page, topage);
         }
         if (page == 10) {
 
@@ -6472,8 +6506,8 @@ beginning: {};
                             {
                                 shipin.play();
                             }
-
-                            page = 6;
+                            vignettestart = true;
+                            topage = 6;
                             pausecooldown = 0;
                             modeselectdelay = 0;
                             MainMusicPlaying = false;
@@ -6492,7 +6526,8 @@ beginning: {};
 
             }
             if (Keyboard::isKeyPressed(Keyboard::Escape)) {
-                page = 9;
+                vignettestart = true;
+                topage = 9;
                 Name = "";
                 shipin.stop();
             }
@@ -6500,10 +6535,10 @@ beginning: {};
 
             window.draw(t1);
             window.draw(t2);
-
+            vignettetransition(page, topage);
         }
+
         //shop
-         //shop
         if (page == 11)
         {
 
@@ -6518,7 +6553,7 @@ beginning: {};
             }
             mainmenu();
 
-            if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left))
+            if (mousepos.x >= 50 && mousepos.x <= 250 && mousepos.y >= 900 && mousepos.y <= 970 && Mouse::isButtonPressed(Mouse::Left) && vignettestart == false)
             {
                 if (soundeffectON && shopdelay.getElapsedTime().asSeconds() >= 0.015)
                 {
@@ -6526,7 +6561,8 @@ beginning: {};
                     shopdelay.restart();
                 }
                 backdelay = 0;
-                page = 0;
+                vignettestart = true;
+                topage = 0;
             }
             for (int i = 0; i < 3; i++)
             {
@@ -6794,8 +6830,10 @@ beginning: {};
                 }
             }
             window.draw(sprite);
-
+            vignettetransition(page, topage);
         }
+        vignette.setFillColor(Color(0, 0, 0, vignettealpha));
+        window.draw(vignette);
         sprite.setPosition(static_cast<Vector2f>(Mouse::getPosition(window))); // Set position 
 
         // window display
