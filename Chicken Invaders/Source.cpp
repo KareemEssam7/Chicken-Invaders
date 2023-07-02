@@ -352,6 +352,10 @@ RectangleShape rectangleldbs[5];
 Text Options;
 Texture checkmark;
 Texture arrow1;
+Texture pluss;
+Texture minuss;
+Sprite pluh[2];
+Sprite minuh[2];
 Sprite arrow_l[2];
 Sprite arrow_r[2];
 Sprite arrow_up[2];
@@ -376,8 +380,13 @@ Text Fire2;
 Text Shift;
 Text musiccheck;
 Text soundeffectcheck;
+RectangleShape rectanglecheck[2];
 RectangleShape rectangleoption[2];
+RectangleShape audio[2][10];
+RectangleShape audiooutline[2];
 RectangleShape rectanglecontrols[6][2];
+int volumelvl1=10;
+int volumelvl2 = 10;
 /////////////////////////////////////////////////////////////////////////////////////////
 // coordinates
 int shopbuttonx = 1560, shopbuttony = 895;
@@ -413,7 +422,7 @@ Text coop;
 Text endoflevel1;
 Font font2;
 RectangleShape rectanglelevels[5];
-RectangleShape rectanglecheck[2];
+
 RectangleShape rectangleselectmode[2];
 RectangleShape rectanglecont(Vector2f(350, 70));
 RectangleShape rectanglereturn(Vector2f(350, 70));
@@ -484,7 +493,7 @@ void IngameImages()
     bottomborder.setPosition(0, 980);
     leftborder.setPosition(0, 0);
     rightborder.setPosition(1820, 0);
-    
+
     //fonts
     font1.loadFromFile("RobotoCondensed-Bold.ttf");
     font3.loadFromFile("Wedgie_Regular.ttf");
@@ -546,7 +555,7 @@ void IngameImages()
 
     menulogo.setTexture(gamelogo);
     menulogo.setPosition(435, 200);
-    
+
 
     // ingame images
     GameBarSkin.setSmooth(true);
@@ -675,11 +684,48 @@ void IngameImages()
     for (int i = 0; i < 2; i++)
     {
         rectanglecheck[i].setSize(Vector2f(70, 70));
-        rectanglecheck[i].setPosition(985, 480 + i * 100);
+        rectanglecheck[i].setPosition(1500, 480 + i * 200);
         rectanglecheck[i].setFillColor(Color(0, 0, 255, 40));
         rectanglecheck[i].setOutlineColor(Color(51, 153, 255, 60));
         rectanglecheck[i].setOutlineThickness(2.8f);
     }
+
+    //audio outline
+    for (int i = 0; i < 2; i++)
+    {
+        audiooutline[i].setSize(Vector2f(765, 90));
+        audiooutline[i].setPosition(555, 470 + i * 200);
+        audiooutline[i].setFillColor(Color::Transparent);
+        audiooutline[i].setOutlineColor(Color(102, 178, 255, 255));
+        audiooutline[i].setOutlineThickness(1.8f);
+    }
+
+    //audio buttons
+    for (int j = 0; j < 2; j++)
+    {
+        for (int i = 0; i < 10; i++)
+        {
+            audio[j][i].setSize(Vector2f(70, 70));
+            audio[j][i].setPosition(565 + i * 75, 480 + j * 200);
+            audio[j][i].setFillColor(Color(204, 229, 255, 225));
+        }
+    }
+
+    //plus minus signs
+    pluss.loadFromFile("plus.png");
+    minuss.loadFromFile("minus.png");
+    pluss.setSmooth(1);
+    minuss.setSmooth(1);
+    for (int i = 0; i < 2; i++)
+    {
+        pluh[i].setTexture(pluss);
+        minuh[i].setTexture(minuss);
+        pluh[i].setPosition(1375, 490+i*200);
+        minuh[i].setPosition(445, 490+i*200);
+        pluh[i].setScale(0.12, 0.12);
+        minuh[i].setScale(0.12, 0.12);
+    }
+
     //Buttons in control menu
     for (int j = 0; j < 2; j++)
     {
@@ -963,15 +1009,15 @@ void IngameImages()
 
     //music text
     musiccheck.setFont(font1);
-    musiccheck.setCharacterSize(32);
-    musiccheck.setPosition(825, 495);
+    musiccheck.setCharacterSize(60);
+    musiccheck.setPosition(235, 475);
     musiccheck.setString("Music");
     musiccheck.setFillColor(Color(204, 229, 255, 225));
 
     //sound effects text
     soundeffectcheck.setFont(font1);
-    soundeffectcheck.setCharacterSize(32);
-    soundeffectcheck.setPosition(775, 595);
+    soundeffectcheck.setCharacterSize(60);
+    soundeffectcheck.setPosition(50, 675);
     soundeffectcheck.setString("Sound Effects");
     soundeffectcheck.setFillColor(Color(204, 229, 255, 225));
 
@@ -1057,7 +1103,7 @@ void IngameImages()
     {
         checkbox[i].setTexture(checkmark);
         checkbox[i].setScale(0.3, 0.3);
-        checkbox[i].setPosition(985, 480 + i * 100);
+        checkbox[i].setPosition(1500, 480 + i * 200);
         checkbox[i].setColor(Color::Green);
     }
 
@@ -3431,7 +3477,7 @@ void mainmenu()
 
     for (int i = 0; i < 2; i++)
     {
-        if (mousepos.x >= 985 && mousepos.x <= 1055 && mousepos.y >= 480 + i * 100 && mousepos.y <= 550 + i * 100)
+        if (mousepos.x >= 1500 && mousepos.x <= 1570 && mousepos.y >= 480 + i * 200 && mousepos.y <= 550 + i * 200)
         {
             //check boxes on
             rectanglecheck[i].setFillColor(Color(0, 128, 255, 40));
@@ -6357,7 +6403,7 @@ beginning: {};
             backdelay = 0;
             checkdelay++;
             mainmenu();
-
+           
             window.draw(Logo);
             window.draw(rectangleback);
             window.draw(back);
@@ -6375,7 +6421,7 @@ beginning: {};
             window.draw(musiccheck);
             window.draw(soundeffectcheck);
 
-            if (mousepos.x >= 985 && mousepos.x <= 1055 && mousepos.y >= 480 && mousepos.y <= 550 && Mouse::isButtonPressed(Mouse::Left) && checkdelay >= 5)
+            if (mousepos.x >= 1500 && mousepos.x <= 1570 && mousepos.y >= 480 && mousepos.y <= 550 && Mouse::isButtonPressed(Mouse::Left) && checkdelay >= 5)
             {
 
                 if (soundeffectON)
@@ -6396,19 +6442,153 @@ beginning: {};
                 {
                     MenuMusic.play();
                 }
+                if (volumelvl1 == 0)
+                {
+                    volumelvl1 = 10;
+                }
                 checkdelay = 0;
 
 
 
             }
-            if (mousepos.x >= 985 && mousepos.x <= 1055 && mousepos.y >= 580 && mousepos.y <= 650 && Mouse::isButtonPressed(Mouse::Left) && checkdelay >= 5)
+
+            if (mousepos.x >= 1500 && mousepos.x <= 1570 && mousepos.y >= 680 && mousepos.y <= 750 && Mouse::isButtonPressed(Mouse::Left) && checkdelay >= 5)
             {
                 if (soundeffectON)
                     MenuClick.play();
                 soundeffectON = !soundeffectON;
+                if (soundeffectON)
+                    MenuClick.play();
+                if (volumelvl2 == 0)
+                {
+                    volumelvl2 = 10;
+                }
+                
                 checkdelay = 0;
             }
-
+            //plus
+            if (mousepos.x >= 1375 && mousepos.x <= 1435 && mousepos.y >= 490 && mousepos.y <= 550 && Mouse::isButtonPressed(Mouse::Left) && checkdelay >= 5)
+            {
+                
+                checkdelay = 0;
+                if (volumelvl1 <= 10)
+                {
+                    if (!musicON) 
+                    {
+                        musicON = true;
+                    if (musicON && IngameMusicPlaying && MainMusicPlaying == false)
+                    {
+                        ingamemusic.play();
+                    }
+                    if (musicON && MainMusicPlaying && IngameMusicPlaying == false)
+                    {
+                      MenuMusic.play();
+                    }
+                    }
+                    if(volumelvl1!=10)
+                    volumelvl1 += 1;
+                }
+               
+                if (soundeffectON)
+                    MenuClick.play();
+            }
+            if (mousepos.x >= 1375 && mousepos.x <= 1435 && mousepos.y >= 690 && mousepos.y <= 750 && Mouse::isButtonPressed(Mouse::Left) && checkdelay >= 5)
+            {
+                
+                checkdelay = 0;
+                if(volumelvl2<=10)
+                {
+                    soundeffectON = true;
+                    if (volumelvl2 != 10)
+                    volumelvl2 += 1;
+                }
+                if (soundeffectON)
+                    MenuClick.play(); 
+            }
+            //minus 
+            if (mousepos.x >= 455 && mousepos.x <= 515 && mousepos.y >= 490 && mousepos.y <= 550 && Mouse::isButtonPressed(Mouse::Left) && checkdelay >= 5)
+            {
+                if (!musicON)
+                {
+                    musicON = true;
+                    if (musicON && IngameMusicPlaying && MainMusicPlaying == false)
+                    {
+                        ingamemusic.play();
+                    }
+                    if (musicON && MainMusicPlaying && IngameMusicPlaying == false)
+                    {
+                        MenuMusic.play();
+                    }
+                }
+                if (soundeffectON)
+                    MenuClick.play();
+                checkdelay = 0;
+                
+                if (volumelvl1 > 0) 
+                {
+                    volumelvl1 -= 1;
+                }
+            }
+            if (mousepos.x >= 455 && mousepos.x <= 515 && mousepos.y >= 690 && mousepos.y <= 750 && Mouse::isButtonPressed(Mouse::Left) && checkdelay >= 5)
+            {
+                 if (!soundeffectON)
+                    soundeffectON = true;
+                if (soundeffectON)
+                    MenuClick.play();
+                checkdelay = 0;
+                if (volumelvl2 > 0) 
+                {
+                    volumelvl2 -= 1;
+                }
+            }
+            for (int j = 0; j < 10; j++)
+            {
+               if (mousepos.x >= 565 + j * 75 && mousepos.x <= 635 + j * 75 && mousepos.y >= 480  && mousepos.y <= 550  && Mouse::isButtonPressed(Mouse::Left) && checkdelay >= 5)
+                {
+                   if (!musicON)
+                   {
+                       musicON = true;
+                       if (musicON && IngameMusicPlaying && MainMusicPlaying == false)
+                       {
+                           ingamemusic.play();
+                       }
+                       if (musicON && MainMusicPlaying && IngameMusicPlaying == false)
+                       {
+                           MenuMusic.play();
+                       }
+                   }
+                   if (soundeffectON)
+                       MenuClick.play();
+                   checkdelay = 0;
+                   volumelvl1 = j + 1;
+                }
+            }
+            for (int j = 0; j < 10; j++)
+            {
+               if (mousepos.x >= 565 + j * 75 && mousepos.x <= 635 + j * 75 && mousepos.y >= 680 && mousepos.y <= 750 && Mouse::isButtonPressed(Mouse::Left) && checkdelay >= 5)
+                {
+                   if (!soundeffectON)
+                       soundeffectON = true;
+                   if (soundeffectON)
+                       MenuClick.play();
+                   checkdelay = 0;
+                    volumelvl2 = j + 1;
+                }
+            }
+           
+            if (volumelvl1 == 0)
+            {
+                musicON = false;
+            }
+            if (volumelvl2 == 0)
+            {
+                soundeffectON = false;
+            }
+            if (musicON == false)
+            {
+                MenuMusic.stop();
+                ingamemusic.stop();
+            }
             if (musicON == true)
             {
                 window.draw(checkbox[0]);
@@ -6417,6 +6597,27 @@ beginning: {};
             {
                 window.draw(checkbox[1]);
             }
+            for (int i = 0; i < 2; i++)
+            {
+                window.draw(audiooutline[i]);
+                window.draw(pluh[i]);
+                window.draw(minuh[i]);
+            }
+            for (int j = 0; j < volumelvl1; j++)
+            {
+                if (musicON)
+                    window.draw(audio[0][j]);
+            }
+            for (int j = 0; j < volumelvl2; j++)
+            {
+                if (soundeffectON)
+                {
+                    window.draw(audio[1][j]);
+                }
+                   
+            }
+           
+            
             window.draw(sprite);
             vignettetransition(page, topage);
         }
@@ -6439,6 +6640,11 @@ beginning: {};
             {
                 vignettestart = true;
                 topage = 10;
+
+
+
+
+
             }
             //coop
             if (mousepos.x >= 985 && mousepos.x <= 1335 && mousepos.y >= 480 && mousepos.y <= 550 && Mouse::isButtonPressed(Mouse::Left) && modeselectdelay >= 5)
@@ -6837,9 +7043,4 @@ beginning: {};
         sprite.setPosition(static_cast<Vector2f>(Mouse::getPosition(window))); // Set position 
 
         // window display
-        window.setView(view1);
-
-        window.display();
-    }
-    return 0;
-}
+}}

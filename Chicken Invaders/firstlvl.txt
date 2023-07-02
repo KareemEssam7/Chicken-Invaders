@@ -78,3 +78,4 @@ asdaa 0*
 asdadaaaaaaaaaaaa 16000*
 ada 12000*
  0*
+mo 0*
