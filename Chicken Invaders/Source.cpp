@@ -22,9 +22,9 @@ struct ChickenStruct
 struct bulletstruct
 {
     double bulletdamage = 1;
-    float bulletSpeed = 10;
+    float bulletSpeed = 15;
     int currentBullet = 0;
-    float bulletCoolDownvar = 12;
+    float bulletCoolDownvar = 9;
     float bulletCoolDown = 0;
     float bulletCoolDown2 = 0;
     const int numberofbullets = 50;
@@ -66,7 +66,8 @@ bool chickenalive = true, chickenalive2 = true;
 int currentchickensfx = 0;
 ChickenStruct chicken;
 bool chickendead[8][4], chickendeadtriangle[2][6];
-
+double chickenknockback[8][3]={};
+bool ischickenhit[8][3]={};
 int alivechicken = 0;
 int chick = 0;
 int chicken_enter = 0;
@@ -119,13 +120,15 @@ Sprite feather[20];
 /////////////////////////////////////////////////////////////////////////////////////////
 
 //player1 and 2 variables
-double PlayerMovement = 9, PlayerSpeed = 22, Player2Movement = 9, Player2Speed = 12;
+double PlayerMovement = 9, PlayerSpeed = 28, Player2Movement = 9, Player2Speed = 20;
 bool playeralive = true, player2alive = true;
 bool player_2 = 1;
 Texture PlayerSkin;
 Texture Player2Skin;
 Sprite Player;
 Sprite Player2ship;
+double playerknockback[2] = {};
+bool hasplayerfired[2] = {};
 
 //ship fire
 Texture shipfiretx;
@@ -304,6 +307,9 @@ RectangleShape leftborder(Vector2f(100, 1080));
 RectangleShape rightborder(Vector2f(100, 1080));
 RectangleShape mousesquare(Vector2f(64, 64));
 
+RectangleShape namebox(Vector2f(460, 100));
+ConvexShape nameborder;
+RectangleShape stripes(Vector2f(2000, 1076));
 
 ///////////////////////////////////////////////////////////////////////////////
 //leaderboard variables
@@ -457,6 +463,8 @@ Sprite eggs_smol[40];
 Sprite eggyolk_smol[40];
 int smolalive = 0;
 int s = 0, smolx = 0, smoly = 0;
+double chickknockback[40] = {};
+bool ischickhit[40] = {};
 
 // Loading Ingame Files
 void IngameImages()
@@ -589,6 +597,7 @@ void IngameImages()
     Shield.setScale(1.5, 1.5);
     Shield2.setFillColor(Color(0, 102, 204, 140));
     Shield2.setPosition(10500, 10500);
+    Shield2.setScale(1.5, 1.5);
 
     //Buttons in main menu
     for (int i = 0; i < 5; i++)
@@ -599,6 +608,31 @@ void IngameImages()
         rectanglemainmenu[i].setOutlineColor(Color(51, 153, 255, 60));
         rectanglemainmenu[i].setOutlineThickness(2.8f);
     }
+
+    //enter name and name border
+    namebox.setPosition(745, 500);
+    namebox.setFillColor(Color(0, 0, 255, 40));
+    namebox.setOutlineColor(Color(102, 178, 255, 255));
+    namebox.setOutlineThickness(1.8f);
+
+    nameborder.setPointCount(8);
+    nameborder.setPoint(0, Vector2f(552, 300));
+    nameborder.setPoint(1, Vector2f(622, 225));
+    nameborder.setPoint(2, Vector2f(1330, 225));
+    nameborder.setPoint(3, Vector2f(1400, 300));
+    nameborder.setPoint(4, Vector2f(1400, 700));
+    nameborder.setPoint(5, Vector2f(1330, 775));
+    nameborder.setPoint(6, Vector2f(622, 775));
+    nameborder.setPoint(7, Vector2f(552, 700));
+    nameborder.setFillColor(Color(0, 0, 255, 40));
+    nameborder.setOutlineColor(Color(102, 178, 255, 255));
+    nameborder.setOutlineThickness(1.8f);
+
+    stripes.setPosition(-10, 2);
+    stripes.setFillColor(Color(0, 0, 255, 40));
+    stripes.setOutlineColor(Color(102, 178, 255, 255));
+    stripes.setOutlineThickness(1.8f);
+
     //Buttons in levels selection
     for (int i = 0; i < 5; i++)
     {
@@ -623,6 +657,7 @@ void IngameImages()
     rectangleshopoptions[3].setFillColor(Color(0, 0, 255, 40));
     rectangleshopoptions[3].setOutlineColor(Color(51, 153, 255, 60));
     rectangleshopoptions[3].setOutlineThickness(2.8f);
+
 
     //color buttons
     for (int j = 0; j < 2; j++)
@@ -778,7 +813,7 @@ void IngameImages()
     t3.setCharacterSize(70);
     t4.setCharacterSize(70);
     t1.setPosition(750, 300);
-    t2.setPosition(750, 400);
+    t2.setPosition(750, 500);
     t3.setPosition(10, 10);
     t4.setPosition(10, 100);
     t1.setFillColor(Color::White);
@@ -1143,7 +1178,7 @@ void IngameImages()
     Player2ship.setTexture(Player2Skin);
     Player2ship.setTextureRect(IntRect(Player2Movement * 60, 0, 60, 42));
     Player2ship.setPosition(960, 850);
-    Player2ship.setScale(1.5, 1.5);
+    Player2ship.setScale(2.25, 2.25);
 
     // Border Image
     rectangle1.setPosition(0, 0);
@@ -1271,7 +1306,7 @@ void IngameImages()
     for (int i = 0; i < bullet.numberofbullets; i++)
     {
         Bullets[i].setTexture(bulletImage);
-        Bullets[i].setScale(2.7, 2.7);
+        Bullets[i].setScale(4, 4);
         Bullets[i].setPosition(-1000, -1000);
     }
 
@@ -1357,12 +1392,33 @@ void IngameImages()
 void PlayerMove()
 {
     // Kareem Essam and Mohamed Wael
+     if (hasplayerfired[0])
+    {
+         Player.move(0, playerknockback[0]);
+        playerknockback[0] -= 5;
+        if (playerknockback[0] < -5)
+        {
+            hasplayerfired[0] = false;
+            playerknockback[0] = 0;
+        }
+    }
+     if (hasplayerfired[1])
+     {
+         Player2ship.move(0, playerknockback[1]);
+         playerknockback[1] -= 5;
+         if (playerknockback[1] < -5)
+         {
+             hasplayerfired[1] = false;
+             playerknockback[1] = 0;
+         }
+     }
     // Creating Movement For Right Direction
     if (Keyboard::isKeyPressed(Keyboard::D) && Player.getPosition().x <= 1800)
     {
         // changing ship to be facing to the right
         Player.setTextureRect(IntRect(PlayerMovement * 60, 0, 60, 42));
         Player.move(PlayerSpeed, 0);
+
 
         if (PlayerMovement < 18)
         {
@@ -1378,6 +1434,7 @@ void PlayerMove()
         Player.setTextureRect(IntRect(PlayerMovement * 60, 0, 60, 42));
         // changing ship to be facing to the left
         Player.move(-PlayerSpeed, 0);
+
         if (PlayerMovement > 0)
         {
             PlayerMovement--;
@@ -1494,7 +1551,7 @@ void PlayerMove()
     shipfire.setPosition(Player.getPosition().x + 67, Player.getPosition().y + 70);
     if (shipfirescale == 0)
     {
-        shipfire.setScale(1.45, 1.45);
+        shipfire.setScale(1.45, 1.65);
         shipfirescale++;
     }
     else
@@ -1520,15 +1577,15 @@ void PlayerMove()
         }
     }
 
-    shipfire2.setPosition(Player2ship.getPosition().x + 45, Player2ship.getPosition().y + 45);
+    shipfire2.setPosition(Player2ship.getPosition().x + 67, Player2ship.getPosition().y + 70);
     if (shipfirescale2 == 0)
     {
-        shipfire2.setScale(1, 1.2);
+        shipfire2.setScale(1.45, 1.65);
         shipfirescale2++;
     }
     else
     {
-        shipfire2.setScale(1, 1);
+        shipfire2.setScale(1.45, 1.45);
         shipfirescale2--;
     }
     if (Keyboard::isKeyPressed(Keyboard::Right) && Player2ship.getPosition().x <= 1800)
@@ -1584,24 +1641,17 @@ void PlayerMove()
 void PlayerShooting() {
 
     //Shooting
-
-
-    if ((Keyboard::isKeyPressed(Keyboard::Space)) && bullet.bulletCoolDown == 0 && pausecooldown == 0 || (Mouse::isButtonPressed(Mouse::Left)) && bullet.bulletCoolDown == 0 && pausecooldown == 0)
+    if ((Keyboard::isKeyPressed(Keyboard::Space)) && bullet.bulletCoolDown == 0)
     {
-        bullet.bulletCoolDown = bullet.bulletCoolDownvar;
-        pausecooldown = 1;
-        //Shield.setPosition(10000, 10000);
-    }
-
-    if ((Keyboard::isKeyPressed(Keyboard::Space)) && bullet.bulletCoolDown == 0 && pausecooldown == 1)
-    {
+        playerknockback[0] = 5;
+        hasplayerfired[0] = true;
         bullet.bulletCoolDown = bullet.bulletCoolDownvar;
         if (doublebullets == 0)
-            Bullets[bullet.currentBullet].setPosition(Player.getPosition().x + 59.5, Player.getPosition().y - 50);
+            Bullets[bullet.currentBullet].setPosition(Player.getPosition().x + 55, Player.getPosition().y - 50);
         else if (doublebullets == 1)
         {
-            Bullets[bullet.currentBullet].setPosition(Player.getPosition().x + 20, Player.getPosition().y - 50);
-            Bullets[bullet.currentBullet + 1].setPosition(Player.getPosition().x + 50, Player.getPosition().y - 50);
+            Bullets[bullet.currentBullet].setPosition(Player.getPosition().x + 55, Player.getPosition().y - 50);
+            Bullets[bullet.currentBullet + 1].setPosition(Player.getPosition().x + 85, Player.getPosition().y - 50);
             bullet.currentBullet++;
             if (bullet.currentBullet >= 40) {
                 bullet.currentBullet = 0;
@@ -1609,15 +1659,15 @@ void PlayerShooting() {
         }
         else if (doublebullets == 2)
         {
-            Bullets[bullet.currentBullet].setPosition(Player.getPosition().x + 20, Player.getPosition().y - 45);
+            Bullets[bullet.currentBullet].setPosition(Player.getPosition().x + 55, Player.getPosition().y - 50);
             if (bullet.currentBullet + 1 >= 40) {
                 bullet.currentBullet = 0;
             }
-            Bullets[bullet.currentBullet + 1].setPosition(Player.getPosition().x + 50, Player.getPosition().y - 45);
+            Bullets[bullet.currentBullet + 1].setPosition(Player.getPosition().x + 85, Player.getPosition().y - 50);
             if (bullet.currentBullet + 2 >= 40) {
                 bullet.currentBullet = 0;
             }
-            Bullets[bullet.currentBullet + 2].setPosition(Player.getPosition().x + 35, Player.getPosition().y - 70);
+            Bullets[bullet.currentBullet + 2].setPosition(Player.getPosition().x + 70, Player.getPosition().y - 75);
             bullet.currentBullet += 2;
             if (bullet.currentBullet >= 40) {
                 bullet.currentBullet = 0;
@@ -1642,10 +1692,12 @@ void PlayerShooting() {
         bullet.currentBullet++;
 
     }
-    if ((Mouse::isButtonPressed(Mouse::Left)) && bullet.bulletCoolDown2 == 0 && pausecooldown == 1 && coopon)
+    if ((Mouse::isButtonPressed(Mouse::Left)) && bullet.bulletCoolDown2 == 0 && coopon)
     {
         bullet.bulletCoolDown2 = bullet.bulletCoolDownvar;
-        Bullets[bullet.currentBullet].setPosition(Player2ship.getPosition().x + 29, Player2ship.getPosition().y - 45);
+        Bullets[bullet.currentBullet].setPosition(Player2ship.getPosition().x + 55, Player2ship.getPosition().y - 50);
+        playerknockback[1] = 5;
+        hasplayerfired[1] = true;
 
         //sfx
         if (soundeffectON && playeralive)
@@ -1808,51 +1860,78 @@ void ChickenMove()
             }
         }
 
-
+       
         chick++;
     }
 
 
-    for (int j = 0; j < 3; j++)
-    {
-        for (int i = 0; i < 8; i++)
+   
+        for (int j = 0; j < 8; j++)
         {
-            if (chicken_enter == 0)
+            for (int z = 0; z < 3; z++)
             {
-                if (j == 0 || j == 2)
+                if (chicken_enter == 0)
                 {
-                    Chicken[i][j].move(8, 0);
+                    if (z == 0 || z == 2)
+                    {
+                        Chicken[j][z].move(8, chickenknockback[j][z]);
+                    }
+                    else
+                        Chicken[j][z].move(-8, chickenknockback[j][z]);
+
+                    if (Chicken[0][0].getPosition().x >= 30)
+                    {
+                        chicken_enter = 1;
+                    }
+                    if (ischickenhit[j][z])
+                    {
+                        chickenknockback[j][z] += 10;
+
+
+                        if (chickenknockback[j][z] > 10)
+                        {
+                            chickenknockback[j][z] = 0;
+                            ischickenhit[j][z] = false;
+                        }
+
+                    }
                 }
                 else
-                    Chicken[i][j].move(-8, 0);
-
-                if (Chicken[0][0].getPosition().x >= 30)
                 {
-                    chicken_enter = 1;
+                    Chicken[j][z].setTextureRect(IntRect(ChickenMovement * 356, 0, 356, 284));
+                    if (rectangle3.getGlobalBounds().intersects(rectangle2.getGlobalBounds()))
+                    {
+                        rectdir = 0;
+                        ChickenDir = 0;
+                    }
+                    else if (rectangle3.getGlobalBounds().intersects(rectangle1.getGlobalBounds()))
+                    {
+                        rectdir = 1;
+                        ChickenDir = 1;
+                    }
+                    if (ChickenDir == 0)
+                    {
+                        Chicken[j][z].move(-chicken.speed, chickenknockback[j][z]);
+                    }
+                    else if (ChickenDir == 1)
+                    {
+                        Chicken[j][z].move(chicken.speed, chickenknockback[j][z]);
+                    }
+
+                   if (ischickenhit[j][z]) 
+                    {
+                        chickenknockback[j][z] += 10;
+
+                        if (chickenknockback[j][z] > 10)
+                        {
+                            chickenknockback[j][z] = 0;
+                            ischickenhit[j][z] = false;
+                        }
+
+                    }
+                    }
                 }
             }
-            else
-            {
-                Chicken[i][j].setTextureRect(IntRect(ChickenMovement * 356, 0, 356, 284));
-                if (rectangle3.getGlobalBounds().intersects(rectangle2.getGlobalBounds()))
-                {
-                    rectdir = 0;
-                    ChickenDir = 0;
-                }
-                else if (rectangle3.getGlobalBounds().intersects(rectangle1.getGlobalBounds()))
-                {
-                    rectdir = 1;
-                    ChickenDir = 1;
-                }
-                if (ChickenDir == 0)
-                    Chicken[i][j].move(-chicken.speed, 0);
-
-                else if (ChickenDir == 1)
-                    Chicken[i][j].move(chicken.speed, 0);
-            }
-
-        }
-    }
 
     if (chicken_enter != 0)
     {
@@ -2220,7 +2299,7 @@ void playerdamage() {
                 expbool2 = 1;
                 explosion2.setPosition(Player2ship.getPosition());
             }
-            Player2ship.setPosition(9000, 9000);
+            Player2ship.setPosition(6000, 6000);
             explosion2.setTextureRect(IntRect(96.6 * exp_x2, 5 + (90.6 * exp_y2), 96.6, 90.6));
             exp_x2++;
             if (exp_x2 == 7 && exp_y2 < 3) {
@@ -3013,9 +3092,21 @@ void scorecalc() {
                     {
                         Bullets[i].setPosition(-10000, -10000);
                         chicken.HP[j][z] = chicken.HP[j][z] - (powerlvls * 0.5) - bullet.bulletdamage;
+                        chickenknockback[j][z] = -10;
+                        ischickenhit[j][z] = true;
+ 
                     }
                     if (chicken.HP[j][z] <= 0)
-                    {
+                    { 
+                        if (soundeffectON)
+                        {
+                            chickenhurt[currentchickensfx].play();
+                            currentchickensfx++;
+                            if (currentchickensfx == 2)
+                            {
+                                currentchickensfx = 0;
+                            }
+                        }
                         if (coopon)
                         {
                             randomizer = 0;
@@ -3058,15 +3149,7 @@ void scorecalc() {
                         rocket.setString(to_string(rockets));
                         rocket2.setString(to_string(rockets));
                     }
-                    if (soundeffectON)
-                    {
-                        chickenhurt[currentchickensfx].play();
-                        currentchickensfx++;
-                        if (currentchickensfx == 2)
-                        {
-                            currentchickensfx = 0;
-                        }
-                    }
+                   
 
 
                 }
@@ -3300,9 +3383,21 @@ void scorecalc() {
                 {
                     Bullets[i].setPosition(-10000, -10000);
                     chicken.smol_hp[j] = chicken.smol_hp[j] - bullet.bulletdamage;
+                    chickknockback[j] = -10;
+                    ischickhit[j] = true;
                 }
                 if (chicken.smol_hp[j] <= 0)
                 {
+                    if (soundeffectON)
+                    {
+                        chickenhurt[currentchickensfx].play();
+                        currentchickensfx++;
+                        if (currentchickensfx == 2)
+                        {
+                            currentchickensfx = 0;
+                        }
+                    }
+
                     if (coopon)
                     {
                         randomizer = 0;
@@ -3351,15 +3446,7 @@ void scorecalc() {
                     rocket.setString(to_string(rockets));
                     rocket2.setString(to_string(rockets));
                 }
-                if (soundeffectON)
-                {
-                    chickenhurt[currentchickensfx].play();
-                    currentchickensfx++;
-                    if (currentchickensfx == 2)
-                    {
-                        currentchickensfx = 0;
-                    }
-                }
+               
 
 
             }
@@ -4415,6 +4502,18 @@ void smolchick()
 
     for (int i = 0; i < 40; i++)
     {
+        if (ischickhit[i])
+        {
+            smol[i].move(0, chickknockback[i]);
+            chickknockback[i] += 10;
+            
+            if (chickknockback[i]>10)
+            {
+                chickknockback[i] = 0;
+                ischickhit[i] = false;
+            }
+
+        }
         if (smol_enter[i] == 0 && right_move[i] == true)
         {
             smol[i].move(13, 0);
@@ -4623,7 +4722,7 @@ beginning: {};
             if (page == 10)
             {
 
-                if (event.type == Event::TextEntered && !Keyboard::isKeyPressed(Keyboard::Enter) && Name.size() <= 20) {
+                if (event.type == Event::TextEntered && !Keyboard::isKeyPressed(Keyboard::Enter) && Name.size() <= 12) {
 
                     Name += static_cast<char>(event.text.unicode);
 
@@ -7024,7 +7123,7 @@ beginning: {};
                     }
                 }
 
-
+                
 
             }
             if (Keyboard::isKeyPressed(Keyboard::Escape)) {
@@ -7034,7 +7133,9 @@ beginning: {};
                 shipin.stop();
             }
             t2.setString(Name);
-
+            window.draw(namebox);
+            window.draw(nameborder);
+            window.draw(stripes);
             window.draw(t1);
             window.draw(t2);
             vignettetransition(page, topage);
