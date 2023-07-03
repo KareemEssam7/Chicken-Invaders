@@ -2944,7 +2944,7 @@ void meteorfast()
                 {
                     meteor[a].setPosition(10000, 10000);
                     cnt += 700;
-                    score.setString("score : " + to_string(cnt));
+                    score.setString(to_string(cnt));
                 }
                 Bullets[i].setPosition(-2000, -2000);
             }
@@ -3214,19 +3214,19 @@ void scorecalc() {
                     {
                         damagedtext.loadFromFile("bossbar1.png");
                     }
-                    else if (boss.bosshp >= (0.75 * sigmaboss) && boss.bosshp < (0.9 * sigmaboss))
+                    else if (boss.bosshp >= (0.8 * sigmaboss) && boss.bosshp < (0.9 * sigmaboss))
                     {
                         damagedtext.loadFromFile("bossbar2.png");
                     }
-                    else if (boss.bosshp >= (0.6 * sigmaboss) && boss.bosshp < (0.75 * sigmaboss))
+                    else if (boss.bosshp >= (0.7 * sigmaboss) && boss.bosshp < (0.8 * sigmaboss))
                     {
                         damagedtext.loadFromFile("bossbar3.png");
                     }
-                    else if (boss.bosshp >= (0.45 * sigmaboss) && boss.bosshp < (0.6 * sigmaboss))
+                    else if (boss.bosshp >= (0.6 * sigmaboss) && boss.bosshp < (7 * sigmaboss))
                     {
                         damagedtext.loadFromFile("bossbar4.png");
                     }
-                    else if (boss.bosshp >= (0.35 * sigmaboss) && boss.bosshp < (0.45 * sigmaboss))
+                    else if (boss.bosshp >= (0.5 * sigmaboss) && boss.bosshp < (0.6* sigmaboss))
                     {
                         boss.eggcooldownvar = 40;
                         damagedtext.loadFromFile("bossbar5.png");
@@ -3236,27 +3236,27 @@ void scorecalc() {
                             screambossdone = 1;
                         }
                     }
-                    else if (boss.bosshp >= (0.25 * sigmaboss) && boss.bosshp < (0.35 * sigmaboss))
+                    else if (boss.bosshp >= (0.4 * sigmaboss) && boss.bosshp < (0.5 * sigmaboss))
                     {
                         damagedtext.loadFromFile("bossbar6.png");
                     }
-                    else if (boss.bosshp >= (0.15 * sigmaboss) && boss.bosshp < (0.25 * sigmaboss))
+                    else if (boss.bosshp >= (0.3 * sigmaboss) && boss.bosshp < (0.4* sigmaboss))
                     {
                         damagedtext.loadFromFile("bossbar7.png");
                     }
-                    else if (boss.bosshp >= (0.10 * sigmaboss) && boss.bosshp < (0.15 * sigmaboss))
+                    else if (boss.bosshp >= (0.2 * sigmaboss) && boss.bosshp < (0.3 * sigmaboss))
                     {
                         damagedtext.loadFromFile("bossbar8.png");
                     }
-                    else if (boss.bosshp >= (0.15 * sigmaboss) && boss.bosshp < (0.2 * sigmaboss))
+                    else if (boss.bosshp >= (0.1 * sigmaboss) && boss.bosshp < (0.2 * sigmaboss))
                     {
                         damagedtext.loadFromFile("bossbar9.png");
                     }
-                    else if (boss.bosshp >= (0.10 * sigmaboss) && boss.bosshp < (0.15 * sigmaboss))
+                    else if (boss.bosshp >= (0.5 * sigmaboss) && boss.bosshp < (0.10 * sigmaboss))
                     {
                         damagedtext.loadFromFile("bossbar10.png");
                     }
-                    else if (boss.bosshp < (0.10 * sigmaboss))
+                    else if (boss.bosshp < (0.5 * sigmaboss))
                     {
                         damagedtext.loadFromFile("bossbar11.png");
                     }
@@ -6117,15 +6117,11 @@ beginning: {};
                 {
                     clock3.restart();
                     clock4.restart();
-                    for (int i = 0; i < 8; i++)
+                    for (int i = 0; i < 40; i++)
                     {
-                        for (int a = 0; a < 3; a++)
-                        {
-                            Chicken[i][a].setPosition(10000, 10000);
-                            eggyolk[i][a].setPosition(10000, 10000);
-                            Eggs[i][a].setPosition(10000, 10000);
-                            chickendead[i][a] = 0;
-                        }
+                        smol[i].setPosition(10000, 10000);
+                        eggs_smol[i].setPosition(10000, 10000);
+                        eggyolk_smol[i].setPosition(10000, 10000);
                     }
                     chickeninitialpos = 0;
                 }
@@ -6336,7 +6332,7 @@ beginning: {};
                     clock3.restart();
                     clock4.restart();
                     meteorx = 0;
-                    for (int i = 0; i < 40; i++)
+                    for (int i = 0; i < 100; i++)
                     {
                         meteor[i].setPosition(10000, 10000);
                     }
