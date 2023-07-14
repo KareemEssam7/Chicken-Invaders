@@ -121,6 +121,7 @@ Sprite feather[20];
 int chickfeatheramount = 40, chickfeatheranim = 0, chickfeathercur = 0,chickfeathermove=5; 
 Sprite chickfeather[40];
 
+
 /////////////////////////////////////////////////////////////////////////////////////////
 
 //player1 and 2 variables
@@ -191,8 +192,8 @@ Sound upgradesound;
 Sound shipin;
 Sound gamewin;
 Sound shoot1[3];
-Sprite iongift;
-Sprite crystalgift;
+Sprite iongift[8];
+Sprite crystalgift[8];
 Texture GiftIon;
 Texture GiftCrystal;
 Texture crystaltear;
@@ -1378,14 +1379,21 @@ void IngameImages()
 
     //ion gift image
     GiftIon.loadFromFile("GIFTIonBlaster.png");
-    iongift.setTexture(GiftIon);
-    iongift.setPosition(-100, -100);
+    for (int i = 0; i < 8; i++)
+    {
+         iongift[i].setTexture(GiftIon);
+         iongift[i].setPosition(-100, -100);
+    }
+    
 
 
     //crystal gift image
     GiftCrystal.loadFromFile("GIFTNeutronGun.png");
-    crystalgift.setTexture(GiftCrystal);
-    crystalgift.setPosition(-100, -100);
+    for (int i = 0; i < 8; i++)
+    {
+        crystalgift[i].setTexture(GiftCrystal);
+        crystalgift[i].setPosition(-100, -100);
+    }
 
 
     //smol chicken
@@ -2572,8 +2580,8 @@ void FoodMovment() {
                 chicken_legs[i][j].rotate(10);
             }
         }
-        iongift.move(0, 1);
-        crystalgift.move(0, 1);
+        iongift[i].move(0, foodmovespeed);
+        crystalgift[i].move(0, foodmovespeed);
     }
 
     for (int i = 0; i < featheramount; i++)
@@ -3132,18 +3140,18 @@ void scorecalc() {
                         }
                         else
                         {
-                            randomizer = 1 + rand() % 20;
+                            randomizer = 1 + rand() % 30;
                         }
 
                         if (randomizer == 1 || randomizer == 2)
                         {
-                            iongift.setPosition(Chicken[j][z].getPosition().x, Chicken[j][z].getPosition().y);
+                            iongift[j].setPosition(Chicken[j][z].getPosition().x, Chicken[j][z].getPosition().y);
 
                         }
                         if (randomizer == 3)
                         {
 
-                            crystalgift.setPosition(Chicken[j][z].getPosition().x, Chicken[j][z].getPosition().y);
+                            crystalgift[j].setPosition(Chicken[j][z].getPosition().x, Chicken[j][z].getPosition().y); 
 
                         }
                         chicken_legs[j][z].setPosition(Chicken[j][z].getPosition().x, Chicken[j][z].getPosition().y);                      
@@ -3181,50 +3189,57 @@ void scorecalc() {
                     bullet.bulletdamage = 1;
                 }
 
-                if (iongift.getGlobalBounds().intersects(Player.getGlobalBounds()))
+                if (iongift[j].getGlobalBounds().intersects(Player.getGlobalBounds()))
                 {
                     if (soundeffectON)
                     {
                         upgradesound.play();
                     }
-                    iongift.setPosition(4000, -100);
+                    iongift[j].setPosition(4000, -100);
                     for (int i = 0; i < 50; i++)
                     {
                         Bullets[i].setTexture(bulletImage);
                     }
                     if (checkbullet == 'b')
                     {
-                        doublebullets = 0;
                         checkbullet = 'r';
                     }
                     else if (doublebullets < 2)
                         doublebullets++;
 
                 }
-                if (crystalgift.getGlobalBounds().intersects(Player.getGlobalBounds()))
+                if (crystalgift[j].getGlobalBounds().intersects(Player.getGlobalBounds()))
                 {
                     if (soundeffectON)
                     {
                         upgradesound.play();
                     }
-                    crystalgift.setPosition(4000, -100);
+                    crystalgift[j].setPosition(4000, -100);
                     for (int i = 0; i < 50; i++)
                     {
                         Bullets[i].setTexture(crystaltear);
                     }
                     if (checkbullet == 'r')
                     {
-                        doublebullets = 0;
                         checkbullet = 'b';
                     }
                     else if (doublebullets < 2)
                         doublebullets++;
                 }
-
+                    
 
                 if (Bullets[i].getGlobalBounds().intersects(bosssprite.getGlobalBounds()))
                 {
+                    chickfeather[chickfeathercur].setScale(1, 1);
+                    chickfeather[chickfeathercur].setPosition(bosssprite.getPosition().x + 500, bosssprite.getPosition().y + 400);
+                    chickfeathercur++;
+                    if (chickfeathercur >= 39)
+                    {
+                        chickfeathercur = 0;
+                    }
                     missileScoreCount += 1000;
+                    cnt += 100;
+                    score.setString(to_string(cnt)); 
                 if (missileScoreCount == 70000)
                 {
                     missileScoreCount = 0;
@@ -3239,62 +3254,18 @@ void scorecalc() {
                         bosshurts.play();
                     }
                     
-                    if (boss.bosshp >= (0.9 * sigmaboss))
-                    {
-                        damagedtext.loadFromFile("bossbar1.png");
-                    }
-                    else if (boss.bosshp >= (0.8 * sigmaboss) && boss.bosshp < (0.9 * sigmaboss))
-                    {
-                        damagedtext.loadFromFile("bossbar2.png");
-                    }
-                    else if (boss.bosshp >= (0.7 * sigmaboss) && boss.bosshp < (0.8 * sigmaboss))
-                    {
-                        damagedtext.loadFromFile("bossbar3.png");
-                    }
-                    else if (boss.bosshp >= (0.6 * sigmaboss) && boss.bosshp < (7 * sigmaboss))
-                    {
-                        damagedtext.loadFromFile("bossbar4.png");
-                    }
-                    else if (boss.bosshp >= (0.5 * sigmaboss) && boss.bosshp < (0.6* sigmaboss))
-                    {
-                        boss.eggcooldownvar = 40;
-                        damagedtext.loadFromFile("bossbar5.png");
-                        if (soundeffectON && screambossdone == 0)
-                        {
-                            screamboss.play();
-                            screambossdone = 1;
-                        }
-                    }
-                    else if (boss.bosshp >= (0.4 * sigmaboss) && boss.bosshp < (0.5 * sigmaboss))
-                    {
-                        damagedtext.loadFromFile("bossbar6.png");
-                    }
-                    else if (boss.bosshp >= (0.3 * sigmaboss) && boss.bosshp < (0.4* sigmaboss))
-                    {
-                        damagedtext.loadFromFile("bossbar7.png");
-                    }
-                    else if (boss.bosshp >= (0.2 * sigmaboss) && boss.bosshp < (0.3 * sigmaboss))
-                    {
-                        damagedtext.loadFromFile("bossbar8.png");
-                    }
-                    else if (boss.bosshp >= (0.1 * sigmaboss) && boss.bosshp < (0.2 * sigmaboss))
-                    {
-                        damagedtext.loadFromFile("bossbar9.png");
-                    }
-                    else if (boss.bosshp >= (0.5 * sigmaboss) && boss.bosshp < (0.10 * sigmaboss))
-                    {
-                        damagedtext.loadFromFile("bossbar10.png");
-                    }
-                    else if (boss.bosshp < (0.5 * sigmaboss))
-                    {
-                        damagedtext.loadFromFile("bossbar11.png");
-                    }
+                   
                     if (boss.bosshp > 0)
                     {
                         boss.bosshp = boss.bosshp - (powerlvls * 0.5) - bullet.bulletdamage;
                     }
                     if (boss.bosshp <= 0)
                     {
+                        if (soundeffectON && screambossdone ==1)
+                        {
+                            screamboss.play();
+                            screambossdone = 2;
+                        }
                         bosssprite.setPosition(10000, 10000);
                         cnt += 5000;
                         score.setString(to_string(cnt));
@@ -3336,73 +3307,6 @@ void scorecalc() {
             }
         }
     }
-    for (int i = 0; i < bullet.numberofbullets; i++)
-    {
-        for (int j = 0; j < 2; j++)
-        {
-            for (int z = 0; z < 6; z++)
-            {
-                if (Bullets[i].getGlobalBounds().intersects(Chickentriangle[j][z].getGlobalBounds()))
-                {
-                    if (chicken.HPtriangle[j][z] > 0)
-                    {
-                        Bullets[i].setPosition(-10000, -10000);
-                        chicken.HPtriangle[j][z] = chicken.HPtriangle[j][z] - (powerlvls * 0.5) - bullet.bulletdamage;
-                    }
-                    if (chicken.HPtriangle[j][z] <= 0)
-                    {
-                        if (coopon)
-                        {
-                            randomizer = 0;
-                        }
-                        else
-                        {
-                            randomizer = 1 + rand() % 40;
-                        }
-
-                        if (randomizer == 1 || randomizer == 2)
-                        {
-                            iongift.setPosition(Chickentriangle[j][z].getPosition().x, Chickentriangle[j][z].getPosition().y);
-
-                        }
-                        if (randomizer == 3)
-                        {
-
-                            crystalgift.setPosition(Chickentriangle[j][z].getPosition().x, Chickentriangle[j][z].getPosition().y);
-
-                        }
-                        chicken_legs[z][j].setPosition(Chickentriangle[j][z].getPosition().x, Chickentriangle[j][z].getPosition().y);
-                        Chickentriangle[j][z].setPosition(10000, 10000);
-                        Bullets[i].setPosition(-10000, -10000);
-                        cnt += 1000;
-                        chickendeadtriangle[j][z] = 1;
-                        score.setString(to_string(cnt));
-                        missileScoreCount += 1000;
-                    }
-
-                    if (missileScoreCount == 70000)
-                    {
-                        missileScoreCount = 0;
-                        rockets += 1;
-                        rocket.setString(to_string(rockets));
-                        rocket2.setString(to_string(rockets));
-                    }
-                    if (soundeffectON)
-                    {
-                        chickenhurt[currentchickensfx].play();
-                        currentchickensfx++;
-                        if (currentchickensfx == 2)
-                        {
-                            currentchickensfx = 0;
-                        }
-                    }
-
-
-                }
-
-            }
-        }
-    }
 
     for (int i = 0; i < bullet.numberofbullets; i++) {
         for (int j = 0; j < 40; j++) {
@@ -3433,18 +3337,18 @@ void scorecalc() {
                     }
                     else
                     {
-                        randomizer = 1 + rand() % 160;
+                        randomizer = 1 + rand() % 30;
                     }
 
                     if (randomizer == 1 || randomizer == 2)
                     {
-                        iongift.setPosition(smol[j].getPosition().x, smol[j].getPosition().y);
+                        iongift[j%8].setPosition(smol[j].getPosition().x, smol[j].getPosition().y);
 
                     }
                     if (randomizer == 3)
                     {
 
-                        crystalgift.setPosition(smol[j].getPosition().x, smol[j].getPosition().y);
+                        crystalgift[j%8].setPosition(smol[j].getPosition().x, smol[j].getPosition().y);
 
                     }
                     chicken_legs[smoly][smolx].setPosition(smol[j].getPosition().x + 100, smol[j].getPosition().y + 100);
@@ -3457,12 +3361,12 @@ void scorecalc() {
 
                     smolx++;
 
-                    if (smolx >= 4)
+                    if (smolx == 3)
                     {
                         smolx = 0;
                         smoly++;
                     }
-                    if (smoly >= 8)
+                    if (smoly == 7)
                         smoly = 0;
                     smol[j].setPosition(10000, 10000);
                     Bullets[i].setPosition(-10000, -10000);
@@ -3493,13 +3397,13 @@ void scorecalc() {
                 bullet.bulletdamage = 1;
             }
 
-            if (iongift.getGlobalBounds().intersects(Player.getGlobalBounds()))
+            if (iongift[j%8].getGlobalBounds().intersects(Player.getGlobalBounds()))
             {
                 if (soundeffectON)
                 {
                     upgradesound.play();
                 }
-                iongift.setPosition(4000, -100);
+                iongift[j%8].setPosition(4000, -100);
                 for (int i = 0; i < 50; i++)
                 {
                     Bullets[i].setTexture(bulletImage);
@@ -3513,13 +3417,13 @@ void scorecalc() {
                     doublebullets++;
 
             }
-            if (crystalgift.getGlobalBounds().intersects(Player.getGlobalBounds()))
+            if (crystalgift[j%8].getGlobalBounds().intersects(Player.getGlobalBounds()))
             {
                 if (soundeffectON)
                 {
                     upgradesound.play();
                 }
-                crystalgift.setPosition(4000, -100);
+                crystalgift[j%8].setPosition(4000, -100);
                 for (int i = 0; i < 50; i++)
                 {
                     Bullets[i].setTexture(crystaltear);
@@ -3880,79 +3784,6 @@ void bossmove() {
     }
     else
         animation++;
-
-    //for (int j = 0; j < 60; j++)
-    //{
-    //    for (int i = 0; i < 60; i++)
-    //    {
-    //        Chicken4[i][j].setTextureRect(IntRect(ChickenMovement * 356, 0, 356, 284));
-    //        Chicken4[i][j].move(0, 5);
-    //    }
-    //}
-    //ChickenMovement++;
-    //ChickenMovement %= 9;
-    //Boss getting killed after collision with bullets
-    //for (int i = 0; i < bullet.numberofbullets; i++)
-    //{
-    //    if (Bullets[i].getGlobalBounds().intersects(bosssprite.getGlobalBounds()))
-    //    {
-    //        if (boss.bosshp >= (0.8 * sigmaboss))
-    //        {
-    //            damagedtext.loadFromFile("bossbar1.png");
-    //        }
-    //        else if (boss.bosshp >= (0.7 * sigmaboss) && boss.bosshp < (0.8 * sigmaboss))
-    //        {
-    //            damagedtext.loadFromFile("bossbar2.png");
-    //        }
-    //        else if (boss.bosshp >= (0.6 * sigmaboss) && boss.bosshp < (0.7 * sigmaboss))
-    //        {
-    //            damagedtext.loadFromFile("bossbar3.png");
-    //        }
-    //        else if (boss.bosshp >= (0.55 * sigmaboss) && boss.bosshp < (0.6 * sigmaboss))
-    //        {
-    //            damagedtext.loadFromFile("bossbar4.png");
-    //        }
-    //        else if (boss.bosshp >= (0.50 * sigmaboss) && boss.bosshp < (0.55 * sigmaboss))
-    //        {
-    //            damagedtext.loadFromFile("bossbar5.png");
-    //        }
-    //        else if (boss.bosshp >= (0.40 * sigmaboss) && boss.bosshp < (0.50 * sigmaboss))
-    //        {
-    //            damagedtext.loadFromFile("bossbar6.png");
-    //        }
-    //        else if (boss.bosshp >= (0.3 * sigmaboss) && boss.bosshp < (0.4 * sigmaboss))
-    //        {
-    //            damagedtext.loadFromFile("bossbar7.png");
-    //        }
-    //        else if (boss.bosshp >= (0.2 * sigmaboss) && boss.bosshp < (0.3 * sigmaboss))
-    //        {
-    //            damagedtext.loadFromFile("bossbar8.png");
-    //        }
-    //        else if (boss.bosshp >= (0.15 * sigmaboss) && boss.bosshp < (0.2 * sigmaboss))
-    //        {
-    //            damagedtext.loadFromFile("bossbar9.png");
-    //        }
-    //        else if (boss.bosshp >= (0.10 * sigmaboss) && boss.bosshp < (0.15 * sigmaboss))
-    //        {
-    //            damagedtext.loadFromFile("bossbar10.png");
-    //        }
-    //        else if (boss.bosshp < (0.10 * sigmaboss))
-    //        {
-    //            damagedtext.loadFromFile("bossbar11.png");
-    //        }
-    //        if (boss.bosshp > 0)
-    //        {
-    //            boss.bosshp = boss.bosshp - (powerlvls * 0.5) - bullet.bulletdamage;
-    //        }
-    //        if (boss.bosshp <= 0)
-    //        {
-    //            bosssprite.setPosition(10000, 10000);
-    //            cnt += 5000;
-    //            score.setString(to_string(cnt));
-    //        }
-    //        Bullets[i].setPosition(-2000, -2000);
-    //    }
-    //}
     if (z == 0)
     {
         for (int i = 0; i < 5; i++)
@@ -3992,7 +3823,7 @@ void bossmove() {
                 bossegg1[i].move(0, 9.8f);
                 bossegg2[i].move(3, 9.8f);
             }
-            if (bossegg[i].getPosition().y > Player.getPosition().y + 50)
+            if (bossegg[i].getPosition().y >= 1000)
             {
                 boss.eggcooldown[i] = rand() % boss.eggcooldownvar;
                 bossegg[i].setScale(0, 0);
@@ -4020,37 +3851,7 @@ void bossmove() {
             }
         }
     }
-    //for (int i = 0; i < 5; i++)
-    //{
-    //    for (int j = 0; j < bullet.numberofbullets; j++)
-    //    {
-    //       /* for (int v = 0; v < 60; v++)
-    //        {
-    //            for (int k = 0; k < 60; k++)
-    //            {
 
-    //                if (Bullets[j].getGlobalBounds().intersects(bossegg[i].getGlobalBounds()))
-    //                {
-    //                    Bullets[j].setPosition(7000, 7000);
-    //                    Chicken4[v][k].setPosition(bossegg[i].getPosition().x, bossegg[i].getPosition().y);
-    //                    bossegg[i].setPosition(9000, 9000);
-    //                }
-    //                else if (Bullets[j].getGlobalBounds().intersects(bossegg1[i].getGlobalBounds()))
-    //                {
-    //                    Bullets[j].setPosition(7000, 7000);
-    //                    Chicken4[v][k].setPosition(bossegg1[i].getPosition().x, bossegg1[i].getPosition().y);
-    //                    bossegg1[i].setPosition(9000, 9000);
-    //                }
-    //                else if (Bullets[j].getGlobalBounds().intersects(bossegg2[i].getGlobalBounds()))
-    //                {
-    //                    Bullets[j].setPosition(7000, 7000);
-    //                    Chicken4[v][k].setPosition(bossegg2[i].getPosition().x, bossegg2[i].getPosition().y);
-    //                    bossegg2[i].setPosition(9000, 9000);
-    //                }
-    //            }
-    //        }*/
-    //    }
-    //}
     if (Player.getGlobalBounds().intersects(bosssprite.getGlobalBounds()) && shield_on == false)
     {
         if (health >= 1)
@@ -4082,16 +3883,7 @@ void bossmove() {
 }
 void reset()
 {
-    /*for (int i = 0; i < 60; i++)
-    {
-        for (int j = 0; j < 60; j++)
-        {
-            Chicken4[i][j].setTexture(ChickenSkin);
-            Chicken4[i][j].setScale(0.5, 0.5);
-            Chicken4[i][j].setTextureRect(IntRect(ChickenMovement * 356, 0, 356, 284));
-            Chicken4[i][j].setPosition(9000, 9000);
-        }
-    }*/
+
     //setting feather texture
     for (int i = 0; i < featheramount; i++)
     {
@@ -4107,6 +3899,7 @@ void reset()
     for (int i = 0; i < chickfeatheramount; i++)
     {
         chickfeather[i].setPosition(-10000, 10000);
+        chickfeather[i].setScale(0.2, 0.2);
     }
     
     for (int j = 0; j < 4; j++)
@@ -4177,8 +3970,12 @@ void reset()
     shipfire.setRotation(0);
     shipfire.setRotation(0);
     shipfire.setScale(1.45, 1.45);
-    crystalgift.setPosition(-10000, -10000);
-    iongift.setPosition(-10000, -10000);
+    for (int i = 0; i < 8; i++)
+    {
+       crystalgift[i].setPosition(-10000, -10000);
+       iongift[i].setPosition(-10000, -10000);
+    }
+   
     Player.setPosition(900, 850);
     Player.setScale(2.25, 2.25);
     Player2ship.setPosition(1000, 850);
@@ -4259,7 +4056,7 @@ void reset()
     }
     prevwave = '1';
     wave1second.setString("Wave " + to_string(prevwave - 48));
-    Wave2 = false, Wave3 = false, Wave4 = false, Wave5 = false, Wave1 = true;
+    Wave2 = false, Wave3 = false, Wave4 = true, Wave5 = false, Wave1 = false;
     for (int j = 0; j < 3; j++)
     {
         for (int i = 0; i < 8; i++)
@@ -5655,9 +5452,12 @@ beginning: {};
                     {
                         window.draw(chickfeather[i]);
                     }
-
-                    window.draw(crystalgift);
-                    window.draw(iongift);
+                    for (int i = 0; i < 8; i++)
+                    {
+                         window.draw(crystalgift[i]);
+                         window.draw(iongift[i]);
+                    }
+                   
                     window.draw(health_bar);
                     window.draw(Gamebar);
                     window.draw(score);
@@ -5936,8 +5736,11 @@ beginning: {};
                     eggmovement(1);
                     scorecalc();
                     FoodMovment();
-                    window.draw(crystalgift);
-                    window.draw(iongift);
+                    for (int i = 0; i < 8; i++)
+                    {
+                        window.draw(crystalgift[i]);
+                        window.draw(iongift[i]);
+                    }
                     window.draw(health_bar);
                     window.draw(Gamebar);
                     window.draw(score);
@@ -6049,8 +5852,11 @@ beginning: {};
                         goto beginning;
 
                     }
-                    window.draw(crystalgift);
-                    window.draw(iongift);
+                    for (int i = 0; i < 8; i++)
+                    {
+                        window.draw(crystalgift[i]);
+                        window.draw(iongift[i]);
+                    }
                     window.draw(health_bar);
                     window.draw(Gamebar);
                     window.draw(score);
@@ -6364,8 +6170,11 @@ beginning: {};
                     {
                         window.draw(chickfeather[i]);
                     }
-                    window.draw(crystalgift);
-                    window.draw(iongift);
+                    for (int i = 0; i < 8; i++)
+                    {
+                        window.draw(crystalgift[i]);
+                        window.draw(iongift[i]);
+                    }
                     eggmovement(1);
                     scorecalc();
                     FoodMovment();
@@ -6439,6 +6248,7 @@ beginning: {};
                     foodmovespeed = 10;
                     feathermove = 5;
                     chickfeathermove = 5;
+                    FoodMovment();
                     PlayerShooting();
                     rocketshooting();
                     bossmove();
@@ -6493,7 +6303,56 @@ beginning: {};
 
                     }
 
-
+                    if (boss.bosshp >= (0.9 * sigmaboss))
+                    {
+                        damagedtext.loadFromFile("bossbar1.png");
+                    }
+                    else if (boss.bosshp >= (0.8 * sigmaboss) && boss.bosshp < (0.9 * sigmaboss))
+                    {
+                        damagedtext.loadFromFile("bossbar2.png");
+                    }
+                    else if (boss.bosshp >= (0.7 * sigmaboss) && boss.bosshp < (0.8 * sigmaboss))
+                    {
+                        damagedtext.loadFromFile("bossbar3.png");
+                    }
+                    else if (boss.bosshp >= (0.6 * sigmaboss) && boss.bosshp < (0.7 * sigmaboss))
+                    {
+                        damagedtext.loadFromFile("bossbar4.png");
+                    }
+                    else if (boss.bosshp >= (0.5 * sigmaboss) && boss.bosshp < (0.6 * sigmaboss))
+                    {
+                        boss.eggcooldownvar = 40;
+                        damagedtext.loadFromFile("bossbar5.png");
+                        if (soundeffectON && screambossdone == 0)
+                        {
+                            screamboss.play();
+                            screambossdone = 1;
+                        }
+                    }
+                    else if (boss.bosshp >= (0.4 * sigmaboss) && boss.bosshp < (0.5 * sigmaboss))
+                    {
+                        damagedtext.loadFromFile("bossbar6.png");
+                    }
+                    else if (boss.bosshp >= (0.3 * sigmaboss) && boss.bosshp < (0.4 * sigmaboss))
+                    {
+                        damagedtext.loadFromFile("bossbar7.png");
+                    }
+                    else if (boss.bosshp >= (0.2 * sigmaboss) && boss.bosshp < (0.3 * sigmaboss))
+                    {
+                        damagedtext.loadFromFile("bossbar8.png");
+                    }
+                    else if (boss.bosshp >= (0.1 * sigmaboss) && boss.bosshp < (0.2 * sigmaboss))
+                    {
+                        damagedtext.loadFromFile("bossbar9.png");
+                    }
+                    else if (boss.bosshp >= (0.5 * sigmaboss) && boss.bosshp < (0.10 * sigmaboss))
+                    {
+                        damagedtext.loadFromFile("bossbar10.png");
+                    }
+                    else if (boss.bosshp < (0.5 * sigmaboss))
+                    {
+                        damagedtext.loadFromFile("bossbar11.png");
+                    }
                     for (int i = 0; i < 5; i++)
                     {
                         window.draw(bossegg[i]);
@@ -6595,6 +6454,7 @@ beginning: {};
                         Wave5 = false;
                         clock4.restart();
                         clock3.restart();
+                       
                         for (int i = 0; i < bullet.numberofbullets; i++)
                         {
                             Bullets[i].setPosition(9000, 9000);
@@ -6617,6 +6477,8 @@ beginning: {};
                         {
                             gamewin.play();
                         }
+                       
+                       
                     }
                     shield_move();
                     window.draw(Shield);
@@ -6633,7 +6495,7 @@ beginning: {};
                         gamewin.stop();
                     }
                 }
-                else
+                else  
                 {
                     backgroundspeed = 20;
                     foodmovespeed = 20;
@@ -6667,7 +6529,7 @@ beginning: {};
                 }
             }
 
-            else
+            else 
             {
                 bossmove();
                 scorecalc();
@@ -6704,6 +6566,7 @@ beginning: {};
                 {
                     if (clock3.getElapsedTime().asSeconds() <= 5)
                     {
+                         
                         window.draw(congratulation);
                     }
                     window.draw(endoflevel1);
@@ -6889,7 +6752,7 @@ beginning: {};
                     eating.setVolume(volumelvl2 * 10);
                     upgradesound.setVolume(volumelvl2 * 10);
                     shipin.setVolume(volumelvl2 * 10);
-                    gamewin.setVolume(volumelvl2 * 10);
+                    gamewin.setVolume(volumelvl2 * 2.5);
                     MenuClick.setVolume(volumelvl2 * 10);
                     bosshurts.setVolume(volumelvl2 * 10);
                     screamboss.setVolume(volumelvl2 * 10);
@@ -6951,7 +6814,7 @@ beginning: {};
                         eating.setVolume(volumelvl2 * 10);
                         upgradesound.setVolume(volumelvl2 * 10);
                         shipin.setVolume(volumelvl2 * 10);
-                        gamewin.setVolume(volumelvl2 * 10);
+                        gamewin.setVolume(volumelvl2 * 2.5);
                         MenuClick.setVolume(volumelvl2 * 10);
                         bosshurts.setVolume(volumelvl2 * 10);
                         screamboss.setVolume(volumelvl2 * 10);
@@ -7010,7 +6873,7 @@ beginning: {};
                     eating.setVolume(volumelvl2 * 10);
                     upgradesound.setVolume(volumelvl2 * 10);
                     shipin.setVolume(volumelvl2 * 10);
-                    gamewin.setVolume(volumelvl2 * 10);
+                    gamewin.setVolume(volumelvl2 * 2.5);
                     MenuClick.setVolume(volumelvl2 * 10);
                     bosshurts.setVolume(volumelvl2 * 10);
                     screamboss.setVolume(volumelvl2 * 10);
@@ -7063,7 +6926,7 @@ beginning: {};
                     eating.setVolume(volumelvl2 * 10);
                     upgradesound.setVolume(volumelvl2 * 10);
                     shipin.setVolume(volumelvl2 * 10);
-                    gamewin.setVolume(volumelvl2 * 10);
+                    gamewin.setVolume(volumelvl2 * 2.5);
                     MenuClick.setVolume(volumelvl2 * 10);
                     bosshurts.setVolume(volumelvl2 * 10);
                     screamboss.setVolume(volumelvl2 * 10);
