@@ -241,6 +241,7 @@ int bosslvl = 1;
 int animation = 0;
 Texture bossimage;
 Sprite bosssprite;
+Clock feathertimer;
 
 //borders for boss!!
 RectangleShape rectangle4(Vector2f(window.getSize().x, 75));
@@ -861,7 +862,7 @@ void IngameImages()
     damagedtext.loadFromFile("bossbar1.png");
     damaged.setTexture(damagedtext);
     damaged.setPosition(700, 20);
-    damaged.setScale(2.5, 2);
+    damaged.setScale(3, 3);
     //Base text
     Base.setFont(font1);
     Base.setCharacterSize(40);
@@ -3230,30 +3231,40 @@ void scorecalc() {
 
                 if (Bullets[i].getGlobalBounds().intersects(bosssprite.getGlobalBounds()))
                 {
-                    chickfeather[chickfeathercur].setScale(1, 1);
-                    chickfeather[chickfeathercur].setPosition(bosssprite.getPosition().x + 500, bosssprite.getPosition().y + 400);
-                    chickfeathercur++;
-                    if (chickfeathercur >= 39)
+                    if (feathertimer.getElapsedTime().asSeconds() > 0.3)
                     {
-                        chickfeathercur = 0;
+                        int rando = rand() % 400 + 30;
+                        chickfeather[chickfeathercur].setScale(0.5, 0.5);
+                        chickfeather[chickfeathercur].setPosition(bosssprite.getPosition().x + rando, bosssprite.getPosition().y + rando);
+                        chickfeathercur++;
+                        if (chickfeathercur >= 39)
+                        {
+                            chickfeathercur = 0;
+                        }
+                        feathertimer.restart();
                     }
+                    
+                    
                     missileScoreCount += 1000;
                     cnt += 100;
                     score.setString(to_string(cnt)); 
-                if (missileScoreCount == 70000)
-                {
+                    if (missileScoreCount == 70000)
+                    {
                     missileScoreCount = 0;
                     rockets += 1;
                     rocket.setString(to_string(rockets));
                     rocket2.setString(to_string(rockets));
-                }
+                    }
 
 
                     if (soundeffectON)
                     {
                         bosshurts.play();
                     }
-                    
+                    if (boss.bosshp > 300 && lvl == '1')
+                    {
+                        boss.bosshp = 200;
+                    }
                    
                     if (boss.bosshp > 0)
                     {
@@ -3271,6 +3282,7 @@ void scorecalc() {
                         score.setString(to_string(cnt));
                     }
                     Bullets[i].setPosition(-2000, -2000);
+                    cout << boss.bosshp << endl;
                 }
                 if (chicken_legs[j][z].getGlobalBounds().intersects(Player.getGlobalBounds()))
                 {
@@ -6307,19 +6319,19 @@ beginning: {};
                     {
                         damagedtext.loadFromFile("bossbar1.png");
                     }
-                    else if (boss.bosshp >= (0.8 * sigmaboss) && boss.bosshp < (0.9 * sigmaboss))
+                    else if (boss.bosshp >= (0.8 * sigmaboss))
                     {
                         damagedtext.loadFromFile("bossbar2.png");
                     }
-                    else if (boss.bosshp >= (0.7 * sigmaboss) && boss.bosshp < (0.8 * sigmaboss))
+                    else if (boss.bosshp >= (0.7 * sigmaboss))
                     {
                         damagedtext.loadFromFile("bossbar3.png");
                     }
-                    else if (boss.bosshp >= (0.6 * sigmaboss) && boss.bosshp < (0.7 * sigmaboss))
+                    else if (boss.bosshp >= (0.6 * sigmaboss))
                     {
                         damagedtext.loadFromFile("bossbar4.png");
                     }
-                    else if (boss.bosshp >= (0.5 * sigmaboss) && boss.bosshp < (0.6 * sigmaboss))
+                    else if (boss.bosshp >= (0.5 * sigmaboss))
                     {
                         boss.eggcooldownvar = 40;
                         damagedtext.loadFromFile("bossbar5.png");
@@ -6329,30 +6341,27 @@ beginning: {};
                             screambossdone = 1;
                         }
                     }
-                    else if (boss.bosshp >= (0.4 * sigmaboss) && boss.bosshp < (0.5 * sigmaboss))
+                    else if (boss.bosshp >= (0.4 * sigmaboss))
                     {
                         damagedtext.loadFromFile("bossbar6.png");
                     }
-                    else if (boss.bosshp >= (0.3 * sigmaboss) && boss.bosshp < (0.4 * sigmaboss))
+                    else if (boss.bosshp >= (0.3 * sigmaboss))
                     {
                         damagedtext.loadFromFile("bossbar7.png");
                     }
-                    else if (boss.bosshp >= (0.2 * sigmaboss) && boss.bosshp < (0.3 * sigmaboss))
+                    else if (boss.bosshp >= (0.2 * sigmaboss))
                     {
                         damagedtext.loadFromFile("bossbar8.png");
                     }
-                    else if (boss.bosshp >= (0.1 * sigmaboss) && boss.bosshp < (0.2 * sigmaboss))
+                    else if (boss.bosshp >= (0.1 * sigmaboss))
                     {
                         damagedtext.loadFromFile("bossbar9.png");
                     }
-                    else if (boss.bosshp >= (0.5 * sigmaboss) && boss.bosshp < (0.10 * sigmaboss))
+                    else 
                     {
                         damagedtext.loadFromFile("bossbar10.png");
                     }
-                    else if (boss.bosshp < (0.5 * sigmaboss))
-                    {
-                        damagedtext.loadFromFile("bossbar11.png");
-                    }
+
                     for (int i = 0; i < 5; i++)
                     {
                         window.draw(bossegg[i]);
