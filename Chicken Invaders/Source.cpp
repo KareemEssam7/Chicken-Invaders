@@ -1007,7 +1007,6 @@ void IngameImages()
         levels[i].setString("Level " + to_string(i + 1));
         levels[i].setFillColor(Color(204, 229, 255, 225));
     }
-
     //ldbs text
     for (int i = 0; i < 5; i++)
     {
@@ -1712,7 +1711,7 @@ void PlayerShooting() {
         bullet.currentBullet++;
 
     }
-    if ((Mouse::isButtonPressed(Mouse::Left)) && bullet.bulletCoolDown2 == 0 && coopon)
+    if ((Mouse::isButtonPressed(Mouse::Left)) && bullet.bulletCoolDown2 == 0 && coopon && health3>0)
     {
         bullet.bulletCoolDown2 = bullet.bulletCoolDownvar;
         Bullets[bullet.currentBullet].setPosition(Player2ship.getPosition().x + 55, Player2ship.getPosition().y - 50);
@@ -2319,7 +2318,7 @@ void playerdamage() {
                 expbool2 = 1;
                 explosion2.setPosition(Player2ship.getPosition());
             }
-            Player2ship.setPosition(6000, 6000);
+            Player2ship.setPosition(19000, 19000);
             explosion2.setTextureRect(IntRect(96.6 * exp_x2, 5 + (90.6 * exp_y2), 96.6, 90.6));
             exp_x2++;
             if (exp_x2 == 7 && exp_y2 < 3) {
@@ -3282,7 +3281,6 @@ void scorecalc() {
                         score.setString(to_string(cnt));
                     }
                     Bullets[i].setPosition(-2000, -2000);
-                    cout << boss.bosshp << endl;
                 }
                 if (chicken_legs[j][z].getGlobalBounds().intersects(Player.getGlobalBounds()))
                 {
@@ -4068,7 +4066,7 @@ void reset()
     }
     prevwave = '1';
     wave1second.setString("Wave " + to_string(prevwave - 48));
-    Wave2 = false, Wave3 = false, Wave4 = true, Wave5 = false, Wave1 = false;
+    Wave2 = false, Wave3 = false, Wave4 = false, Wave5 = false, Wave1 =true;
     for (int j = 0; j < 3; j++)
     {
         for (int i = 0; i < 8; i++)
@@ -4972,6 +4970,7 @@ beginning: {};
             {
                 if (soundeffectON)
                     MenuClick.play();
+                boss.bosshp = 200;
                 sigmaboss = 200;
                 lvl = '1';
                 c4.restart();
@@ -4983,6 +4982,7 @@ beginning: {};
             {
                 if (soundeffectON)
                     MenuClick.play();
+                boss.bosshp = 250;
                 sigmaboss = 250;
                 lvl = '2';
                 c4.restart();
@@ -4995,6 +4995,7 @@ beginning: {};
                 if (soundeffectON)
                     MenuClick.play();
                 sigmaboss = 300;
+                boss.bosshp = 300;
                 lvl = '3';
                 c4.restart();
                 vignettestart = true;
@@ -5005,7 +5006,8 @@ beginning: {};
             {
                 if (soundeffectON)
                     MenuClick.play();
-                sigmaboss = 400;
+                sigmaboss = 350;
+                boss.bosshp = 350;
                 lvl = '4';
                 c4.restart();
                 vignettestart = true;
@@ -5016,7 +5018,8 @@ beginning: {};
             {
                 if (soundeffectON)
                     MenuClick.play();
-                sigmaboss = 500;
+                sigmaboss = 400;
+                boss.bosshp = 400;
                 lvl = '5';
                 c4.restart();
                 vignettestart = true;
@@ -6226,7 +6229,6 @@ beginning: {};
                 wave1second.setString("Wave " + to_string(prevwave - 48));
                 if (prevwave == '4')
                 {
-                    boss.bosshp = 300 + (bosslvl * 10);
                     bossalive = 1;
                     clock3.restart();
                     clock4.restart();
